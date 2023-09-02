@@ -47,26 +47,25 @@ void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_base, in
     }
     else if (event_id == IP_EVENT_STA_GOT_IP)
     {
-        printf("Wifi got IP...\n\n");
+        printf("WiFi successfully connected...\n\n");       
     }
 }
 
 void connect_wifi()
 {
-    //                          s1.4
-    // 2 - Wi-Fi Configuration Phase
+    // Wi-Fi Configuration Phase
     esp_netif_init();
-    esp_event_loop_create_default();     // event loop                    s1.2
-    esp_netif_create_default_wifi_sta(); // WiFi station                      s1.3
+    esp_event_loop_create_default();     // event loop                    
+    esp_netif_create_default_wifi_sta(); // WiFi station                    
     wifi_init_config_t wifi_initiation = WIFI_INIT_CONFIG_DEFAULT();
     esp_wifi_init(&wifi_initiation); //
     esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, wifi_event_handler, NULL);
     esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, wifi_event_handler, NULL);
 
-    // 3 - Wi-Fi Start Phase
+    // Wi-Fi Start Phase
     esp_wifi_start();
     esp_wifi_set_mode(WIFI_MODE_STA);
-    // 4- Wi-Fi Connect Phase
+    
+    // Wi-Fi Connect Phase
     esp_wifi_connect();
-    //printf("wifi_init_softap finished. SSID:%s  password:%s", ssid, pass);
 }

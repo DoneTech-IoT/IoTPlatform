@@ -10,8 +10,9 @@
 #include "rm67162.h"
 #include "wifi.h"
 
-    char *pass = "xxxx";
-    char *ssid = "xxxx";
+// To Do: ask user through console to provide SSID and Password
+char *pass = WIFI_PASSWORD; 
+char *ssid = WIFI_SSID;
 
 void app_main(void)
 {
