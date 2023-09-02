@@ -4,10 +4,22 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-const char *ssid = "xxxxxxx";
-const char *pass = "xxxxxxx";
+void configure_wifi (char *ssid, char *password)
+{
+    wifi_config_t wifi_configuration = {
+    .sta = {
+        .ssid = "",
+        .password = "",
 
-static void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
+            }
+    };
+    strcpy((char *)wifi_configuration.sta.ssid, ssid);
+    strcpy((char *)wifi_configuration.sta.password, password);
+    // esp_log_write(ESP_LOG_INFO, "Kconfig", "SSID=%s, PASS=%s", ssid, pass);
+    esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_configuration);
+}
+
+void wifi_event_handler(void *event_handler_arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
     static int retry_num = 0;
 
@@ -50,22 +62,11 @@ void connect_wifi()
     esp_wifi_init(&wifi_initiation); //
     esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, wifi_event_handler, NULL);
     esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, wifi_event_handler, NULL);
-    wifi_config_t wifi_configuration = {
-        .sta = {
-            .ssid = "",
-            .password = "",
 
-        }
-
-    };
-    strcpy((char *)wifi_configuration.sta.ssid, ssid);
-    strcpy((char *)wifi_configuration.sta.password, pass);
-    // esp_log_write(ESP_LOG_INFO, "Kconfig", "SSID=%s, PASS=%s", ssid, pass);
-    esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_configuration);
     // 3 - Wi-Fi Start Phase
     esp_wifi_start();
     esp_wifi_set_mode(WIFI_MODE_STA);
     // 4- Wi-Fi Connect Phase
     esp_wifi_connect();
-    printf("wifi_init_softap finished. SSID:%s  password:%s", ssid, pass);
+    //printf("wifi_init_softap finished. SSID:%s  password:%s", ssid, pass);
 }

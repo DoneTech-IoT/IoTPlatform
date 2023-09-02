@@ -10,6 +10,8 @@
 #include "rm67162.h"
 #include "wifi.h"
 
+    char *pass = "xxxx";
+    char *ssid = "xxxx";
 
 void app_main(void)
 {
@@ -17,6 +19,7 @@ void app_main(void)
     lv_init();
 
     nvs_flash_init();
+    configure_wifi(ssid, pass);
     connect_wifi();
 
     lcd_fill(100, 100, 536, 240, 0x1221);
