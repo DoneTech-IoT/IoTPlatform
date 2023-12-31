@@ -1,4 +1,5 @@
-idf_component_register(SRCS "main.c"
-                    INCLUDE_DIRS "."
-                    REQUIRES rm67162 lvgl wifi
-                    )             
+idf_component_register(SRC_DIRS          "."
+                      PRIV_INCLUDE_DIRS  ".")                      
+
+set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
+target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
