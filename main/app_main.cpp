@@ -1,3 +1,4 @@
+#include <nvs_flash.h>
 #include "MatterInterface.h"
 
 QueueHandle_t MainBufQueue;
@@ -10,6 +11,8 @@ MatterInterfaceHandler_t MatterInterfaceHandler;
 
 extern "C" void app_main()
 {        
+    nvs_flash_init();
+    
     MatterInterfaceHandler.SharedBufQueue = &MainBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MainSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
