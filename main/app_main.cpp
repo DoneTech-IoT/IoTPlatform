@@ -9,9 +9,7 @@ void MatterAttributeUpdateCBMain(callback_type_t type,
 MatterInterfaceHandler_t MatterInterfaceHandler;
 
 extern "C" void app_main()
-{    
-    nvs_flash_init();
-
+{        
     MatterInterfaceHandler.SharedBufQueue = &MainBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MainSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
