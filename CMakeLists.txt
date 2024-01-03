@@ -39,9 +39,10 @@ set(EXTRA_COMPONENT_DIRS
     "${MATTER_SDK_PATH}/config/esp32/components"
     "${ESP_MATTER_PATH}/components"
     "${ESP_MATTER_PATH}/device_hal/device"
+    ${IDF_PATH}/examples/common_components/protocol_examples_common
     ${extra_components_dirs_append})
 
-project(light_switch)
+project(DoneDeskHub)
 if(CONFIG_IDF_TARGET_ESP32C2)
     include(relinker)
 endif()
