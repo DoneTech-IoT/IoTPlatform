@@ -11,7 +11,7 @@
 // ****************************** Local Variables 
 static const char *TAG = "MatterTask";
 uint16_t switch_endpoint_id = 0;
-static MatterInterfaceHandler_t InterfaceHandler;
+static MatterInterfaceHandler_t *InterfaceHandler;
 // ****************************** Local Functions 
 
 using namespace esp_matter;
@@ -61,7 +61,7 @@ static esp_err_t app_identification_cb(identification::callback_type_t type, uin
 {
     ESP_LOGI(TAG, "Identification callback: type: %u, effect: %u, variant: %u", type, effect_id, effect_variant);
 
-    InterfaceHandler.MatterIdentificationCB(type, endpoint_id, effect_id, effect_variant, priv_data);
+    InterfaceHandler->MatterIdentificationCB(type, endpoint_id, effect_id, effect_variant, priv_data);
 
     return ESP_OK;
 }
@@ -73,20 +73,20 @@ static esp_err_t app_attribute_update_cb(callback_type_t type, uint16_t endpoint
         /* Handle the attribute updates here. */
     }
  
-    InterfaceHandler.MatterAttributeUpdateCB(type, endpoint_id, cluster_id, attribute_id, val, priv_data);
+    InterfaceHandler->MatterAttributeUpdateCB(type, endpoint_id, cluster_id, attribute_id, val, priv_data);
 
     return ESP_OK;
 }
 
 bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
 {
-    InterfaceHandler = *MatterInterfaceHandler;
+    InterfaceHandler = MatterInterfaceHandler;
 
-    if(InterfaceHandler.SharedBufQueue != NULL &&
-       InterfaceHandler.SharedSemaphore  != NULL && 
-       //InterfaceHandler.MatterNetworkEventCB != NULL &&
-       //InterfaceHandler.MatterIdentificationCB != NULL &&
-       InterfaceHandler.MatterAttributeUpdateCB != NULL)        
+    if(InterfaceHandler->SharedBufQueue != NULL &&
+       InterfaceHandler->SharedSemaphore  != NULL && 
+       //InterfaceHandler->MatterNetworkEventCB != NULL &&
+       //InterfaceHandler->MatterIdentificationCB != NULL &&
+       InterfaceHandler->MatterAttributeUpdateCB != NULL)        
     {
         esp_err_t err = ESP_OK;
     
