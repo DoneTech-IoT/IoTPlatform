@@ -1,9 +1,6 @@
 #ifndef _SPIFFS_MANAGER_H_
 #define _SPIFFS_MANAGER_H_
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <sys/unistd.h>
@@ -15,16 +12,28 @@ extern "C"
 #include "cJSON.h"
 #include "GlobalInit.h"
 
-/**
- *@brief This function does global initialization for Spiffs, checks for save existence, and sends a signal if it exists
- */
-void SpiffsGlobalConfig();
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+// /**
+//  *@brief This function does global initialization for Spiffs, checks for save existence, and sends a signal if it exists
+//  */
+// void SpiffsGlobalConfig();
 
 /**
  *@brief Perform a SPIFFS check on the specified partition and initd globally
  * @param conf The SPIFFS configuration.
  */
-void SpiffsInit();
+void SpiffsInit(SemaphoreHandle_t *SpiffsMutex);
+
+// /**
+//  *@brief Check if a file exists in the SPIFFS file system.
+//  * @param addressInSpiffs The address of the file in SPIFFS.
+//  * @return True if the file exists, false otherwise.
+//  */
+// bool SpiffsExistenceCheck(char *addressInSpiffs);
 
 /**
  *@brief Read the contents of a file in the SPIFFS file system and store it in a buffer.
@@ -47,7 +56,7 @@ void SpiffsWrite(char *addressInSpiffs, char *data);
  *@param[in] ... The variable arguments containing key-value pairs. The last argument must be NULL.
  *@return Returns true if the file is successfully saved, and false otherwise.
  */
-void SaveFileInSpiffsWithTxtFormat(char *addressInSpiffs, char *key, char *value, ...);
+void SpiffsWriteTxtFile(char *addressInSpiffs, char *key, char *value, ...);
 
 /**
  *@brief This function reads key-value pairs from a file in SPIFFS with a text format.
@@ -55,14 +64,7 @@ void SaveFileInSpiffsWithTxtFormat(char *addressInSpiffs, char *key, char *value
  *@param[out] ... The variable arguments to store the retrieved values. The last argument must be NULL.
  *@return Returns true if the file is successfully read and key-value pairs are retrieved, and false otherwise.
  */
-void ReadTxtFileFromSpiffs(char *addressInSpiffs, char *key, char *value, ...);
-
-/**
- *@brief Check if a file exists in the SPIFFS file system.
- * @param addressInSpiffs The address of the file in SPIFFS.
- * @return True if the file exists, false otherwise.
- */
-bool SpiffsExistenceCheck(char *addressInSpiffs);
+void SpiffsReadTxtFile(char *addressInSpiffs, char *key, char *value, ...);
 
 /**
  *@brief This function removes a file from SPIFFS.
@@ -70,7 +72,7 @@ bool SpiffsExistenceCheck(char *addressInSpiffs);
  *@return Returns true if the file removal is successful, and false otherwise.
  */
 bool SpiffsRemoveFile(char *addressInSpiffs);
-#endif
 #ifdef __cplusplus
 }
-#endif
+#endif //__cplusplus
+#endif //_SPIFFS_MANAGER_H_
