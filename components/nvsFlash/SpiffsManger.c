@@ -8,19 +8,20 @@
 #define InternalBufSize_ 2 * 1000
 static const char *TAG = "Spiffs";
 
+static SemaphoreHandle_t *SpiffsMutexLocal;      
+
 /**
  *@brief Perform a SPIFFS check on the specified partition.
  * @param conf The SPIFFS configuration.
  */
-void SpiffsCheckingPerforming(esp_vfs_spiffs_conf_t conf)
+static void SpiffsCheckingPerforming(esp_vfs_spiffs_conf_t conf)
 {
     esp_err_t Ret;
     ESP_LOGI(TAG, "Performing SPIFFS_check().");
     Ret = esp_spiffs_check(conf.partition_label);
     if (Ret != ESP_OK)
     {
-        ESP_LOGE(TAG, "SPIFFS_check() failed (%s)", esp_err_to_name(Ret));
-        return;
+        ESP_LOGE(TAG, "SPIFFS_check() failed (%s)", esp_err_to_name(Ret));        
     }
     else
     {
@@ -32,8 +33,10 @@ void SpiffsCheckingPerforming(esp_vfs_spiffs_conf_t conf)
  *@brief Perform a SPIFFS check on the specified partition and initd globally
  * @param conf The SPIFFS configuration.
  */
-void SpiffsInit()
+void SpiffsInit(SemaphoreHandle_t *SpiffsMutex)
 {
+    SpiffsMutexLocal = SpiffsMutex;
+
     ESP_LOGI(TAG, "Initializing SPIFFS");
     esp_vfs_spiffs_conf_t conf = {
         .base_path = "/spiffs",
@@ -54,36 +57,37 @@ void SpiffsInit()
         else
         {
             ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(Ret));
-        }
-        return;
-    }
-    size_t total = 0, used = 0;
-    Ret = esp_spiffs_info(conf.partition_label, &total, &used);
-    if (Ret != ESP_OK)
-    {
-        ESP_LOGE(TAG, "Failed to get SPIFFS partition information (%s). Formatting...", esp_err_to_name(Ret));
-        esp_spiffs_format(conf.partition_label);
-        return;
+        }        
     }
     else
     {
-        ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
-    }
-    if (used > total)
-    {
-        ESP_LOGW(TAG, "Number of used bytes cannot be larger than total. Performing SPIFFS_check().");
-        Ret = esp_spiffs_check(conf.partition_label);
+        size_t total = 0, used = 0;
+        Ret = esp_spiffs_info(conf.partition_label, &total, &used);
         if (Ret != ESP_OK)
         {
-            ESP_LOGE(TAG, "SPIFFS_check() failed (%s)", esp_err_to_name(Ret));
-            return;
+            ESP_LOGE(TAG, "Failed to get SPIFFS partition information (%s). Formatting...", esp_err_to_name(Ret));
+            esp_spiffs_format(conf.partition_label);            
         }
         else
         {
-            ESP_LOGI(TAG, "SPIFFS_check() successful");
+            ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
         }
-    }
-    SpiffsCheckingPerforming(conf);
+        if (used > total)
+        {
+            ESP_LOGW(TAG, "Number of used bytes cannot be larger than total. Performing SPIFFS_check().");
+            Ret = esp_spiffs_check(conf.partition_label);
+            if (Ret != ESP_OK)
+            {
+                ESP_LOGE(TAG, "SPIFFS_check() failed (%s)", esp_err_to_name(Ret));
+                return;
+            }
+            else
+            {
+                ESP_LOGI(TAG, "SPIFFS_check() successful");
+            }
+        }
+        SpiffsCheckingPerforming(conf);
+    }        
 }
 
 /**
@@ -91,8 +95,8 @@ void SpiffsInit()
  * @param addressInSpiffs The address of the file in SPIFFS.
  * @return True if the file exists, false otherwise.
  */
-bool SpiffsExistenceCheck(char *addressInSpiffs)
-{
+static bool SpiffsExistenceCheck(char *addressInSpiffs)
+{    
     FILE *file;
     file = fopen(addressInSpiffs, "r");
     if (file)
@@ -105,7 +109,7 @@ bool SpiffsExistenceCheck(char *addressInSpiffs)
     {
         // ESP_LOGI(TAG, "File does not exist.");
         return 0;
-    }
+    }    
 }
 /**
  *@brief Write data to a new file or append to existing file
@@ -114,34 +118,46 @@ bool SpiffsExistenceCheck(char *addressInSpiffs)
  */
 void SpiffsWrite(char *addressInSpiffs, char *data)
 {
-    if (SpiffsExistenceCheck(addressInSpiffs) == 0)
+    if(xSemaphoreTake(SpiffsMutexLocal, portMAX_DELAY) == pdTRUE)
     {
-        ESP_LOGI(TAG, "Opening file for writing");
-        FILE *file = fopen(addressInSpiffs, "w");
-        if (file == NULL)
+        if (SpiffsExistenceCheck(addressInSpiffs) == 0)
         {
-            ESP_LOGE(TAG, "Failed to open file for writing");
-            return;
+            ESP_LOGI(TAG, "Opening file for writing");
+            FILE *file = fopen(addressInSpiffs, "w");
+            if (file)
+            {
+                fprintf(file, data);
+                ESP_LOGI(TAG, "data is =%s", data);
+                ESP_LOGI(TAG, "File written");
+                fclose(file);            
+            }
+            else
+            {
+                ESP_LOGE(TAG, "Failed to open file for writing");            
+            }        
         }
-        fprintf(file, data);
-        ESP_LOGI(TAG, "data is =%s", data);
-        ESP_LOGI(TAG, "File written");
-        fclose(file);
+        else
+        {
+            ESP_LOGI(TAG, "Opening file for appending");
+            FILE *file = fopen(addressInSpiffs, "a");
+            if (file)
+            {
+                fprintf(file, "$%s", data);
+                ESP_LOGI(TAG, "data is =%s", data);
+                ESP_LOGI(TAG, "File appended");
+                fclose(file);            
+            }
+            else
+            {
+                ESP_LOGE(TAG, "Failed to open file for appending");            
+            }        
+        }
+        xSemaphoreGive(SpiffsMutexLocal, portMAX_DELAY);
     }
     else
     {
-        ESP_LOGI(TAG, "Opening file for appending");
-        FILE *file = fopen(addressInSpiffs, "a");
-        if (file == NULL)
-        {
-            ESP_LOGE(TAG, "Failed to open file for appending");
-            return;
-        }
-        fprintf(file, "$%s", data);
-        ESP_LOGI(TAG, "data is =%s", data);
-        ESP_LOGI(TAG, "File appended");
-        fclose(file);
-    }
+        ESP_LOGE(TAG, "Can not access to Spiffs");
+    }            
 }
 
 /**
@@ -151,25 +167,38 @@ void SpiffsWrite(char *addressInSpiffs, char *data)
  * @param SizeOfBuffer The size of the buffer.
  */
 void SpiffsRead(char *addressInSpiffs, char *Buffer, size_t SizeOfBuffer)
-{
-    char *InternalBuf = (char *)malloc(SizeOfBuffer * sizeof(char));
-    memset(Buffer, 0x00, SizeOfBuffer);
-    FILE *file;
-    if (SpiffsExistenceCheck(addressInSpiffs) == 0)
+{    
+    if(xSemaphoreTake(SpiffsMutexLocal, portMAX_DELAY) == pdTRUE)
     {
-        return;
+        char *InternalBuf = (char *)malloc(SizeOfBuffer * sizeof(char));
+        memset(Buffer, 0x00, SizeOfBuffer);
+        FILE *file;
+
+        if (SpiffsExistenceCheck(addressInSpiffs))
+        {
+            file = fopen(addressInSpiffs, "r");
+            static int Counter = 0;
+            memset(InternalBuf, 0x00, SizeOfBuffer);
+            while (fgets(InternalBuf, SizeOfBuffer, file) != NULL)
+            {
+                strcat(Buffer, InternalBuf);
+                Counter = strlen(InternalBuf) + Counter;
+            }
+            Buffer[Counter + 1] = '\0';
+            ESP_LOGI(TAG, "File red");
+            free(InternalBuf);
+            fclose(file);
+        }
+        else
+        {
+            ESP_LOGE(TAG, "File does not exists.");
+        }  
+        xSemaphoreGive(SpiffsMutexLocal, portMAX_DELAY);  
     }
-    file = fopen(addressInSpiffs, "r");
-    static int Counter = 0;
-    memset(InternalBuf, 0x00, SizeOfBuffer);
-    while (fgets(InternalBuf, SizeOfBuffer, file) != NULL)
+    else
     {
-        strcat(Buffer, InternalBuf);
-        Counter = strlen(InternalBuf) + Counter;
-    }
-    Buffer[Counter + 1] = '\0';
-    ESP_LOGI(TAG, "File red");
-    fclose(file);
+        ESP_LOGE(TAG, "Can not access to Spiffs");
+    }   
 }
 
 /**
@@ -178,23 +207,23 @@ void SpiffsRead(char *addressInSpiffs, char *Buffer, size_t SizeOfBuffer)
  *@param[in] newName The new name for the file.
  *@return Returns true if the rename operation is successful, and false otherwise.
  */
-void SpiffsRename(char *OldAddress, char *NewAddress)
+void SpiffsRename(char *oldName, char *newName)
 {
 
     // FILE *file = fopen(OldAddress, "r");
-    if (SpiffsExistenceCheck(OldAddress) == 0)
+    if (SpiffsExistenceCheck(oldName) == 0)
     {
         return;
     }
     struct stat st;
-    if (stat(OldAddress, &st) == 0)
+    if (stat(oldName, &st) == 0)
     {
         // Delete it if it exists
-        unlink(OldAddress);
+        unlink(oldName);
     }
     // Rename original file
     ESP_LOGI(TAG, "Renaming file");
-    if (rename(OldAddress, NewAddress) != 0)
+    if (rename(oldName, newName) != 0)
     {
         ESP_LOGE(TAG, "Rename failed");
         return;
@@ -237,7 +266,7 @@ bool SpiffsRemoveFile(char *addressInSpiffs)
  *@param[in] bufferSize The size of the value buffer.
  *@return Returns true if the value is found and copied to the value buffer, and false otherwise.
  */
-char *FindValueByKey(const char *jsonStr, const char *key, char *ValueBuffer, size_t SizeOfValueBuf)
+static char *FindValueByKey(const char *jsonStr, const char *key, char *ValueBuffer, size_t SizeOfValueBuf)
 {
     cJSON *root = cJSON_Parse(jsonStr);
     if (root == NULL)
@@ -263,7 +292,7 @@ char *FindValueByKey(const char *jsonStr, const char *key, char *ValueBuffer, si
  *@brief This function parses a JSON string and prints the key-value pairs.
  *@param[in] jsonString The JSON string to parse and print.
  */
-void parseOutputJSON(const char *jsonStr)
+static void parseOutputJSON(const char *jsonStr)
 {
     // CountOfKeyValues(jsonStr);
     char buf[100];
@@ -292,7 +321,7 @@ void parseOutputJSON(const char *jsonStr)
  *@param[in] jsonString The JSON string to count the key-value pairs.
  *@return The number of key-value pairs.
  */
-int CountOfKeyValues(const char *jsonStr)
+static int CountOfKeyValues(const char *jsonStr)
 {
     cJSON *root = cJSON_Parse(jsonStr);
     if (root == NULL)
@@ -312,7 +341,7 @@ int CountOfKeyValues(const char *jsonStr)
  *@param[in] ... The variable arguments containing key-value pairs. The last argument must be NULL.
  *@return Returns true if the file is successfully saved, and false otherwise.
  */
-void SaveFileInSpiffsWithTxtFormat(char *addressInSpiffs, char *key, char *value, ...)
+void WriteTxtFileSpiffs(char *addressInSpiffs, char *key, char *value, ...)
 {
     va_list args;
     va_start(args, value);
@@ -337,7 +366,7 @@ void SaveFileInSpiffsWithTxtFormat(char *addressInSpiffs, char *key, char *value
  *@param[out] ... The variable arguments to store the retrieved values. The last argument must be NULL.
  *@return Returns true if the file is successfully read and key-value pairs are retrieved, and false otherwise.
  */
-void ReadTxtFileFromSpiffs(char *addressInSpiffs, char *key, char *value, ...)
+void ReadTxtFileSpiffs(char *addressInSpiffs, char *key, char *value, ...)
 {
     char *InternalBuf = (char *)malloc(InternalBufSize_ * sizeof(char));
     SpiffsRead(addressInSpiffs, InternalBuf, InternalBufSize_);
@@ -369,21 +398,21 @@ void ReadTxtFileFromSpiffs(char *addressInSpiffs, char *key, char *value, ...)
 /**
  *@brief This function does global initialization for Spiffs and checks for save existence, and sends a signal if it exists
  */
-void SpiffsGlobalConfig()
-{
-    SpiffsInit();
-    if (SpiffsExistenceCheck(WifiConfigDirectoryAddressInSpiffs) == 1)
-    {
-        //xSemaphoreGive(WifiParamExistenceCheckerSemaphore);
-    }
+// void SpiffsGlobalConfig()
+// {
+//     SpiffsInit();
+//     if (SpiffsExistenceCheck(WifiConfigDirectoryAddressInSpiffs) == 1)
+//     {
+//         //xSemaphoreGive(WifiParamExistenceCheckerSemaphore);
+//     }
 
-    #ifdef SpotifyEnable
-    if (SpiffsExistenceCheck(SpotifyConfigAddressInSpiffs) == 1)
-    {
-        //xSemaphoreGive(IsSpotifyAuthorizedSemaphore);
-    }
-    #endif
-}
+//     #ifdef SpotifyEnable
+//     if (SpiffsExistenceCheck(SpotifyConfigAddressInSpiffs) == 1)
+//     {
+//         //xSemaphoreGive(IsSpotifyAuthorizedSemaphore);
+//     }
+//     #endif
+// }
 #ifdef TEST
 /**
  *@brief This function is a test scenario that demonstrates the usage of the SPIFFS and JSON-related functions.
