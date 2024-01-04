@@ -16,6 +16,8 @@ SpotifyInterfaceHandler_t SpotifyInterfaceHandler;
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
 MatterInterfaceHandler_t MatterInterfaceHandler;
+
+SemaphoreHandle_t SpiffsMutex;      
 // ****************************** GLobal Functions ****************************** //
 void MatterAttributeUpdateCBMain(callback_type_t type, 
                 uint16_t endpoint_id, uint32_t cluster_id,
@@ -32,6 +34,7 @@ extern "C" void app_main()
     GlobalInitInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
     GlobalInitInterfaceHandler.WifiParamExistenceCheckerSemaphore = &WifiParamExistenceCheckerSemaphore;
     GlobalInitInterfaceHandler.FinishWifiConfig = &FinishWifiConfig;
+    GlobalInitInterfaceHandler.SpiffsMutex = &SpiffsMutex;
     GlobalInit(&GlobalInitInterfaceHandler);
         
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
