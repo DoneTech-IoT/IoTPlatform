@@ -24,7 +24,8 @@ bool GlobalInit(GlobalInitInterfaceHandler_t *InterfaceHandler)
     #endif        
         InterfaceHandler->FinishWifiConfig = xSemaphoreCreateBinary();
         InterfaceHandler->WifiParamExistenceCheckerSemaphore = xSemaphoreCreateBinary();
-                            
+        InterfaceHandler->SpiffsMutex = xSemaphoreCreateMutex();  
+
         ESP_LOGI(TAG, "GlobalInit initiated successfully");        
         return true;
     }    
