@@ -42,8 +42,6 @@ typedef struct
 #endif    
     SemaphoreHandle_t *WifiParamExistenceCheckerSemaphore;
     SemaphoreHandle_t *FinishWifiConfig;  
-
-    SemaphoreHandle_t *SpiffsMutex;      
 } GlobalInitInterfaceHandler_t;
 
 #ifdef SpotifyEnable
