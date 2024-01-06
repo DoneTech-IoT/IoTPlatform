@@ -184,7 +184,7 @@ void SpiffsRead(char *addressInSpiffs, char *Buffer, size_t SizeOfBuffer)
                 strcat(Buffer, InternalBuf);
                 Counter = strlen(InternalBuf) + Counter;
             }
-            Buffer[Counter + 1] = '\0';
+            Buffer[Counter + 1] = '\0';            
             ESP_LOGI(TAG, "File red");
             free(InternalBuf);
             fclose(file);
@@ -358,7 +358,7 @@ static int CountOfKeyValues(const char *jsonStr)
  *@param[in] ... The variable arguments containing key-value pairs. The last argument must be NULL.
  *@return Returns true if the file is successfully saved, and false otherwise.
  */
-void WriteTxtFileSpiffs(char *addressInSpiffs, char *key, char *value, ...)
+void SpiffsWriteTxtFile(char *addressInSpiffs, char *key, char *value, ...)
 {
     va_list args;
     va_start(args, value);
@@ -383,9 +383,9 @@ void WriteTxtFileSpiffs(char *addressInSpiffs, char *key, char *value, ...)
  *@param[out] ... The variable arguments to store the retrieved values. The last argument must be NULL.
  *@return Returns true if the file is successfully read and key-value pairs are retrieved, and false otherwise.
  */
-void ReadTxtFileSpiffs(char *addressInSpiffs, char *key, char *value, ...)
+void SpiffsReadTxtFile(char *addressInSpiffs, char *key, char *value, ...)
 {
-    char *InternalBuf = (char *)malloc(InternalBufSize_ * sizeof(char));
+    char *InternalBuf = (char *)malloc(InternalBufSize_ * sizeof(char));    
     SpiffsRead(addressInSpiffs, InternalBuf, InternalBufSize_);
     cJSON *root = cJSON_Parse(InternalBuf);
     if (root == NULL)
@@ -431,7 +431,7 @@ void ReadTxtFileSpiffs(char *addressInSpiffs, char *key, char *value, ...)
 //     }
 //     #endif
 // }
-#ifdef TEST
+
 /**
  *@brief This function is a test scenario that demonstrates the usage of the SPIFFS and JSON-related functions.
  */
@@ -442,9 +442,11 @@ void SpiffsTest(void)
     SpiffsWrite("/spiffs/hello.txt", "This is Test!");
     char buf[1000];
     SpiffsRead("/spiffs/hello.txt", buf, sizeof(buf));
+    printf("\n\n\n\n%s\n\n\n", buf);
     SpiffsWrite("/spiffs/hello.txt", "QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dAr_QABtmfRQr3d");
     SpiffsRead("/spiffs/hello.txt", buf, sizeof(buf));
     printf("\n\n\n\n%s\n\n\n", buf);
+    SpiffsRemoveFile("/spiffs/hello.txt");
     SpiffsWriteTxtFile("/spiffs/hello.txt", "Key1", "test", "Key2", "544", "Key3", "bibibi", NULL, NULL);
     char value1[20];
     char value2[20];
@@ -456,4 +458,3 @@ void SpiffsTest(void)
     printf("Value2: %s\n", value2);
     printf("Value3: %s\n", value3);
 }
-#endif
