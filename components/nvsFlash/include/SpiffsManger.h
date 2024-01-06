@@ -72,6 +72,12 @@ void SpiffsReadTxtFile(char *addressInSpiffs, char *key, char *value, ...);
  *@return Returns true if the file removal is successful, and false otherwise.
  */
 bool SpiffsRemoveFile(char *addressInSpiffs);
+
+/**
+ *@brief This function is a test scenario that demonstrates the usage of the SPIFFS and JSON-related functions.
+ */
+void SpiffsTest(void);
+
 #ifdef __cplusplus
 }
 #endif //__cplusplus
