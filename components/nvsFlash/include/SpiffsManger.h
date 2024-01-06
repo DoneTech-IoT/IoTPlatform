@@ -26,7 +26,7 @@ extern "C"
  *@brief Perform a SPIFFS check on the specified partition and initd globally
  * @param conf The SPIFFS configuration.
  */
-void SpiffsInit(SemaphoreHandle_t *SpiffsMutex);
+void SpiffsInit();
 
 // /**
 //  *@brief Check if a file exists in the SPIFFS file system.
