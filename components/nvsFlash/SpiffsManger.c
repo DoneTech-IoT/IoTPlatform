@@ -8,7 +8,7 @@
 #define InternalBufSize_ 2 * 1000
 static const char *TAG = "Spiffs";
 
-static SemaphoreHandle_t *SpiffsMutexLocal;      
+static SemaphoreHandle_t SpiffsMutex;      
 
 /**
  *@brief Perform a SPIFFS check on the specified partition.
@@ -33,9 +33,9 @@ static void SpiffsCheckingPerforming(esp_vfs_spiffs_conf_t conf)
  *@brief Perform a SPIFFS check on the specified partition and initd globally
  * @param conf The SPIFFS configuration.
  */
-void SpiffsInit(SemaphoreHandle_t *SpiffsMutex)
+void SpiffsInit()
 {
-    SpiffsMutexLocal = SpiffsMutex;
+    SpiffsMutex = xSemaphoreCreateMutex();  
 
     ESP_LOGI(TAG, "Initializing SPIFFS");
     esp_vfs_spiffs_conf_t conf = {
@@ -118,7 +118,7 @@ static bool SpiffsExistenceCheck(char *addressInSpiffs)
  */
 void SpiffsWrite(char *addressInSpiffs, char *data)
 {
-    if(xSemaphoreTake(SpiffsMutexLocal, portMAX_DELAY) == pdTRUE)
+    if(xSemaphoreTake(SpiffsMutex, portMAX_DELAY) == pdTRUE)
     {
         if (SpiffsExistenceCheck(addressInSpiffs) == 0)
         {
@@ -152,7 +152,7 @@ void SpiffsWrite(char *addressInSpiffs, char *data)
                 ESP_LOGE(TAG, "Failed to open file for appending");            
             }        
         }
-        xSemaphoreGive(SpiffsMutexLocal, portMAX_DELAY);
+        xSemaphoreGive(SpiffsMutex);
     }
     else
     {
@@ -168,7 +168,7 @@ void SpiffsWrite(char *addressInSpiffs, char *data)
  */
 void SpiffsRead(char *addressInSpiffs, char *Buffer, size_t SizeOfBuffer)
 {    
-    if(xSemaphoreTake(SpiffsMutexLocal, portMAX_DELAY) == pdTRUE)
+    if(xSemaphoreTake(SpiffsMutex, portMAX_DELAY) == pdTRUE)
     {
         char *InternalBuf = (char *)malloc(SizeOfBuffer * sizeof(char));
         memset(Buffer, 0x00, SizeOfBuffer);
@@ -193,7 +193,7 @@ void SpiffsRead(char *addressInSpiffs, char *Buffer, size_t SizeOfBuffer)
         {
             ESP_LOGE(TAG, "File does not exists.");
         }  
-        xSemaphoreGive(SpiffsMutexLocal, portMAX_DELAY);  
+        xSemaphoreGive(SpiffsMutex);  
     }
     else
     {
@@ -209,27 +209,34 @@ void SpiffsRead(char *addressInSpiffs, char *Buffer, size_t SizeOfBuffer)
  */
 void SpiffsRename(char *oldName, char *newName)
 {
-
-    // FILE *file = fopen(OldAddress, "r");
-    if (SpiffsExistenceCheck(oldName) == 0)
+    if(xSemaphoreTake(SpiffsMutex, portMAX_DELAY) == pdTRUE)
     {
-        return;
+        // FILE *file = fopen(OldAddress, "r");
+        if (SpiffsExistenceCheck(oldName) == 0)
+        {
+            return;
+        }
+        struct stat st;
+        if (stat(oldName, &st) == 0)
+        {
+            // Delete it if it exists
+            unlink(oldName);
+        }
+        // Rename original file
+        ESP_LOGI(TAG, "Renaming file");
+        if (rename(oldName, newName) != 0)
+        {
+            ESP_LOGE(TAG, "Rename failed");
+            return;
+        }
+        ESP_LOGE(TAG, "Rename success!");
+        // fclose(file);
+        xSemaphoreGive(SpiffsMutex); 
     }
-    struct stat st;
-    if (stat(oldName, &st) == 0)
+    else
     {
-        // Delete it if it exists
-        unlink(oldName);
-    }
-    // Rename original file
-    ESP_LOGI(TAG, "Renaming file");
-    if (rename(oldName, newName) != 0)
-    {
-        ESP_LOGE(TAG, "Rename failed");
-        return;
-    }
-    ESP_LOGE(TAG, "Rename success!");
-    // fclose(file);
+        ESP_LOGE(TAG, "Can not access to Spiffs");
+    } 
 }
 
 /**
@@ -239,23 +246,33 @@ void SpiffsRename(char *oldName, char *newName)
  */
 bool SpiffsRemoveFile(char *addressInSpiffs)
 {
-    if (SpiffsExistenceCheck(addressInSpiffs) == 1)
+    bool ret = 0;
+    if(xSemaphoreTake(SpiffsMutex, portMAX_DELAY) == pdTRUE)
     {
-        if (remove(addressInSpiffs) == 0)
+        if (SpiffsExistenceCheck(addressInSpiffs) == 1)
         {
-            ESP_LOGE(TAG, "File removed successfully.");
-            return 0;
+            if (remove(addressInSpiffs) == 0)
+            {
+                ESP_LOGE(TAG, "File removed successfully.");
+                ret = 0;
+            }
+            else
+            {
+                ESP_LOGE(TAG, "Unable to remove the file.");
+                ret = 1;
+            }
         }
         else
         {
-            ESP_LOGE(TAG, "Unable to remove the file.");
-            return 1;
+            ret = 0;
         }
+        xSemaphoreGive(SpiffsMutex); 
     }
     else
     {
-        return 0;
-    }
+        ESP_LOGE(TAG, "Can not access to Spiffs");
+    }  
+    return ret;      
 }
 
 /**
@@ -271,13 +288,13 @@ static char *FindValueByKey(const char *jsonStr, const char *key, char *ValueBuf
     cJSON *root = cJSON_Parse(jsonStr);
     if (root == NULL)
     {
-        printf("Failed to parse JSON.\n");
+        ESP_LOGE(TAG,"Failed to parse JSON.\n");
         return NULL;
     }
     cJSON *item = cJSON_GetObjectItemCaseSensitive(root, key);
     if (item == NULL)
     {
-        printf("Key '%s' not found.\n", key);
+        ESP_LOGE(TAG,"Key '%s' not found.\n", key);
         cJSON_Delete(root);
         return NULL;
     }
@@ -297,11 +314,11 @@ static void parseOutputJSON(const char *jsonStr)
     // CountOfKeyValues(jsonStr);
     char buf[100];
     FindValueByKey(jsonStr, "Key1", buf, sizeof(buf));
-    printf("\n%s\n", buf);
+    ESP_LOGI(TAG, "\n%s\n", buf);
     cJSON *root = cJSON_Parse(jsonStr);
     if (root == NULL)
     {
-        printf("Failed to parse JSON.\n");
+        ESP_LOGE(TAG,"Failed to parse JSON.\n");
         return;
     }
     cJSON *item = root->child;
@@ -309,7 +326,7 @@ static void parseOutputJSON(const char *jsonStr)
     {
         if (cJSON_IsString(item))
         {
-            printf("%s: %s\n", item->string, item->valuestring);
+            ESP_LOGI(TAG, "%s: %s\n", item->string, item->valuestring);
         }
         item = item->next;
     }
@@ -326,11 +343,11 @@ static int CountOfKeyValues(const char *jsonStr)
     cJSON *root = cJSON_Parse(jsonStr);
     if (root == NULL)
     {
-        printf("Failed to parse JSON.\n");
+        ESP_LOGE(TAG,"Failed to parse JSON.\n");
         return -1;
     }
     int count = cJSON_GetArraySize(root);
-    printf("count of keys = %d\n", count);
+    ESP_LOGI(TAG, "count of keys = %d\n", count);
     cJSON_Delete(root);
     return count;
 }
@@ -354,7 +371,7 @@ void WriteTxtFileSpiffs(char *addressInSpiffs, char *key, char *value, ...)
     }
     va_end(args);
     char *jsonStr = cJSON_Print(root);
-    printf("%s", jsonStr);
+    ESP_LOGI(TAG, "%s", jsonStr);
     cJSON_Delete(root);
     SpiffsWrite(addressInSpiffs, jsonStr);
     free(jsonStr);
@@ -373,7 +390,7 @@ void ReadTxtFileSpiffs(char *addressInSpiffs, char *key, char *value, ...)
     cJSON *root = cJSON_Parse(InternalBuf);
     if (root == NULL)
     {
-        printf("Failed to parse JSON.\n");
+        ESP_LOGE(TAG, "Failed to parse JSON.\n");
         return;
     }
     va_list args;
@@ -391,6 +408,7 @@ void ReadTxtFileSpiffs(char *addressInSpiffs, char *key, char *value, ...)
         currentKey = va_arg(args, char *);
         currentValue = va_arg(args, char *);
     }
+    free(InternalBuf);
     va_end(args);
     cJSON_Delete(root);
 }
@@ -427,12 +445,12 @@ void SpiffsTest(void)
     SpiffsWrite("/spiffs/hello.txt", "QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dQABtmfRQr3dAr_QABtmfRQr3dAr_QABtmfRQr3d");
     SpiffsRead("/spiffs/hello.txt", buf, sizeof(buf));
     printf("\n\n\n\n%s\n\n\n", buf);
-    SaveFileInSpiffsWithTxtFormat("/spiffs/hello.txt", "Key1", "test", "Key2", "544", "Key3", "bibibi", NULL, NULL);
+    SpiffsWriteTxtFile("/spiffs/hello.txt", "Key1", "test", "Key2", "544", "Key3", "bibibi", NULL, NULL);
     char value1[20];
     char value2[20];
     char value3[20];
 
-    ReadFileFromSpiffsWithTxtFormat("/spiffs/hello.txt", "Key1", value1, "Key2", value2, "Key3", value3, NULL, NULL);
+    SpiffsReadTxtFile("/spiffs/hello.txt", "Key1", value1, "Key2", value2, "Key3", value3, NULL, NULL);
 
     printf("Value1: %s\n", value1);
     printf("Value2: %s\n", value2);
