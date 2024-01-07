@@ -20,13 +20,7 @@ extern "C"
 // /**
 //  *@brief This function does global initialization for Spiffs, checks for save existence, and sends a signal if it exists
 //  */
-// void SpiffsGlobalConfig();
-
-/**
- *@brief Perform a SPIFFS check on the specified partition and initd globally
- * @param conf The SPIFFS configuration.
- */
-void SpiffsInit();
+void SpiffsGlobalConfig(GlobalInitInterfaceHandler_t *GlobalInitInterfaceHandler);
 
 // /**
 //  *@brief Check if a file exists in the SPIFFS file system.
@@ -72,6 +66,13 @@ void SpiffsReadTxtFile(char *addressInSpiffs, char *key, char *value, ...);
  *@return Returns true if the file removal is successful, and false otherwise.
  */
 bool SpiffsRemoveFile(char *addressInSpiffs);
+
+/**
+ *@brief Check if a file exists in the SPIFFS file system.
+ * @param addressInSpiffs The address of the file in SPIFFS.
+ * @return True if the file exists, false otherwise.
+ */
+bool SpiffsExistenceCheck(char *addressInSpiffs);
 
 /**
  *@brief This function is a test scenario that demonstrates the usage of the SPIFFS and JSON-related functions.

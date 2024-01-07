@@ -1,14 +1,16 @@
 /*
  * Mohammad Javad Abbasi (work.abbasii@gmail.com)
  * init 2023.11.27
- *
+ * SEZ@Done (ehsan.ziyaee@gmail.com)
+ * refactore 2024.01.07
  * a component for work with Spiffs.
  */
 #include "SpiffsManger.h"
 #define InternalBufSize_ 2 * 1000
 static const char *TAG = "Spiffs";
 
-static SemaphoreHandle_t SpiffsMutex;      
+static SemaphoreHandle_t SpiffsMutex;   
+static GlobalInitInterfaceHandler_t *InterfaceHandler;
 
 /**
  *@brief Perform a SPIFFS check on the specified partition.
@@ -86,7 +88,8 @@ void SpiffsInit()
                 ESP_LOGI(TAG, "SPIFFS_check() successful");
             }
         }
-        SpiffsCheckingPerforming(conf);
+        //SEZ@Done comment it
+        //SpiffsCheckingPerforming(conf);
     }        
 }
 
@@ -95,7 +98,7 @@ void SpiffsInit()
  * @param addressInSpiffs The address of the file in SPIFFS.
  * @return True if the file exists, false otherwise.
  */
-static bool SpiffsExistenceCheck(char *addressInSpiffs)
+bool SpiffsExistenceCheck(char *addressInSpiffs)
 {    
     FILE *file;
     file = fopen(addressInSpiffs, "r");
@@ -416,21 +419,22 @@ void SpiffsReadTxtFile(char *addressInSpiffs, char *key, char *value, ...)
 /**
  *@brief This function does global initialization for Spiffs and checks for save existence, and sends a signal if it exists
  */
-// void SpiffsGlobalConfig()
-// {
-//     SpiffsInit();
-//     if (SpiffsExistenceCheck(WifiConfigDirectoryAddressInSpiffs) == 1)
-//     {
-//         //xSemaphoreGive(WifiParamExistenceCheckerSemaphore);
-//     }
+void SpiffsGlobalConfig(GlobalInitInterfaceHandler_t *GlobalInitInterfaceHandler)
+{
+    InterfaceHandler = GlobalInitInterfaceHandler;
+    SpiffsInit();
+    if (SpiffsExistenceCheck(WifiConfigDirectoryAddressInSpiffs) == 1)
+    {
+        xSemaphoreGive(InterfaceHandler->WifiParamExistenceCheckerSemaphore);
+    }
 
-//     #ifdef SpotifyEnable
-//     if (SpiffsExistenceCheck(SpotifyConfigAddressInSpiffs) == 1)
-//     {
-//         //xSemaphoreGive(IsSpotifyAuthorizedSemaphore);
-//     }
-//     #endif
-// }
+    #ifdef SpotifyEnable
+    if (SpiffsExistenceCheck(SpotifyConfigAddressInSpiffs) == 1)
+    {
+        xSemaphoreGive(InterfaceHandler->WorkWithStorageInSpotifyComponentSemaphore);
+    }
+    #endif
+}
 
 /**
  *@brief This function is a test scenario that demonstrates the usage of the SPIFFS and JSON-related functions.
