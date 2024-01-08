@@ -19,13 +19,13 @@ bool GlobalInit(GlobalInitInterfaceHandler_t *InterfaceHandler)
         InterfaceHandler->WifiParamExistenceCheckerSemaphore != NULL)
     {     
     #ifdef SpotifyEnable        
-        InterfaceHandler->HttpsBufQueue = xQueueCreate(1, sizeof(char) * sizeof(char[2500]));
-        InterfaceHandler->HttpsResponseReadySemaphore = xSemaphoreCreateBinary();
-        InterfaceHandler->IsSpotifyAuthorizedSemaphore = xSemaphoreCreateBinary();
-        InterfaceHandler->WorkWithStorageInSpotifyComponentSemaphore = xSemaphoreCreateBinary();
+        *(InterfaceHandler->HttpsBufQueue) = xQueueCreate(1, sizeof(char) * sizeof(char[2500]));
+        *(InterfaceHandler->HttpsResponseReadySemaphore) = xSemaphoreCreateBinary();
+        *(InterfaceHandler->IsSpotifyAuthorizedSemaphore) = xSemaphoreCreateBinary();
+        *(InterfaceHandler->WorkWithStorageInSpotifyComponentSemaphore) = xSemaphoreCreateBinary();
     #endif        
-        InterfaceHandler->FinishWifiConfig = xSemaphoreCreateBinary();
-        InterfaceHandler->WifiParamExistenceCheckerSemaphore = xSemaphoreCreateBinary();        
+        *(InterfaceHandler->FinishWifiConfig) = xSemaphoreCreateBinary();
+        *(InterfaceHandler->WifiParamExistenceCheckerSemaphore) = xSemaphoreCreateBinary();        
 
         ESP_LOGI(TAG, "GlobalInit initiated successfully");        
         return true;
