@@ -425,13 +425,13 @@ void SpiffsGlobalConfig(GlobalInitInterfaceHandler_t *GlobalInitInterfaceHandler
     SpiffsInit();
     if (SpiffsExistenceCheck(WifiConfigDirectoryAddressInSpiffs) == 1)
     {
-        xSemaphoreGive(InterfaceHandler->WifiParamExistenceCheckerSemaphore);
+        xSemaphoreGive(*(InterfaceHandler->WifiParamExistenceCheckerSemaphore));
     }
 
     #ifdef SpotifyEnable
     if (SpiffsExistenceCheck(SpotifyConfigAddressInSpiffs) == 1)
     {
-        xSemaphoreGive(InterfaceHandler->WorkWithStorageInSpotifyComponentSemaphore);
+        xSemaphoreGive(*(InterfaceHandler->WorkWithStorageInSpotifyComponentSemaphore));        
     }
     #endif
 }
