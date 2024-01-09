@@ -249,7 +249,7 @@ void SpiffsRename(char *oldName, char *newName)
  */
 bool SpiffsRemoveFile(char *addressInSpiffs)
 {
-    bool ret = 0;
+    bool ret = false;
     if(xSemaphoreTake(SpiffsMutex, portMAX_DELAY) == pdTRUE)
     {
         if (SpiffsExistenceCheck(addressInSpiffs) == 1)
@@ -257,17 +257,17 @@ bool SpiffsRemoveFile(char *addressInSpiffs)
             if (remove(addressInSpiffs) == 0)
             {
                 ESP_LOGE(TAG, "File removed successfully.");
-                ret = 0;
+                ret = false;
             }
             else
             {
                 ESP_LOGE(TAG, "Unable to remove the file.");
-                ret = 1;
+                ret = true;
             }
         }
         else
         {
-            ret = 0;
+            ret = false;
         }
         xSemaphoreGive(SpiffsMutex); 
     }
