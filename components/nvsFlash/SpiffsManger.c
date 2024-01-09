@@ -315,7 +315,7 @@ static char *FindValueByKey(const char *jsonStr, const char *key, char *ValueBuf
  * @brief This function parses a JSON string and prints the key-value pairs.
  * @param[in] jsonString The JSON string to parse and print.
  */
-static void parseOutputJSON(const char *jsonStr)
+static void ParseOutputJSON(const char *jsonStr)
 {
     // CountOfKeyValues(jsonStr);
     char buf[100];
