@@ -47,7 +47,8 @@ extern "C" void app_main()
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     Matter_TaskInit(&MatterInterfaceHandler);
-vTaskDelay((pdMS_TO_TICKS(SEC * 10)));
+vTaskDelay((pdMS_TO_TICKS(SEC * 5)));
+
 
 #ifdef SpotifyEnable
     SpotifyInterfaceHandler.HttpsBufQueue = &HttpsBufQueue;
