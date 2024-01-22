@@ -1,4 +1,5 @@
 #include "SpotifyHttpLocalServer.h"
+#include "esp_mac.h"
 static const char *TAG = "SpotifyTask";
 // ******************************
 HttpLocalServerParam_t HttpLocalServerLocalParam;
@@ -133,21 +134,72 @@ httpd_handle_t Spotify_StartWebServer()
     return httpd_stop(server);
 }
 
+static char *generate_hostname(void);
 /**
  * @brief This function starts the mDNS service.
  */
 bool Spotify_StartMDNSService()
 {
-    esp_err_t err = mdns_init();
-    if (err)
-    {
-        ESP_LOGE(TAG, "MDNS Init failed: %d", err);
-        return false;
+     esp_err_t err = mdns_init();
+    // if (err)
+    // {
+    //     ESP_LOGE(TAG, "MDNS Init failed: %d", err);
+    //     return false;
+    // }
+    // else
+    // {
+    //     mdns_hostname_set("deskhub");
+    //     mdns_instance_name_set("Spotify");
+    //     return true;
+    // }
+    
+        
+    //mdns_hostname_set("deskhub");
+    //mdns_instance_name_set("spotify");
+    //mdns_service_add("deskhub", "_http", "_tcp", 80, NULL, 0);
+
+    //structure with TXT records
+    mdns_txt_item_t serviceTxtData[3] = {
+        {"board", "esp32"},
+        {"u", "user"},
+        {"p", "password"}
+    };
+
+    char *delegated_hostname;
+    //char *hostname = malloc(50 * sizeof(char));//generate_hostname();    
+    char hostname[50];
+    ESP_ERROR_CHECK( mdns_hostname_get(hostname));
+    ESP_LOGE(TAG, "MDNS HostName: %s", hostname);
+    if (-1 == asprintf(&delegated_hostname, "%s-delegated", hostname)) {
+        abort();
     }
-    else
-    {
-        mdns_hostname_set("deskhub");
-        mdns_instance_name_set("Spotify");
-        return true;
+    ESP_LOGE(TAG, "MDNS HostName-delegated: %s", delegated_hostname);
+    mdns_ip_addr_t addr4, addr6;
+    esp_netif_str_to_ip4("127.0.0.1", &addr4.addr.u_addr.ip4);
+    addr4.addr.type = ESP_IPADDR_TYPE_V4;
+    esp_netif_str_to_ip6("fd11:22::1", &addr6.addr.u_addr.ip6);
+    addr6.addr.type = ESP_IPADDR_TYPE_V6;
+    addr4.next = &addr6;
+    addr6.next = NULL;
+    ESP_ERROR_CHECK( mdns_delegate_hostname_add(delegated_hostname, &addr4) );
+    ESP_ERROR_CHECK( mdns_service_add_for_host(NULL, "_http", "_tcp", delegated_hostname, 80, serviceTxtData, 3) );
+    free(delegated_hostname);    
+    //free(hostname);    
+
+    return true;
+}
+
+static char *generate_hostname(void)
+{
+// #ifndef CONFIG_MDNS_ADD_MAC_TO_HOSTNAME
+//     return strdup(CONFIG_MDNS_HOSTNAME);
+// #else
+    uint8_t mac[6];
+    char   *hostname;
+    esp_read_mac(mac, ESP_MAC_WIFI_STA);
+    if (-1 == asprintf(&hostname, "%s-%02X%02X%02X", "CONFIG_MDNS_HOSTNAME", mac[3], mac[4], mac[5])) {
+        abort();
     }
+    return hostname;
+//#endif
 }
