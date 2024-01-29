@@ -100,11 +100,8 @@ void SpiffsInit()
 * @param[in] useCase use this function in this lib or externaly.(Not need thread-safety when use internally)
 * @return True if the file is found, false otherwise.
  */
-bool SpiffsExistenceCheck(char *addressInSpiffs, UseCase_t useCase)
-{    
-    if (useCase == External_Use)
-        if(xSemaphoreTake(SpiffsMutex, portMAX_DELAY) == pdTRUE){};
-        
+static bool SpiffsExistenceCheck(char *addressInSpiffs)
+{                
     FILE *file;
     file = fopen(addressInSpiffs, "r");
     if (file)
@@ -117,10 +114,28 @@ bool SpiffsExistenceCheck(char *addressInSpiffs, UseCase_t useCase)
     {
         // ESP_LOGI(TAG, "File does not exist.");
         return 0;
-    }   
+    }       
+}
 
-    if (useCase == External_Use)
+/**
+* @brief Searches for a file in the SPIFFS file system using the provided user-supplied address.
+* This function takes an address from the user, performs a search in the SPIFFS file system,
+* and attempts to locate a file with the specified address. If the file is found, the function
+* returns true; otherwise, it returns false.
+* @param[in] addressInSpiffs The address of the file in the SPIFFS.
+* @return True if the file is found, false otherwise.
+*/
+bool SpiffsIsExists(char *addressInSpiffs)
+{
+    if(xSemaphoreTake(SpiffsMutex, portMAX_DELAY) == pdTRUE)
+    {
+        SpiffsExistenceCheck(addressInSpiffs);
         xSemaphoreGive(SpiffsMutex);  
+    }
+    else
+    {
+        ESP_LOGE(TAG, "Can not access to Spiffs");
+    }   
 }
 
 /**
@@ -132,7 +147,7 @@ void SpiffsWrite(char *addressInSpiffs, char *data)
 {
     if(xSemaphoreTake(SpiffsMutex, portMAX_DELAY) == pdTRUE)
     {
-        if (SpiffsExistenceCheck(addressInSpiffs, Internal_Use) == 0)
+        if (SpiffsExistenceCheck(addressInSpiffs) == 0)
         {
             ESP_LOGI(TAG, "Opening file for writing");
             FILE *file = fopen(addressInSpiffs, "w");
@@ -186,7 +201,7 @@ void SpiffsRead(char *addressInSpiffs, char *Buffer, size_t SizeOfBuffer)
         memset(Buffer, 0x00, SizeOfBuffer);
         FILE *file;
 
-        if (SpiffsExistenceCheck(addressInSpiffs, Internal_Use))
+        if (SpiffsExistenceCheck(addressInSpiffs))
         {
             file = fopen(addressInSpiffs, "r");
             static int Counter = 0;
@@ -224,7 +239,7 @@ void SpiffsRename(char *oldName, char *newName)
     if(xSemaphoreTake(SpiffsMutex, portMAX_DELAY) == pdTRUE)
     {
         // FILE *file = fopen(OldAddress, "r");
-        if (SpiffsExistenceCheck(oldName, Internal_Use) == 0)
+        if (SpiffsExistenceCheck(oldName) == 0)
         {
             return;
         }
@@ -261,7 +276,7 @@ bool SpiffsRemoveFile(char *addressInSpiffs)
     bool ret = false;
     if(xSemaphoreTake(SpiffsMutex, portMAX_DELAY) == pdTRUE)
     {
-        if (SpiffsExistenceCheck(addressInSpiffs, Internal_Use) == 1)
+        if (SpiffsExistenceCheck(addressInSpiffs) == 1)
         {
             if (remove(addressInSpiffs) == 0)
             {

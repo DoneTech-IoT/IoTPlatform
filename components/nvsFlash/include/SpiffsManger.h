@@ -18,14 +18,6 @@ extern "C"
 #endif
 
 /**
- * @brief use this enum in SpiffsExistenceCheck
- */
-typedef enum {
-    Internal_Use    = 0,
-    External_Use    = 1,
-}UseCase_t;
-
-/**
  * @brief Perform a SPIFFS check on the specified partition and initd globally
  */
 void SpiffsInit();
@@ -36,10 +28,9 @@ void SpiffsInit();
 * and attempts to locate a file with the specified address. If the file is found, the function
 * returns true; otherwise, it returns false.
 * @param[in] addressInSpiffs The address of the file in the SPIFFS.
-* @param[in] useCase use this function in this lib or externaly.(Not need thread-safety when use internally)
 * @return True if the file is found, false otherwise.
 */
-bool SpiffsExistenceCheck(char *addressInSpiffs, UseCase_t useCase);
+bool SpiffsIsExists(char *addressInSpiffs);
 
 /**
  * @brief Read the contents of a file in the SPIFFS file system and store it in a buffer.
