@@ -127,15 +127,17 @@ static bool SpiffsExistenceCheck(char *addressInSpiffs)
 */
 bool SpiffsIsExists(char *addressInSpiffs)
 {
+    bool ret = false;
     if(xSemaphoreTake(SpiffsMutex, portMAX_DELAY) == pdTRUE)
     {
-        SpiffsExistenceCheck(addressInSpiffs);
+        ret = SpiffsExistenceCheck(addressInSpiffs);
         xSemaphoreGive(SpiffsMutex);  
     }
     else
     {
         ESP_LOGE(TAG, "Can not access to Spiffs");
     }   
+    return ret;
 }
 
 /**
