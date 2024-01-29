@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "JsonUtility.h"
 
+static const char *TAG = "JsonUtility";
+
 /**
  * @brief This function searches for a specific value in a JSON string based on a given key.
  * @param[in] jsonString The JSON string to search within.
