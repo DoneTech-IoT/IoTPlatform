@@ -103,7 +103,7 @@ void SpiffsInit()
 bool SpiffsExistenceCheck(char *addressInSpiffs, UseCase_t useCase)
 {    
     if (useCase == External_Use)
-        if(xSemaphoreTake(SpiffsMutex, portMAX_DELAY) == pdTRUE)
+        if(xSemaphoreTake(SpiffsMutex, portMAX_DELAY) == pdTRUE){};
         
     FILE *file;
     file = fopen(addressInSpiffs, "r");
@@ -132,7 +132,7 @@ void SpiffsWrite(char *addressInSpiffs, char *data)
 {
     if(xSemaphoreTake(SpiffsMutex, portMAX_DELAY) == pdTRUE)
     {
-        if (SpiffsExistenceCheck(addressInSpiffs) == 0)
+        if (SpiffsExistenceCheck(addressInSpiffs, Internal_Use) == 0)
         {
             ESP_LOGI(TAG, "Opening file for writing");
             FILE *file = fopen(addressInSpiffs, "w");
@@ -186,7 +186,7 @@ void SpiffsRead(char *addressInSpiffs, char *Buffer, size_t SizeOfBuffer)
         memset(Buffer, 0x00, SizeOfBuffer);
         FILE *file;
 
-        if (SpiffsExistenceCheck(addressInSpiffs))
+        if (SpiffsExistenceCheck(addressInSpiffs, Internal_Use))
         {
             file = fopen(addressInSpiffs, "r");
             static int Counter = 0;
@@ -224,7 +224,7 @@ void SpiffsRename(char *oldName, char *newName)
     if(xSemaphoreTake(SpiffsMutex, portMAX_DELAY) == pdTRUE)
     {
         // FILE *file = fopen(OldAddress, "r");
-        if (SpiffsExistenceCheck(oldName) == 0)
+        if (SpiffsExistenceCheck(oldName, Internal_Use) == 0)
         {
             return;
         }
@@ -261,7 +261,7 @@ bool SpiffsRemoveFile(char *addressInSpiffs)
     bool ret = false;
     if(xSemaphoreTake(SpiffsMutex, portMAX_DELAY) == pdTRUE)
     {
-        if (SpiffsExistenceCheck(addressInSpiffs) == 1)
+        if (SpiffsExistenceCheck(addressInSpiffs, Internal_Use) == 1)
         {
             if (remove(addressInSpiffs) == 0)
             {
