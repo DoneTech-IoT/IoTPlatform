@@ -98,10 +98,14 @@ void SpiffsInit()
 * and attempts to locate a file with the specified address. If the file is found, the function
 * returns true; otherwise, it returns false.
 * @param[in] addressInSpiffs The address of the file in the SPIFFS.
+* @param[in] useCase use this function in this lib or externaly.(Not need thread-safety when use internally)
 * @return True if the file is found, false otherwise.
  */
-bool SpiffsExistenceCheck(char *addressInSpiffs)
+bool SpiffsExistenceCheck(char *addressInSpiffs, UseCase_t useCase)
 {    
+    if (useCase == External_Use)
+        if(xSemaphoreTake(SpiffsMutex, portMAX_DELAY) == pdTRUE)
+        
     FILE *file;
     file = fopen(addressInSpiffs, "r");
     if (file)
@@ -114,7 +118,10 @@ bool SpiffsExistenceCheck(char *addressInSpiffs)
     {
         // ESP_LOGI(TAG, "File does not exist.");
         return 0;
-    }    
+    }   
+
+    if (useCase == External_Use)
+        xSemaphoreGive(SpiffsMutex);  
 }
 
 /**
