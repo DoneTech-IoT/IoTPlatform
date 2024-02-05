@@ -18,10 +18,19 @@ extern "C"
 #endif
 
 /**
- * @brief This function does global initialization for Spiffs, checks for save existence, and sends a signal if it exists
- * @param[in] GlobalInitInterfaceHandler pointer of GlobalInitHandeler for its content access
+ * @brief Perform a SPIFFS check on the specified partition and initd globally
  */
-void SpiffsGlobalConfig(GlobalInitInterfaceHandler_t *GlobalInitInterfaceHandler);
+void SpiffsInit();
+
+/**
+* @brief Searches for a file in the SPIFFS file system using the provided user-supplied address.
+* This function takes an address from the user, performs a search in the SPIFFS file system,
+* and attempts to locate a file with the specified address. If the file is found, the function
+* returns true; otherwise, it returns false.
+* @param[in] addressInSpiffs The address of the file in the SPIFFS.
+* @return True if the file is found, false otherwise.
+*/
+bool SpiffsIsExists(char *addressInSpiffs);
 
 /**
  * @brief Read the contents of a file in the SPIFFS file system and store it in a buffer.
@@ -72,16 +81,6 @@ void SpiffsRename(char *oldName, char *newName);
  * @return Returns true if the file removal is successful, and false otherwise.
  */
 bool SpiffsRemoveFile(char *addressInSpiffs);
-
-/**
-* @brief Searches for a file in the SPIFFS file system using the provided user-supplied address.
-* This function takes an address from the user, performs a search in the SPIFFS file system,
-* and attempts to locate a file with the specified address. If the file is found, the function
-* returns true; otherwise, it returns false.
-* @param[in] addressInSpiffs The address of the file in the SPIFFS.
-* @return True if the file is found, false otherwise.
-*/
-bool SpiffsExistenceCheck(char *addressInSpiffs);
 
 /**
  * @brief This function is a test scenario that demonstrates the usage of the SPIFFS and JSON-related functions.
