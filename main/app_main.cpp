@@ -41,7 +41,7 @@ extern "C" void app_main()
     GlobalInitInterfaceHandler.WifiParamExistenceCheckerSemaphore = &WifiParamExistenceCheckerSemaphore;
     GlobalInitInterfaceHandler.FinishWifiConfig = &FinishWifiConfig;    
     GlobalInit(&GlobalInitInterfaceHandler);
-    SpiffsGlobalConfig(&GlobalInitInterfaceHandler);
+    SpiffsInit();
 
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
