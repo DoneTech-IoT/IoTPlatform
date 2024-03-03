@@ -33,7 +33,6 @@ extern "C" void app_main()
 {   
     nvsFlashInit();
     nvs_flash_init();
-
     GlobalInitInterfaceHandler.HttpsBufQueue = &HttpsBufQueue;
     GlobalInitInterfaceHandler.HttpsResponseReadySemaphore = &HttpsResponseReadySemaphore;
     GlobalInitInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
