@@ -42,7 +42,7 @@ static esp_err_t Spotify_RequestDataAccess(httpd_req_t *req)
  */
 static esp_err_t Spotify_HttpsCallbackHandler(httpd_req_t *req)
 {
-    char Buf[SMALL_BUF*2];
+    char Buf[SMALL_BUF * 2];
     if (httpd_req_get_url_query_str(req, Buf, sizeof(Buf)) == ESP_OK)
     {
         if (Spotify_FindCode(Buf, sizeof(Buf)) == true)
@@ -128,7 +128,7 @@ httpd_handle_t Spotify_StartWebServer()
  * @brief This function stops the web server for handling HTTPS requests.
  * @return Returns the HTTP server handle if it is started successfully, or NULL otherwise.
  */
- esp_err_t Spotify_StopSpotifyWebServer(httpd_handle_t server)
+esp_err_t Spotify_StopSpotifyWebServer(httpd_handle_t server)
 {
     return httpd_stop(server);
 }
@@ -138,16 +138,31 @@ httpd_handle_t Spotify_StartWebServer()
  */
 bool Spotify_StartMDNSService()
 {
-    esp_err_t err = mdns_init();
-    if (err)
+    esp_err_t err;
+    err = mdns_init();
+    if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "MDNS Init failed: %d", err);
         return false;
     }
-    else
+    err = mdns_hostname_set("deskhub");
+    if (err != ESP_OK)
     {
-        mdns_hostname_set("deskhub");
-        mdns_instance_name_set("Spotify");
-        return true;
+        ESP_LOGE(TAG, "mdns_hostname_set  failed: %d", err);
+        return false;
     }
+    err = mdns_instance_name_set("spotify");
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "mdns_instance_name_set  failed: %d", err);
+        return false;
+    }
+    err = mdns_service_add(NULL, "_http", "_tcp", 80, NULL, 0);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "mdns_service_add  failed: %d", err);
+        return false;
+    }
+    ESP_LOGI(TAG, " MDNS Inited :");
+    return true;
 }
