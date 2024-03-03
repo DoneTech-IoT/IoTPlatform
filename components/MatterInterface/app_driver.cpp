@@ -43,8 +43,7 @@ static esp_err_t app_driver_bound_console_handler(int argc, char **argv)
         client::command_handle_t cmd_handle;
         uint16_t local_endpoint_id = strtol((const char *)&argv[1][2], NULL, 16);
         cmd_handle.cluster_id = strtol((const char *)&argv[2][2], NULL, 16);
-        cmd_handle.command_id = strtol((const char *)&argv[3][2], NULL, 16);
-        cmd_handle.is_group = false;
+        cmd_handle.command_id = strtol((const char *)&argv[3][2], NULL, 16);        
 
         if (argc > 4) {
             console_buffer[0] = argc - 4;
@@ -65,8 +64,7 @@ static esp_err_t app_driver_bound_console_handler(int argc, char **argv)
         client::command_handle_t cmd_handle;
         uint16_t local_endpoint_id = strtol((const char *)&argv[1][2], NULL, 16);
         cmd_handle.cluster_id = strtol((const char *)&argv[2][2], NULL, 16);
-        cmd_handle.command_id = strtol((const char *)&argv[3][2], NULL, 16);
-        cmd_handle.is_group = true;
+        cmd_handle.command_id = strtol((const char *)&argv[3][2], NULL, 16);        
 
         if (argc > 4) {
             console_buffer[0] = argc - 4;
@@ -107,8 +105,7 @@ static esp_err_t app_driver_client_console_handler(int argc, char **argv)
         uint64_t node_id = strtol((const char *)&argv[2][2], NULL, 16);
         cmd_handle.endpoint_id = strtol((const char *)&argv[3][2], NULL, 16);
         cmd_handle.cluster_id = strtol((const char *)&argv[4][2], NULL, 16);
-        cmd_handle.command_id = strtol((const char *)&argv[5][2], NULL, 16);
-        cmd_handle.is_group = false;
+        cmd_handle.command_id = strtol((const char *)&argv[5][2], NULL, 16);        
 
         if (argc > 6) {
             console_buffer[0] = argc - 6;
@@ -130,8 +127,7 @@ static esp_err_t app_driver_client_console_handler(int argc, char **argv)
         uint8_t fabric_index = strtol((const char *)&argv[1][2], NULL, 16);
         cmd_handle.group_id = strtol((const char *)&argv[2][2], NULL, 16);
         cmd_handle.cluster_id = strtol((const char *)&argv[3][2], NULL, 16);
-        cmd_handle.command_id = strtol((const char *)&argv[4][2], NULL, 16);
-        cmd_handle.is_group = true;
+        cmd_handle.command_id = strtol((const char *)&argv[4][2], NULL, 16);        
 
         if (argc > 5) {
             console_buffer[0] = argc - 5;
@@ -259,8 +255,7 @@ static void app_driver_button_toggle_cb(void *arg, void *data)
     ESP_LOGI(TAG, "Toggle button pressed");
     client::command_handle_t cmd_handle;
     cmd_handle.cluster_id = OnOff::Id;
-    cmd_handle.command_id = OnOff::Commands::Toggle::Id;
-    cmd_handle.is_group = false;
+    cmd_handle.command_id = OnOff::Commands::Toggle::Id;    
 
     lock::chip_stack_lock(portMAX_DELAY);
     client::cluster_update(switch_endpoint_id, &cmd_handle);
