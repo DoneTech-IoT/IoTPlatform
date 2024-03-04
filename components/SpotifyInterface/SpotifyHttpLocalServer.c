@@ -152,7 +152,7 @@ bool Spotify_StartMDNSService()
         ESP_LOGE(TAG, "mdns_hostname_set  failed: %d", err);
         return false;
     }
-    err = mdns_instance_name_set("spotify");
+    err = mdns_instance_name_set("spotify");//not work with Matter
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "mdns_instance_name_set  failed: %d", err);
