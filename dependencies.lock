@@ -41,18 +41,24 @@ dependencies:
       service_url: https://api.components.espressif.com/
       type: service
     version: 2.4.1
-  espressif/json_generator:
-    component_hash: e96ed991f3c36dc5a10a0f97c64ee71c4f05ac6d0ee5861e937b3f093e3ac845
+  espressif/jsmn:
+    component_hash: d80350c41bbaa827c98a25b6072df00884e72f54885996fab4a4f0aebce6b6c3
     source:
       service_url: https://api.components.espressif.com/
       type: service
     version: 1.1.0
-  espressif/json_parser:
-    component_hash: 2130029a8c005ba12476c5b5ae5c1c4589cb0c171f8100644d1ab883434eb91f
+  espressif/json_generator:
+    component_hash: 45033e1c199b13f1c8c1b544fb7d4e2df6a8e3071ebdcb1b22582b61a7974ff2
     source:
       service_url: https://api.components.espressif.com/
       type: service
-    version: 1.0.0
+    version: 1.1.2
+  espressif/json_parser:
+    component_hash: d74b81729ad06ec11ff5eb5b1b0d7df1d00e6027fc11471f4b139c70dcf1b1e4
+    source:
+      service_url: https://api.components.espressif.com/
+      type: service
+    version: 1.0.3
   espressif/led_strip:
     component_hash: e8179c56057c243e80a8286c39361eb4bef33e42eb5f7fc841ea877597ca13f7
     source:
@@ -60,22 +66,22 @@ dependencies:
       type: service
     version: 1.0.0
   espressif/mdns:
-    component_hash: 810ec139689ae93bf42520d05de4855fbb68f7140ef67797d91d8d61829589cb
+    component_hash: d96d277207c4fec77ec290b7a8b0ca4043e10f407df0ff6aa52e54a94f0c54a5
     source:
       service_url: https://api.components.espressif.com/
       type: service
-    version: 1.2.2
+    version: 1.2.4
   espressif/rmaker_common:
-    component_hash: f2616edceccfb48d75da490563809ed332f5c7a9c3e66ed40837f458fac4eaeb
+    component_hash: 021c02465e4996dd3292db36ea47b5e3122e7e2d3514797735a96bc12598b44f
     source:
       service_url: https://api.components.espressif.com/
       type: service
-    version: 1.4.4
+    version: 1.4.5
   idf:
     component_hash: null
     source:
       type: idf
     version: 5.1.2
-manifest_hash: 737b4f638f43b3c113a459f4a967a4cb79f0fbf3ce52a17e8ec7093dcb3328dd
+manifest_hash: 51fe40d3aae0527078c0fa921485269fb23f412079150bf135e7f4e1cb423eaa
 target: esp32s3
 version: 1.0.0

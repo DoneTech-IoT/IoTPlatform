@@ -33,7 +33,6 @@ extern "C" void app_main()
 {   
     nvsFlashInit();
     nvs_flash_init();
-
     GlobalInitInterfaceHandler.HttpsBufQueue = &HttpsBufQueue;
     GlobalInitInterfaceHandler.HttpsResponseReadySemaphore = &HttpsResponseReadySemaphore;
     GlobalInitInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
@@ -47,7 +46,8 @@ extern "C" void app_main()
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     Matter_TaskInit(&MatterInterfaceHandler);
-vTaskDelay((pdMS_TO_TICKS(SEC * 10)));
+vTaskDelay((pdMS_TO_TICKS(SEC * 5)));
+
 
 #ifdef SpotifyEnable
     SpotifyInterfaceHandler.HttpsBufQueue = &HttpsBufQueue;
