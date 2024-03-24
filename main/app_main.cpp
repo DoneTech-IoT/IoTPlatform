@@ -31,7 +31,7 @@ void CallbackTest(char *buffer)
 
 extern "C" void app_main()
 {   
-    nvsFlashInit();
+    //nvsFlashInit();
     nvs_flash_init();
     GlobalInitInterfaceHandler.HttpsBufQueue = &HttpsBufQueue;
     GlobalInitInterfaceHandler.HttpsResponseReadySemaphore = &HttpsResponseReadySemaphore;
@@ -46,6 +46,7 @@ extern "C" void app_main()
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     Matter_TaskInit(&MatterInterfaceHandler);
+
 vTaskDelay((pdMS_TO_TICKS(SEC * 5)));
 
 
@@ -57,17 +58,17 @@ vTaskDelay((pdMS_TO_TICKS(SEC * 5)));
     SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
     SpotifyInterfaceHandler.EventHandlerCallBackFunction = CallbackTest;
     Spotify_TaskInit(&SpotifyInterfaceHandler, SPOTIFY_TASK_STACK_SIZE);
-//     // after this semaphore you can use playback command function in every where !
-//     if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
-//         Spotify_SendCommand(GetNowPlaying);
-//     vTaskDelay((pdMS_TO_TICKS(SEC * 10)));
-//     Spotify_SendCommand(Play);
-//     vTaskDelay((pdMS_TO_TICKS(SEC * 15)));
-//     Spotify_SendCommand(GetNowPlaying);
-//     vTaskDelay((pdMS_TO_TICKS(SEC * 15)));
-//     Spotify_SendCommand(GetUserInfo);
-//     vTaskDelay((pdMS_TO_TICKS(SEC * 15)));
-//     Spotify_SendCommand(Pause);
+    // after this semaphore you can use playback command function in every where !
+    // if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
+    //     Spotify_SendCommand(GetNowPlaying);
+    // vTaskDelay((pdMS_TO_TICKS(SEC * 10)));
+    // Spotify_SendCommand(Play);
+    // vTaskDelay((pdMS_TO_TICKS(SEC * 15)));
+    // Spotify_SendCommand(GetNowPlaying);
+    // vTaskDelay((pdMS_TO_TICKS(SEC * 15)));
+    // Spotify_SendCommand(GetUserInfo);
+    // vTaskDelay((pdMS_TO_TICKS(SEC * 15)));
+    // Spotify_SendCommand(Pause);
  #endif
 
     vTaskDelay(5000/portTICK_PERIOD_MS);
