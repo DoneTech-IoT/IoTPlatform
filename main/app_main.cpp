@@ -5,7 +5,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "Setup_GPIO.h"
-#include"MatterInterface.h"
+#include "MatterInterface.h"
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
@@ -70,6 +70,9 @@ void CallbackTest(char *buffer)
 
 extern "C" void app_main()
 {
+    size_t freeHeapSize;
+    freeHeapSize = xPortGetFreeHeapSize();
+    ESP_LOGE("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);
     GUI_TaskInit();
     GlobalInit();
     nvsFlashInit();
@@ -79,10 +82,10 @@ extern "C" void app_main()
     BottomCallBackFunctions.AcceptBottomCallBack = AcceptBottomCallBack_;
     GPIO_init(BottomCallBackFunctions);
 
-    MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
-    MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
-    MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
-    Matter_TaskInit(&MatterInterfaceHandler);
+    // MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
+    // MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
+    // MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
+    // Matter_TaskInit(&MatterInterfaceHandler);
     vTaskDelay((pdMS_TO_TICKS(SEC * 5)));
 
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
@@ -91,7 +94,6 @@ extern "C" void app_main()
     unsigned int numberOfTasks = uxTaskGetNumberOfTasks();
     printf("Number of tasks: %u\n", numberOfTasks);
     printf("CONFIG_FREERTOS_HZ =%d\n", CONFIG_FREERTOS_HZ);
-    size_t freeHeapSize;
     freeHeapSize = xPortGetFreeHeapSize();
     ESP_LOGE("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);
     // after this semaphore you can use playback command function in every where !

@@ -37,7 +37,7 @@ static void GUI_mainTask(void *pvParameter)
     disp_drv.draw_buf = &disp_draw_buf;
     lv_disp_drv_register(&disp_drv);
     setup_ui(&guider_ui);
-        // LVGLBottomInit();
+    // LVGLBottomInit();
     LVGL_Timer();
     while (1)
     {
@@ -49,20 +49,21 @@ static void GUI_mainTask(void *pvParameter)
 /**
  * @brief Function to initialize LVGL task
  */
+#include "esp_heap_caps.h"
 void GUI_TaskInit(void)
 {
     StaticTask_t *xTaskLVGLBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
     StackType_t *xLVGLStack = (StackType_t *)malloc(LVGL_STACK * 8 * MULTIPLIER * sizeof(StackType_t));
     if (xTaskLVGLBuffer == NULL || xLVGLStack == NULL)
     {
-        ESP_LOGE("TAG", "Memory allocation failed!");
+        ESP_LOGE(TAG, "Memory allocation failed!");
         free(xTaskLVGLBuffer);
         free(xLVGLStack);
         return; // Exit with an error code
     }
     xTaskCreateStatic(
-        GUI_mainTask,               // Task function
-        "GUI_mainTask",             // Task name (for debugging)
+        GUI_mainTask,                // Task function
+        "GUI_mainTask",              // Task name (for debugging)
         LVGL_STACK * 8 * MULTIPLIER, // Stack size (in words)
         NULL,                        // Task parameters (passed to the task function)
         tskIDLE_PRIORITY + 1,        // Task priority (adjust as needed)
@@ -72,7 +73,6 @@ void GUI_TaskInit(void)
     // this delay so important
     vTaskDelay(500);
 }
-
 
 /**
  * @brief Function to update the LVGL screen
@@ -89,7 +89,7 @@ void GUI_UpdateSpotifyScreen(char *Artist, char *Song, char *Album, int Duration
 
     int minutues = ProgressMS / 60000;
     int second = (ProgressMS % 60000) / 1000;
-    char time [20];
+    char time[20];
     sprintf(time, "%d:%d", minutues, second);
     ESP_LOGW(TAG, "Time: %s", time);
     lv_event_send(guider_ui.Spotify_Page_label_time, LV_EVENT_VALUE_CHANGED, time);
@@ -97,4 +97,3 @@ void GUI_UpdateSpotifyScreen(char *Artist, char *Song, char *Album, int Duration
     int progress = (ProgressMS * 100) / DurationMS;
     lv_event_send(guider_ui.Spotify_Page_bar_progress, LV_EVENT_VALUE_CHANGED, progress);
 }
-
