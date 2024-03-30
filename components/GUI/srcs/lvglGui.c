@@ -4,26 +4,28 @@
 
 static const char *TAG = "LVGL_GUI";
 static lv_disp_draw_buf_t disp_draw_buf;
-lv_color_t *LVGL_BigBuf1;
-lv_color_t *LVGL_BigBuf2;
-
+// lv_color_t *LVGL_BigBuf1;
+// lv_color_t *LVGL_BigBuf2;
+lv_color_t *LVGL_BigBuf1[LV_HOR_RES_MAX * 100 * MULTIPLIER];
+lv_color_t *LVGL_BigBuf2[LV_HOR_RES_MAX * 100 * MULTIPLIER];
 /**
  * @brief main LVGL gui TASK
  */
 static void GUI_mainTask(void *pvParameter)
 {
     // Allocate memory for LVGL display buffers
-    lv_color_t *LVGL_BigBuf1 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
-    lv_color_t *LVGL_BigBuf2 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
+    // lv_color_t *LVGL_BigBuf1 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
+    // lv_color_t *LVGL_BigBuf2 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
     // lv_color_t *LVGL_BigBuf1 = (lv_color_t *)heap_caps_malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t), MALLOC_CAP_SPIRAM );
     // lv_color_t *LVGL_BigBuf2 = (lv_color_t *)heap_caps_malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t), MALLOC_CAP_SPIRAM );
-    if (LVGL_BigBuf2 == NULL || LVGL_BigBuf2 == NULL)
-    {
-        ESP_LOGE(TAG, "Memory allocation failed!");
-        free(LVGL_BigBuf2);
-        free(LVGL_BigBuf2);
-        vTaskDelete(NULL);
-    }
+
+    // if (LVGL_BigBuf2 == NULL || LVGL_BigBuf2 == NULL)
+    // {
+    //     ESP_LOGE(TAG, "Memory allocation failed!");
+    //     free(LVGL_BigBuf2);
+    //     free(LVGL_BigBuf2);
+    //     vTaskDelete(NULL);
+    // }
     // Initialize LVGL and display driver
     lv_init();
     lvgl_driver_init();
@@ -52,26 +54,33 @@ static void GUI_mainTask(void *pvParameter)
 
 void GUI_TaskInit(void)
 {
-    StaticTask_t *xTaskLVGLBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
-    StackType_t *xLVGLStack = (StackType_t *)malloc(LVGL_STACK * 8 * MULTIPLIER * sizeof(StackType_t));
-    // StaticTask_t *xTaskLVGLBuffer = (StaticTask_t *)heap_caps_malloc(sizeof(StaticTask_t), MALLOC_CAP_SPIRAM );
-    // StackType_t *xLVGLStack = (StackType_t *)heap_caps_malloc(LVGL_STACK * 8 * MULTIPLIER * sizeof(StackType_t), MALLOC_CAP_SPIRAM );
-    if (xTaskLVGLBuffer == NULL || xLVGLStack == NULL)
-    {
-        ESP_LOGE(TAG, "Memory allocation failed!");
-        free(xTaskLVGLBuffer);
-        free(xLVGLStack);
-        return; // Exit with an error code
-    }
-    xTaskCreateStatic(
-        GUI_mainTask,                // Task function
-        "GUI_mainTask",              // Task name (for debugging)
-        LVGL_STACK * 8 * MULTIPLIER, // Stack size (in words)
-        NULL,                        // Task parameters (passed to the task function)
-        tskIDLE_PRIORITY + 1,        // Task priority (adjust as needed)
-        xLVGLStack,                  // Stack buffer
-        xTaskLVGLBuffer              // Task control block
-    );
+    // StaticTask_t *xTaskLVGLBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
+    // StackType_t *xLVGLStack = (StackType_t *)malloc(LVGL_STACK * 8 * MULTIPLIER * sizeof(StackType_t));
+    // // StaticTask_t *xTaskLVGLBuffer = (StaticTask_t *)heap_caps_malloc(sizeof(StaticTask_t), MALLOC_CAP_SPIRAM );
+    // // StackType_t *xLVGLStack = (StackType_t *)heap_caps_malloc(LVGL_STACK * 8 * MULTIPLIER * sizeof(StackType_t), MALLOC_CAP_SPIRAM );
+    // if (xTaskLVGLBuffer == NULL || xLVGLStack == NULL)
+    // {
+    //     ESP_LOGE(TAG, "Memory allocation failed!");
+    //     free(xTaskLVGLBuffer);
+    //     free(xLVGLStack);
+    //     return; // Exit with an error code
+    // }
+    // xTaskCreateStatic(
+    //     GUI_mainTask,                // Task function
+    //     "GUI_mainTask",              // Task name (for debugging)
+    //     LVGL_STACK * 8 * MULTIPLIER, // Stack size (in words)
+    //     NULL,                        // Task parameters (passed to the task function)
+    //     tskIDLE_PRIORITY + 1,        // Task priority (adjust as needed)
+    //     xLVGLStack,                  // Stack buffer
+    //     xTaskLVGLBuffer              // Task control block
+    // );
+
+    xTaskCreate(GUI_mainTask,            // Task function
+                "GUI_mainTask",          // Task name
+                LVGL_STACK * MULTIPLIER, // Stack size in bytes
+                NULL,                    // Task parameters
+                tskIDLE_PRIORITY + 1,    // Task priority (adjust as needed)
+                NULL);                   // Task handle (optional)
     // this delay so important
     vTaskDelay(500);
 }
