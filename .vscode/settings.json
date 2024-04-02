@@ -8,7 +8,8 @@
         "string_view": "cpp",
         "initializer_list": "cpp",
         "lvglgui.h": "c",
-        "lvglinterface.h": "c"
+        "lvglinterface.h": "c",
+        "gui_guider.h": "c"
     },
     "idf.openOcdConfigs": [
         "board/esp32s3-builtin.cfg"
