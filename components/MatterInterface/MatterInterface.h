@@ -8,6 +8,7 @@
 #include <esp_matter.h>
 #include <esp_matter_console.h>
 #include <esp_matter_ota.h>
+
 #include <esp_matter_identify.h>
 #include <esp_matter_endpoint.h>
 

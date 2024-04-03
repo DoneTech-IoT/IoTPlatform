@@ -1,7 +1,6 @@
 /*
  * Mohammad Javad Abbasi (work.abbasii@gmail.com)
  * init 2023.11.27
- *
  * a component for work with Spiffs.
  */
 #include "SpiffsManger.h"
@@ -234,6 +233,7 @@ bool SpiffsRemoveFile(char *addressInSpiffs)
  *@return Returns true if the file is successfully saved, and false otherwise.
  */
 void SaveFileInSpiffsWithTxtFormat(char *addressInSpiffs, char *key, char *value, ...)
+
 {
     va_list args;
     va_start(args, value);
@@ -280,7 +280,6 @@ bool ReadTxtFileFromSpiffs(char *addressInSpiffs, char *key, char *value, ...)
         {
             const char *itemValue = item->valuestring;
             snprintf(currentValue, strlen(itemValue) + 1, "%s", itemValue);
-            keyFound = true;
         }
         currentKey = va_arg(args, char *);
         currentValue = va_arg(args, char *);

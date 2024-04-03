@@ -1,3 +1,4 @@
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -10,11 +11,14 @@ extern "C" {
 #include <nvs_flash.h>
 #include <sys/param.h>
 #include "protocol_examples_common.h"
+
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
 #include "freertos/queue.h"
+
 #include "SpiffsManger.h"
+
 
 // **************************************************************** applicaiton configurations
 #define SpotifyEnable
@@ -25,6 +29,7 @@ extern "C" {
 #define SpotifyConfigAddressInSpiffs "/spiffs/SpotifyConfig.txt"
 
 // **************************************************************** constant macros
+
 #define HTTPS_PRIORITY 4
 
 #define SEC         1000
@@ -45,6 +50,7 @@ extern SemaphoreHandle_t IsSpotifyAuthorizedSemaphore;
  * timeout definition part 
 */
 #define SPOTIFY_RESPONSE_TIMEOUT (10*1000)/portTICK_PERIOD_MS
+
 #endif
 
 // **************************************************************** initilization functions
@@ -52,8 +58,10 @@ extern SemaphoreHandle_t IsSpotifyAuthorizedSemaphore;
  * in this function we init hardware or variable that need them
  *  globally
  */
+
 void GlobalInit();
 #endif
 #ifdef __cplusplus
 }
 #endif
+

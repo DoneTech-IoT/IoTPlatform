@@ -81,3 +81,4 @@ bool SpiffsRemoveFile(char *addressInSpiffs);
 #ifdef __cplusplus
 }
 #endif
+
