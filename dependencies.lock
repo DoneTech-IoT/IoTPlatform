@@ -66,11 +66,11 @@ dependencies:
       type: service
     version: 1.0.0
   espressif/mdns:
-    component_hash: d96d277207c4fec77ec290b7a8b0ca4043e10f407df0ff6aa52e54a94f0c54a5
+    component_hash: d8ae7aa491ff97aea1d00d514a1de42cdbaaf1bce10df183968fa5594b904de7
     source:
       service_url: https://api.components.espressif.com/
       type: service
-    version: 1.2.4
+    version: 1.2.5
   espressif/rmaker_common:
     component_hash: 021c02465e4996dd3292db36ea47b5e3122e7e2d3514797735a96bc12598b44f
     source:
@@ -81,7 +81,13 @@ dependencies:
     component_hash: null
     source:
       type: idf
-    version: 5.1.2
-manifest_hash: 51fe40d3aae0527078c0fa921485269fb23f412079150bf135e7f4e1cb423eaa
+    version: 5.2.0
+  lvgl/lvgl:
+    component_hash: d7c1ac037ae6e85d94897f807d6e7ba0946a83e720074fc95a4f6241da9f9f53
+    source:
+      service_url: https://api.components.espressif.com/
+      type: service
+    version: 8.4.0
+manifest_hash: 72569d7d5e632ee18ffc17df2f3baf2a257dfa9cda1a27556bd52359a4968a0b
 target: esp32s3
 version: 1.0.0
