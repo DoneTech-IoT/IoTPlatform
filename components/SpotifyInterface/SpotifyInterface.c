@@ -58,7 +58,6 @@ bool Spotify_TaskInit(SpotifyInterfaceHandler_t *SpotifyInterfaceHandler)
         PrivateHandler.SpotifyBuffer.SpotifyResponseReadyFlag = xSemaphoreCreateBinary();    
         SpotifyAPICallInit(&PrivateHandler.SpotifyBuffer);
 
-
         ESP_LOGI(TAG, "Spotify app initiated successfully");
     }
     else
@@ -285,6 +284,7 @@ static bool Spotify_TokenRenew(void)
 }
 
 
+
 /**
  * @brief Sends a command to control Spotify.
  * This function sends various commands to control the Spotify application based on the given command value.
@@ -308,11 +308,11 @@ bool Spotify_SendCommand(SpotifyInterfaceHandler_t SpotifyInterfaceHandler, int 
 
     ESP_LOGI(TAG, "user Command is %d", Command);
     if (PrivateHandler.Status == LOGIN || PrivateHandler.Status == AUTHENTICATED)
-
     {
         ESP_LOGE(TAG, "You are not authorized !");
         return false;
     }
+
     bool IsSuccessfull = false;
     switch (Command)
     {

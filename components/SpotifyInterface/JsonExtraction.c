@@ -2,11 +2,11 @@
 #include "SpotifyTypedef.h"
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "cJSON.h"
 #include"JsonExtraction.h"
 
 static const char *TAG = "JsonExTraction";
+
 
 /**
  * @brief This function extracts specific parameters from a JSON string and assigns them to corresponding fields in a TokenParam structure.
@@ -16,7 +16,6 @@ static const char *TAG = "JsonExTraction";
  */
 bool ExtractAccessTokenParamsTokenFromJson(char *Json, Token_t *token) 
     {
-
     cJSON *J_Token = cJSON_Parse(Json);
     if (J_Token == NULL) 
     {

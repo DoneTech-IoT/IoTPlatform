@@ -12,13 +12,13 @@ extern "C"
 #include "esp_netif.h"
 #include "esp_eth.h"
 #include "protocol_examples_common.h"
-#include <esp_http_server.h>
+#include <esp_https_server.h>
 #include "esp_tls.h"
 #include "sdkconfig.h"
 #include "mdns.h"
 #include "freertos/queue.h"
 #include "esp_psram.h"
-#include "SpotifyWebAppInfo_sample.h"
+#include "SpotifyWebAppInfo.h"
 
 // ****************************************************************
 #define SPOTIFY_TASK_STACK_SIZE (uint32_t)(30*1000U)

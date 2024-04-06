@@ -163,18 +163,21 @@ bool Spotify_StartMDNSService()
         ESP_LOGE(TAG, "MDNS Init failed: %d", err);
         return false;
     }
+
     err = mdns_hostname_set("deskhub");
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "mdns_hostname_set  failed: %d", err);
         return false;
     }
+
     err = mdns_instance_name_set("spotify");
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "mdns_instance_name_set  failed: %d", err);
         return false;
     }
+
     err = mdns_service_add(NULL, "_http", "_tcp", 80, NULL, 0);
     if (err != ESP_OK)
     {
