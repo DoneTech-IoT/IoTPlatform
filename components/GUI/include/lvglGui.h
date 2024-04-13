@@ -10,21 +10,10 @@ extern "C" {
 
 #include"LVGLInterface.h"
 #include"lvglTimer.h"
-// #include "styles/lv_example_style.h"
-// #include "get_started/lv_example_get_started.h"
-// #include "widgets/lv_example_widgets.h"
-// #include "layouts/lv_example_layout.h"
-// #include "scroll/lv_example_scroll.h"
-// #include "anim/lv_example_anim.h"
-// #include "event/lv_example_event.h"
-// #include "styles/lv_example_style.h"
-// #include "others/lv_example_others.h"
-// #include "libs/lv_example_libs.h"
-// #include "lvgl__lvgl/src/font/lv_font.h"
-// #include "lvgl__lvgl/examples/scroll/lv_example_scroll.h"
-// #include "lvgl__lvgl/src/core/lv_obj.h"
 
-
+void SpotifyPageLoad();
+void MatterDisconnectPageLoad();
+void MatterConnectPageLoad();
 /**
  * @brief      create guiTask and its global method
  */
@@ -39,7 +28,7 @@ void GUI_TaskInit(void);
  * @return void
  */
 void GUI_UpdateSpotifyScreen(char *Artist, char *Song, char *Album, int DurationMS, int ProgressMS);
-
+void testMatter();
 #ifdef __cplusplus
 }
 #endif

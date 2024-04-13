@@ -1,13 +1,13 @@
 #include "lvglGui.h"
-#include "custom.h"
+
 #include "gui_guider.h"
 
 static const char *TAG = "LVGL_GUI";
 static lv_disp_draw_buf_t disp_draw_buf;
 // lv_color_t *LVGL_BigBuf1;
 // lv_color_t *LVGL_BigBuf2;
-lv_color_t *LVGL_BigBuf1[LV_HOR_RES_MAX * 100 * MULTIPLIER];
-lv_color_t *LVGL_BigBuf2[LV_HOR_RES_MAX * 100 * MULTIPLIER];
+// lv_color_t *LVGL_BigBuf1[LV_HOR_RES_MAX * 100 * MULTIPLIER];
+// lv_color_t *LVGL_BigBuf2[LV_HOR_RES_MAX * 100 * MULTIPLIER];
 /**
  * @brief main LVGL gui TASK
  */
@@ -96,4 +96,9 @@ void GUI_UpdateSpotifyScreen(char *Artist, char *Song, char *Album, int Duration
 
     int progress = (ProgressMS * 100) / DurationMS;
     lv_event_send(guider_ui.Spotify_Page_bar_progress, LV_EVENT_VALUE_CHANGED, progress);
+}
+
+void testMatter()
+{
+    lv_event_send(guider_ui.Spotify_Page_cont_1, LV_EVENT_VALUE_CHANGED, NULL);
 }

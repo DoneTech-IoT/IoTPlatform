@@ -1,0 +1,1 @@
+GEN_CSRCS += _song_cover_alpha_192x192.c _Spotify_Logo_RGB_White_alpha_120x35.c _matter_icon_alpha_58x54.c

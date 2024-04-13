@@ -1,11 +1,7 @@
 idf_component_register(
     SRCS
     
-"custom/custom.c"
 "generated/widgets_init.c"
-"generated/setup_scr_Main_Menu.c"
-"generated/setup_scr_Matter_connected_page.c"
-"generated/setup_scr_Matter_disconnect_page.c"
 "generated/guider_fonts/lv_font_arial_20.c"
 "generated/guider_fonts/lv_font_montserratMedium_12.c"
 "generated/guider_fonts/lv_font_montserratMedium_16.c"
@@ -19,7 +15,10 @@ idf_component_register(
 "generated/images/_Spotify_Logo_RGB_White_alpha_120x35.c"
 "generated/images/_lamp_alpha_152x134.c"
 "generated/images/_song_cover_alpha_192x192.c"
+"generated/images/mergeBinFile.c"
 "generated/images/_lamp_alpha_128x128.c"
+"generated/images/_matter_icon_alpha_58x54.c"
+"generated/images/_giphy_0_alpha_183x180.c"
 "generated/events_init.c"
 "generated/gui_guider.c"
 "generated/setup_scr_Spotify_Page.c"
@@ -27,7 +26,6 @@ idf_component_register(
 "srcs/lvglGui.c"
  INCLUDE_DIRS 
 
-"custom"
 "generated"
 "generated/guider_customer_fonts"
 "include"

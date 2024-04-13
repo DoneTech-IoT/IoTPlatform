@@ -7,20 +7,14 @@
 * terms, then you may not retain, install, activate or otherwise use the software.
 */
 
+#include "lvgl.h"
 
-#ifndef EVENTS_INIT_H_
-#define EVENTS_INIT_H_
-#ifdef __cplusplus
-extern "C" {
-#endif
+#if LV_USE_FS_RAWFS
 
-#include "gui_guider.h"
+const rawfs_size_t rawfs_file_count = 1;
+rawfs_file_t rawfs_files[1] = {
+	0x0, 0, 12604, "/Spotify_Logo_RGB_White.bin",
 
-void events_init(lv_ui *ui);
+};
 
-void events_init_Spotify_Page(lv_ui *ui);
-
-#ifdef __cplusplus
-}
-#endif
-#endif /* EVENT_CB_H_ */
+#endif  /*LV_USE_FS_RAWFS*/ 
