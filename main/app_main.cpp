@@ -34,35 +34,7 @@ void SpotifyPeriodicTimer(TimerHandle_t xTimer)
                             SpotifyInterfaceHandler.PlaybackInfo->Progress);
     ESP_LOGI(TAG, "Playback info updated");
 }
-void IRAM_ATTR BackBottomCallBack_(void *arg, void *data)
-{
-    if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, 0) == pdTRUE)
-    {
-        bool CommandResult = Spotify_SendCommand(SpotifyInterfaceHandler, Play);
-        if (CommandResult == false)
-        {
-            ESP_LOGE(TAG, "Play failed");
-            return;
-        }
-    }
-}
-void IRAM_ATTR AcceptBottomCallBack_(void *arg, void *data)
-{
-    if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, 0) == pdTRUE)
-    {
-        bool CommandResult = Spotify_SendCommand(SpotifyInterfaceHandler, Pause);
-        if (CommandResult == false)
-        {
-            ESP_LOGE(TAG, "Pause failed");
-            return;
-        }
-    }
-}
 // ****************************** GLobal Functions ****************************** //
-void MatterAttributeUpdateCBMain(callback_type_t type,
-                                 uint16_t endpoint_id, uint32_t cluster_id,
-                                 uint32_t attribute_id, esp_matter_attr_val_t *val,
-                                 void *priv_data);
 
 void CallbackTest(char *buffer)
 {
@@ -80,14 +52,10 @@ extern "C" void app_main()
     GlobalInit();
     nvsFlashInit();
     SpiffsGlobalConfig();
-    BottomCallBackFunctions_t BottomCallBackFunctions;
-    BottomCallBackFunctions.BackBottomCallBack = BackBottomCallBack_;
-    BottomCallBackFunctions.AcceptBottomCallBack = AcceptBottomCallBack_;
-    GPIO_init(BottomCallBackFunctions);
-
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
-    MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
+    MatterInterfaceHandler.ChangeGUIBuyMatterRequest=&MatterNetworkConnection;
+    // MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     Matter_TaskInit(&MatterInterfaceHandler);
     vTaskDelay((pdMS_TO_TICKS(SEC * 5)));
 
@@ -120,18 +88,4 @@ extern "C" void app_main()
             }
         }
     }
-}
-
-void MatterAttributeUpdateCBMain(
-    callback_type_t type,
-    uint16_t endpoint_id, uint32_t cluster_id,
-    uint32_t attribute_id, esp_matter_attr_val_t *val,
-    void *priv_data)
-{
-    printf("callback_type_t: %u\n", type);
-    printf("endpoint_id: %u\n", endpoint_id);
-    printf("cluster_id: %lu\n", cluster_id);
-    printf("attribute_id: %lu\n", attribute_id);
-    printf("val: %p\n", val);
-    printf("priv_data: %p\n", priv_data);
 }

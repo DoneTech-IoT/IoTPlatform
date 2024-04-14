@@ -10,7 +10,7 @@
 #include "events_init.h"
 #include <stdio.h>
 #include "lvgl.h"
-
+#include"lvglGui.h"
 #if LV_USE_FREEMASTER
 #include "freemaster_client.h"
 #endif
@@ -25,7 +25,7 @@ static void Spotify_Page_event_handler(lv_event_t *e)
 	case LV_EVENT_CLICKED:
 	{
 		ESP_LOGE("event", "Spotify_Page_event_handler");
-		ui_load_scr_animation(&guider_ui, &guider_ui.Main_Menu, guider_ui.Main_Menu_del, &guider_ui.Spotify_Page_del, setup_scr_Main_Menu, LV_SCR_LOAD_ANIM_NONE, 200, 200, false, true);
+		// ui_load_scr_animation(&guider_ui, &guider_ui.Main_Menu, guider_ui.Main_Menu_del, &guider_ui.Spotify_Page_del, setup_scr_Main_Menu, LV_SCR_LOAD_ANIM_NONE, 200, 200, false, true);
 		lv_refr_now(NULL);
 		break;
 	}

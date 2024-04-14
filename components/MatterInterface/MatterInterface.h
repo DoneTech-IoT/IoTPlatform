@@ -36,13 +36,13 @@ typedef void (*MatterIdentificationCBPtr)(
                 uint16_t endpoint_id, uint32_t cluster_id,
                 uint32_t attribute_id, esp_matter_attr_val_t *val, 
                 void *priv_data);
-
+ typedef void (*changeGUI)();
 typedef struct {
     QueueHandle_t *SharedBufQueue;
     SemaphoreHandle_t *SharedSemaphore;    
     MatterNetworkEventCBPtr MatterNetworkEventCB;
     MatterIdentificationCBPtr MatterIdentificationCB;
-    MatterAttributeUpdateCBPtr MatterAttributeUpdateCB;
+    changeGUI ChangeGUIBuyMatterRequest;
 } MatterInterfaceHandler_t;
 
 bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler);

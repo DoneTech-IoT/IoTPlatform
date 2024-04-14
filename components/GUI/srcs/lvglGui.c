@@ -98,7 +98,8 @@ void GUI_UpdateSpotifyScreen(char *Artist, char *Song, char *Album, int Duration
     lv_event_send(guider_ui.Spotify_Page_bar_progress, LV_EVENT_VALUE_CHANGED, progress);
 }
 
-void testMatter()
+void MatterNetworkConnection()
 {
     lv_event_send(guider_ui.Spotify_Page_cont_1, LV_EVENT_VALUE_CHANGED, NULL);
+    ESP_LOGW(TAG, "request for changing color");
 }
