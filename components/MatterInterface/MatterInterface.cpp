@@ -79,8 +79,8 @@ static esp_err_t app_attribute_update_cb(callback_type_t type, uint16_t endpoint
         /* Handle the attribute updates here. */
     }
 
-    // InterfaceHandler->MatterAttributeUpdateCB(type, endpoint_id, cluster_id, attribute_id, val, priv_data);
-
+    InterfaceHandler->MatterAttributeUpdateCB(type, endpoint_id, cluster_id, attribute_id, val, priv_data);
+    ESP_LOGW("MYlog","app_attribute_update_cb");
     return ESP_OK;
 }
 
@@ -89,10 +89,10 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
     InterfaceHandler = MatterInterfaceHandler;
 
     if (InterfaceHandler->SharedBufQueue != NULL &&
-        InterfaceHandler->SharedSemaphore != NULL 
+        InterfaceHandler->SharedSemaphore != NULL &&
         // InterfaceHandler->MatterNetworkEventCB != NULL &&
         // InterfaceHandler->MatterIdentificationCB != NULL &&
-        // InterfaceHandler->MatterAttributeUpdateCB != NULL
+        InterfaceHandler->MatterAttributeUpdateCB != NULL
         )
     {
         esp_err_t err = ESP_OK;

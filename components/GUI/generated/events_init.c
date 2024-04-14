@@ -130,6 +130,7 @@ static void Spotify_Page_cont_1_event_handler (lv_event_t *e)
 	case LV_EVENT_VALUE_CHANGED:
 	{
 		lv_obj_set_style_bg_color(guider_ui.Spotify_Page_cont_1, lv_color_hex(0xfffb00), LV_PART_MAIN);
+		ESP_LOGW("LVGL", "lv_obj_set_style_bg_color");
 		lv_refr_now(NULL);
 		break;
 	}

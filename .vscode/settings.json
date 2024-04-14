@@ -10,7 +10,13 @@
         "lvglgui.h": "c",
         "lvglinterface.h": "c",
         "gui_guider.h": "c",
-        "cstdint": "cpp"
+        "cstdint": "cpp",
+        "compare": "cpp",
+        "functional": "cpp",
+        "ratio": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp"
     },
     "idf.openOcdConfigs": [
         "board/esp32s3-builtin.cfg"
