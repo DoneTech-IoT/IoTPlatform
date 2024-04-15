@@ -49,7 +49,7 @@ extern "C" void app_main()
     size_t freeHeapSize;
     freeHeapSize = xPortGetFreeHeapSize();
     ESP_LOGW("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);
-    GUI_TaskInit();
+    // GUI_TaskInit();
     freeHeapSize = xPortGetFreeHeapSize();
     ESP_LOGW("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);
     GlobalInit();

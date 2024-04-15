@@ -29,7 +29,7 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
     case chip::DeviceLayer::DeviceEventType::kCommissioningComplete:
     {
         ESP_LOGW(TAG, " Commissioning has completed by a call to the general commissioning cluster command.");
-        InterfaceHandler->ChangeGUIBuyMatterRequest();
+        // InterfaceHandler->ChangeGUIBuyMatterRequest();
         break;
     }
 
