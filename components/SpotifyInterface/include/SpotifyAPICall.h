@@ -7,7 +7,7 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 #include "cJSON.h"
-#include "esp_http_client.h"
+// #include "esp_https_client.h"
 #include "SpotifyInterface.h"
 #include"SpotifyTypedef.h"
 #include "esp_crt_bundle.h"
