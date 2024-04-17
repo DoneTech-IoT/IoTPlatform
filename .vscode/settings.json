@@ -3,7 +3,8 @@
     "files.associations": {
         "lvgl.h": "c",
         "rm67162.h": "c",
-        "rm67162_qspi_pins_config.h": "c"
+        "rm67162_qspi_pins_config.h": "c",
+        "cstdint": "c"
     },
     "idf.openOcdConfigs": [
         "board/esp32s3-builtin.cfg"

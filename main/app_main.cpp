@@ -1,97 +1,107 @@
+#include "lvglGui.h"
 #include "GlobalInit.h"
 #include "nvsFlash.h"
-#include "MatterInterface.h"
 #include "SpotifyInterface.h"
-#include "SpiffsManger.h"
-// ****************************** GLobal Variables ****************************** //
-SemaphoreHandle_t IsSpotifyAuthorizedSemaphore;
-SemaphoreHandle_t WifiParamExistenceCheckerSemaphore;
-SemaphoreHandle_t FinishWifiConfig;
-SemaphoreHandle_t WorkWithStorageInSpotifyComponentSemaphore;
-GlobalInitInterfaceHandler_t GlobalInitInterfaceHandler;
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "Setup_GPIO.h"
+#include "MatterInterface.h"
 
-QueueHandle_t HttpsBufQueue;
-SemaphoreHandle_t HttpsResponseReadySemaphore;
-SpotifyInterfaceHandler_t SpotifyInterfaceHandler;  
-
+#define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
 MatterInterfaceHandler_t MatterInterfaceHandler;
+// ****************************** GLobal Variables ****************************** //
+static const char *TAG = "Main";
+SpotifyInterfaceHandler_t SpotifyInterfaceHandler;
 
 // ****************************** GLobal Functions ****************************** //
-void MatterAttributeUpdateCBMain(callback_type_t type, 
-                uint16_t endpoint_id, uint32_t cluster_id,
-                uint32_t attribute_id, esp_matter_attr_val_t *val, 
-                void *priv_data);
-
+/**
+ * @brief Function to change colors based on a timer callback
+ */
+void SpotifyPeriodicTimer(TimerHandle_t xTimer)
+{
+    bool CommandResult = Spotify_SendCommand(SpotifyInterfaceHandler, GetNowPlaying);
+    if (CommandResult == false)
+    {
+        ESP_LOGE(TAG, "Playback info update failed");
+        return;
+    }
+    GUI_UpdateSpotifyScreen(SpotifyInterfaceHandler.PlaybackInfo->ArtistName,
+                            SpotifyInterfaceHandler.PlaybackInfo->SongName,
+                            SpotifyInterfaceHandler.PlaybackInfo->AlbumName,
+                            SpotifyInterfaceHandler.PlaybackInfo->Duration,
+                            SpotifyInterfaceHandler.PlaybackInfo->Progress);
+    ESP_LOGI(TAG, "Playback info updated");
+}
+// ****************************** GLobal Functions ****************************** //
+void MatterAttributeUpdateCBMain(callback_type_t type,
+                                 uint16_t endpoint_id, uint32_t cluster_id,
+                                 uint32_t attribute_id, esp_matter_attr_val_t *val,
+                                 void *priv_data);
 void CallbackTest(char *buffer)
 {
     ESP_LOGW("Spotify_callback_test ", "%s", buffer);
 }
 
 extern "C" void app_main()
-{   
-    //nvsFlashInit();
-    nvs_flash_init();
-    GlobalInitInterfaceHandler.HttpsBufQueue = &HttpsBufQueue;
-    GlobalInitInterfaceHandler.HttpsResponseReadySemaphore = &HttpsResponseReadySemaphore;
-    GlobalInitInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
-    GlobalInitInterfaceHandler.WorkWithStorageInSpotifyComponentSemaphore = &WorkWithStorageInSpotifyComponentSemaphore;
-    GlobalInitInterfaceHandler.WifiParamExistenceCheckerSemaphore = &WifiParamExistenceCheckerSemaphore;
-    GlobalInitInterfaceHandler.FinishWifiConfig = &FinishWifiConfig;    
-    GlobalInit(&GlobalInitInterfaceHandler);
-    SpiffsInit();
-
-    MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
-    MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
-    MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
-    Matter_TaskInit(&MatterInterfaceHandler);
-
-vTaskDelay((pdMS_TO_TICKS(SEC * 5)));
-
-
-#ifdef SpotifyEnable
-    SpotifyInterfaceHandler.HttpsBufQueue = &HttpsBufQueue;
-    SpotifyInterfaceHandler.HttpsResponseReadySemaphore = &HttpsResponseReadySemaphore;
-    SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
-    SpotifyInterfaceHandler.WorkWithStorageInSpotifyComponentSemaphore = &WorkWithStorageInSpotifyComponentSemaphore;
-    SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
-    SpotifyInterfaceHandler.EventHandlerCallBackFunction = CallbackTest;
-    Spotify_TaskInit(&SpotifyInterfaceHandler, SPOTIFY_TASK_STACK_SIZE);
-    // after this semaphore you can use playback command function in every where !
-    // if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
-    //     Spotify_SendCommand(GetNowPlaying);
-    // vTaskDelay((pdMS_TO_TICKS(SEC * 10)));
-    // Spotify_SendCommand(Play);
-    // vTaskDelay((pdMS_TO_TICKS(SEC * 15)));
-    // Spotify_SendCommand(GetNowPlaying);
-    // vTaskDelay((pdMS_TO_TICKS(SEC * 15)));
-    // Spotify_SendCommand(GetUserInfo);
-    // vTaskDelay((pdMS_TO_TICKS(SEC * 15)));
-    // Spotify_SendCommand(Pause);
- #endif
-
-    vTaskDelay(5000/portTICK_PERIOD_MS);
-    unsigned int numberOfTasks = uxTaskGetNumberOfTasks();
-    printf("Number of tasks: %u\n", numberOfTasks);
-    printf("CONFIG_FREERTOS_HZ =%d\n",CONFIG_FREERTOS_HZ);    
+{
     size_t freeHeapSize;
     freeHeapSize = xPortGetFreeHeapSize();
-    ESP_LOGE("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);
-}
+    ESP_LOGW("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);
+    GUI_TaskInit();
+    freeHeapSize = xPortGetFreeHeapSize();
+    ESP_LOGW("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);
+    GlobalInit();
+    nvsFlashInit();
+    SpiffsGlobalConfig();
+    MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
+    MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
+    MatterInterfaceHandler.ChangeGUIBuyMatterRequest=&MatterNetworkConnection;
+    MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
+    Matter_TaskInit(&MatterInterfaceHandler);
+    vTaskDelay((pdMS_TO_TICKS(SEC * 5)));
 
+    SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
+    SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
+    Spotify_TaskInit(&SpotifyInterfaceHandler);
+    unsigned int numberOfTasks = uxTaskGetNumberOfTasks();
+    printf("Number of tasks: %u\n", numberOfTasks);
+    printf("CONFIG_FREERTOS_HZ =%d\n", CONFIG_FREERTOS_HZ);
+    freeHeapSize = xPortGetFreeHeapSize();
+    ESP_LOGE(TAG, "Free Heap Size: %u bytes\n", freeHeapSize);
+    // after this semaphore you can use playback command function in every where !
+    if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
+    {
+        bool CommandResult = false;
+        CommandResult = Spotify_SendCommand(SpotifyInterfaceHandler, GetUserInfo);
+        if (CommandResult == false)
+        {
+            ESP_LOGE(TAG, "User info update failed");
+            return;
+        }
+        ESP_LOGI(TAG, "User info updated");
+        TimerHandle_t xTimer = xTimerCreate("update", TIMER_TIME, pdTRUE, NULL, SpotifyPeriodicTimer);
+        xTimerStart(xTimer, 0);
+        if (xTimer != NULL)
+        {
+            if (xTimerStart(xTimer, 0) == pdPASS)
+            {
+                ESP_LOGI(TAG, "Timer getting start");
+            }
+        }
+    }
+}
 void MatterAttributeUpdateCBMain(
-                callback_type_t type, 
-                uint16_t endpoint_id, uint32_t cluster_id,
-                uint32_t attribute_id, esp_matter_attr_val_t *val, 
-                void *priv_data)
+    callback_type_t type,
+    uint16_t endpoint_id, uint32_t cluster_id,
+    uint32_t attribute_id, esp_matter_attr_val_t *val,
+    void *priv_data)
 {
-    // SEZ@Done comment it for cleaning sturtup logging
-    
-    // printf("callback_type_t: %u\n", type);
-    // printf("endpoint_id: %u\n", endpoint_id);
-    // printf("cluster_id: %lu\n", cluster_id);
-    // printf("attribute_id: %lu\n", attribute_id);
-    // printf("val: %p\n", val);
-    // printf("priv_data: %p\n", priv_data);
+    printf("callback_type_t: %u\n", type);
+    printf("endpoint_id: %u\n", endpoint_id);
+    printf("cluster_id: %lu\n", cluster_id);
+    printf("attribute_id: %lu\n", attribute_id);
+    printf("val: %p\n", val);
+    printf("priv_data: %p\n", priv_data);
 }
