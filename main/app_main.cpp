@@ -73,10 +73,10 @@ extern "C" void app_main()
 {
     size_t freeHeapSize;
     freeHeapSize = xPortGetFreeHeapSize();
-    ESP_LOGW("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);
+    ESP_LOGW("TAG", "Free Heap Size befor GUI: %u bytes\n", freeHeapSize);
     GUI_TaskInit();
     freeHeapSize = xPortGetFreeHeapSize();
-    ESP_LOGW("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);
+    ESP_LOGW("TAG", "Free Heap Size after GUI: %u bytes\n", freeHeapSize);
     GlobalInit();
     nvsFlashInit();
     SpiffsGlobalConfig();
@@ -85,20 +85,28 @@ extern "C" void app_main()
     BottomCallBackFunctions.AcceptBottomCallBack = AcceptBottomCallBack_;
     GPIO_init(BottomCallBackFunctions);
 
+    freeHeapSize = xPortGetFreeHeapSize();
+    ESP_LOGW("TAG", "Free Heap Size befor Matter: %u bytes\n", freeHeapSize);
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     Matter_TaskInit(&MatterInterfaceHandler);
+    freeHeapSize = xPortGetFreeHeapSize();
+    ESP_LOGW("TAG", "Free Heap Size after Matter: %u bytes\n", freeHeapSize);
     vTaskDelay((pdMS_TO_TICKS(SEC * 5)));
 
+    freeHeapSize = xPortGetFreeHeapSize();
+    ESP_LOGW("TAG", "Free Heap Size befor Spotify: %u bytes\n", freeHeapSize);
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
     SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
-    Spotify_TaskInit(&SpotifyInterfaceHandler);
+    Spotify_TaskInit(&SpotifyInterfaceHandler);    
+    
     unsigned int numberOfTasks = uxTaskGetNumberOfTasks();
-    printf("Number of tasks: %u\n", numberOfTasks);
-    printf("CONFIG_FREERTOS_HZ =%d\n", CONFIG_FREERTOS_HZ);
+    ESP_LOGW(TAG, "Number of tasks: %u\n", numberOfTasks);
+    ESP_LOGW(TAG, "CONFIG_FREERTOS_HZ =%d\n", CONFIG_FREERTOS_HZ);
     freeHeapSize = xPortGetFreeHeapSize();
-    ESP_LOGE(TAG, "Free Heap Size: %u bytes\n", freeHeapSize);
+    ESP_LOGW(TAG, "Free Heap Size: %u bytes\n", freeHeapSize);
+
     // after this semaphore you can use playback command function in every where !
     if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
     {
@@ -119,7 +127,7 @@ extern "C" void app_main()
                 ESP_LOGI(TAG, "Timer getting start");
             }
         }
-    }
+    }    
 }
 
 void MatterAttributeUpdateCBMain(
@@ -128,10 +136,10 @@ void MatterAttributeUpdateCBMain(
     uint32_t attribute_id, esp_matter_attr_val_t *val,
     void *priv_data)
 {
-    printf("callback_type_t: %u\n", type);
-    printf("endpoint_id: %u\n", endpoint_id);
-    printf("cluster_id: %lu\n", cluster_id);
-    printf("attribute_id: %lu\n", attribute_id);
-    printf("val: %p\n", val);
-    printf("priv_data: %p\n", priv_data);
+    // printf("callback_type_t: %u\n", type);
+    // printf("endpoint_id: %u\n", endpoint_id);
+    // printf("cluster_id: %lu\n", cluster_id);
+    // printf("attribute_id: %lu\n", attribute_id);
+    // printf("val: %p\n", val);
+    // printf("priv_data: %p\n", priv_data);
 }
