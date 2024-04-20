@@ -21,7 +21,8 @@
 
 #include <app_priv.h>
 #include <app_reset.h>
-
+#include <app/server/CommissioningWindowManager.h>
+#include <app/server/Server.h>
 using namespace esp_matter;
 using namespace esp_matter::attribute;
 using namespace esp_matter::endpoint;

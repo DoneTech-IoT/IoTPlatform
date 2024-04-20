@@ -1,4 +1,4 @@
-set(PRIV_REQUIRES_LIST device esp_matter esp_matter_console app_reset)
+set(PRIV_REQUIRES_LIST device esp_matter esp_matter_console app_reset GUI)
 
 idf_component_register(
     SRC_DIRS     "."

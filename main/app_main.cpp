@@ -27,11 +27,11 @@ void SpotifyPeriodicTimer(TimerHandle_t xTimer)
         ESP_LOGE(TAG, "Playback info update failed");
         return;
     }
-    GUI_UpdateSpotifyScreen(SpotifyInterfaceHandler.PlaybackInfo->ArtistName,
-                            SpotifyInterfaceHandler.PlaybackInfo->SongName,
-                            SpotifyInterfaceHandler.PlaybackInfo->AlbumName,
-                            SpotifyInterfaceHandler.PlaybackInfo->Duration,
-                            SpotifyInterfaceHandler.PlaybackInfo->Progress);
+    // GUI_UpdateSpotifyScreen(SpotifyInterfaceHandler.PlaybackInfo->ArtistName,
+    //                         SpotifyInterfaceHandler.PlaybackInfo->SongName,
+    //                         SpotifyInterfaceHandler.PlaybackInfo->AlbumName,
+    //                         SpotifyInterfaceHandler.PlaybackInfo->Duration,
+    //                         SpotifyInterfaceHandler.PlaybackInfo->Progress);
     ESP_LOGI(TAG, "Playback info updated");
 }
 void IRAM_ATTR BackBottomCallBack_(void *arg, void *data)
@@ -90,7 +90,7 @@ extern "C" void app_main()
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     Matter_TaskInit(&MatterInterfaceHandler);
     vTaskDelay((pdMS_TO_TICKS(SEC * 5)));
-
+    // MatterNetworkConnected();
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
     SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
     Spotify_TaskInit(&SpotifyInterfaceHandler);
@@ -120,6 +120,7 @@ extern "C" void app_main()
             }
         }
     }
+    
 }
 
 void MatterAttributeUpdateCBMain(
