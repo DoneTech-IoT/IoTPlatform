@@ -80,17 +80,14 @@ extern "C" void app_main()
     GlobalInit();
     nvsFlashInit();
     SpiffsGlobalConfig();
-    BottomCallBackFunctions_t BottomCallBackFunctions;
-    BottomCallBackFunctions.BackBottomCallBack = BackBottomCallBack_;
-    BottomCallBackFunctions.AcceptBottomCallBack = AcceptBottomCallBack_;
-    GPIO_init(BottomCallBackFunctions);
 
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
+    MatterInterfaceHandler.UpdateGUI_AddMatterIcon=MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
+
     vTaskDelay((pdMS_TO_TICKS(SEC * 5)));
-    // MatterNetworkConnected();
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
     SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
     Spotify_TaskInit(&SpotifyInterfaceHandler);

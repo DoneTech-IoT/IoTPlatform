@@ -17,7 +17,6 @@
 
 #include <app_priv.h>
 #include <app_reset.h>
-#include"lvglGui.h"
 using chip::kInvalidClusterId;
 static constexpr chip::CommandId kInvalidCommandId = 0xFFFF'FFFF;
 

@@ -6,7 +6,6 @@
 #endif
 
 #include "MatterInterface.h"
-#include "lvglGui.h"
 // ****************************** Local Variables
 static const char *TAG = "MatterTask";
 uint16_t switch_endpoint_id = 0;
@@ -27,7 +26,7 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
         chip::CommissioningWindowManager &commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
         if (!commissionMgr.IsCommissioningWindowOpen())
         {
-            MatterNetworkConnected();
+            InterfaceHandler->UpdateGUI_AddMatterIcon();
         }
         break;
     }
@@ -56,10 +55,8 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
         break;
 
     case chip::DeviceLayer::DeviceEventType::kFabricRemoved:
-    {
         ESP_LOGW(TAG, "Fabric removed successfully");
         break;
-    }
 
     case chip::DeviceLayer::DeviceEventType::kFabricWillBeRemoved:
         ESP_LOGW(TAG, "Fabric will be removed");
@@ -71,13 +68,12 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
 
     case chip::DeviceLayer::DeviceEventType::kFabricCommitted:
         ESP_LOGW(TAG, "Fabric is committed");
-        MatterNetworkConnected();
+        InterfaceHandler->UpdateGUI_AddMatterIcon();
         break;
 
     case chip::DeviceLayer::DeviceEventType::kBLEDeinitialized:
         ESP_LOGW(TAG, "BLE deinitialized and memory reclaimed");
         break;
-
     default:
         break;
     }
@@ -111,8 +107,7 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
 
     if (InterfaceHandler->SharedBufQueue != NULL &&
         InterfaceHandler->SharedSemaphore != NULL &&
-        // InterfaceHandler->MatterNetworkEventCB != NULL &&
-        // InterfaceHandler->MatterIdentificationCB != NULL &&
+        InterfaceHandler->UpdateGUI_AddMatterIcon != NULL &&
         InterfaceHandler->MatterAttributeUpdateCB != NULL)
     {
         esp_err_t err = ESP_OK;

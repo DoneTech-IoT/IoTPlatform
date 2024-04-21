@@ -38,12 +38,14 @@ typedef void (*MatterIdentificationCBPtr)(
                 uint32_t attribute_id, esp_matter_attr_val_t *val, 
                 void *priv_data);
 
+typedef void (*UpdateGUI_AddMatterIconPtr)();
 typedef struct {
     QueueHandle_t *SharedBufQueue;
     SemaphoreHandle_t *SharedSemaphore;    
     MatterNetworkEventCBPtr MatterNetworkEventCB;
     MatterIdentificationCBPtr MatterIdentificationCB;
     MatterAttributeUpdateCBPtr MatterAttributeUpdateCB;
+    UpdateGUI_AddMatterIconPtr UpdateGUI_AddMatterIcon;
 } MatterInterfaceHandler_t;
 
 bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler);
