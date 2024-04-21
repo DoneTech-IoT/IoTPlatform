@@ -166,7 +166,6 @@ static void Spotify_Page_Matter_logo_photo_Handler(lv_event_t *e)
 	case LV_EVENT_VALUE_CHANGED:
 	{
 		lv_obj_set_style_img_opa(object, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-		ESP_LOGE("TAG", "do matter logo show");
 		lv_refr_now(NULL);
 		break;
 	}

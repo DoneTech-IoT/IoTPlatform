@@ -106,5 +106,4 @@ void GUI_UpdateSpotifyScreen(bool songUpdated, char *Artist, char *Song, char *A
 void MatterNetworkConnected()
 {
     lv_event_send(guider_ui.Matter_logo, LV_EVENT_VALUE_CHANGED, NULL);
-    ESP_LOGE(TAG, "send matter logo show");
 }
