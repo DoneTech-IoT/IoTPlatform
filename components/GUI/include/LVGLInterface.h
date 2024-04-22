@@ -34,7 +34,7 @@ extern "C"
 #include "rm67162Lilygo.h"
 #include "rm67162.h"
 
-#define MULTIPLIER 20
+#define MULTIPLIER 5
 #define LV_TICK_PERIOD_MS 1
 #define LVGL_STACK 2500
 #define TIMER_CALLBACK_TIME 10 * 1000 /* in milliseconds */
