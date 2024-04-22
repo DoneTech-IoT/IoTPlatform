@@ -73,7 +73,7 @@ extern "C" void app_main()
 {
     size_t freeHeapSize;
     freeHeapSize = xPortGetFreeHeapSize();
-    ESP_LOGW("TAG", "Free Heap Size befor GUI: %u bytes\n", freeHeapSize);
+    ESP_LOGW("TAG", "Free Heap Size before GUI: %u bytes\n", freeHeapSize);
     GUI_TaskInit();
     freeHeapSize = xPortGetFreeHeapSize();
     ESP_LOGW("TAG", "Free Heap Size after GUI: %u bytes\n", freeHeapSize);
@@ -86,7 +86,7 @@ extern "C" void app_main()
     GPIO_init(BottomCallBackFunctions);
 
     freeHeapSize = xPortGetFreeHeapSize();
-    ESP_LOGW("TAG", "Free Heap Size befor Matter: %u bytes\n", freeHeapSize);
+    ESP_LOGW("TAG", "Free Heap Size before Matter: %u bytes\n", freeHeapSize);
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
@@ -96,7 +96,7 @@ extern "C" void app_main()
     vTaskDelay((pdMS_TO_TICKS(SEC * 5)));
 
     freeHeapSize = xPortGetFreeHeapSize();
-    ESP_LOGW("TAG", "Free Heap Size befor Spotify: %u bytes\n", freeHeapSize);
+    ESP_LOGW("TAG", "Free Heap Size before Spotify: %u bytes\n", freeHeapSize);
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
     SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
     Spotify_TaskInit(&SpotifyInterfaceHandler);    
