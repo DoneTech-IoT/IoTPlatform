@@ -6,11 +6,13 @@
 #include "freertos/task.h"
 #include "Setup_GPIO.h"
 #include "MatterInterface.h"
+#include"TaskManger.h"
 
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
 MatterInterfaceHandler_t MatterInterfaceHandler;
+GuiInterfaceHandler_t GuiInterfaceHandler;
 // ****************************** GLobal Variables ****************************** //
 static const char *TAG = "Main";
 SpotifyInterfaceHandler_t SpotifyInterfaceHandler;
@@ -73,7 +75,8 @@ extern "C" void app_main()
 {
     size_t freeHeapSize;
     freeHeapSize = xPortGetFreeHeapSize();
-    ESP_LOGW("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);
+    GuiInterfaceHandler.TaskPriority=tskIDLE_PRIORITY + 1;
+    GuiInterfaceHandler.GuiTaskHandler=xTaskGUIHandle;
     GUI_TaskInit();
     freeHeapSize = xPortGetFreeHeapSize();
     ESP_LOGW("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);

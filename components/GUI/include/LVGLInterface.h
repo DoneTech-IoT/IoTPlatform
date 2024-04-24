@@ -28,6 +28,11 @@ extern "C"
 #define LVGL_STACK 2500
 #define TIMER_CALLBACK_TIME 10 * 1000 /* in milliseconds */
 
+typedef struct GuiInterfaceHandler_t
+{
+   UBaseType_t TaskPriority;
+   TaskHandle_t GuiTaskHandler;
+};
 #ifdef __cplusplus
 }
 #endif

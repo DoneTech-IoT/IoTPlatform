@@ -18,12 +18,12 @@ void GUI_TaskInit(void)
         free(xLVGLStack);
         return; // Exit with an error code
     }
-    xTaskCreateStatic(
+    GuiInterfaceHandler.GuiTaskHandler=xTaskCreateStatic(
         GUI_mainTask,                // Task function
         "GUI_mainTask",              // Task name (for debugging)
         LVGL_STACK * 8 * MULTIPLIER, // Stack size (in words)
         NULL,                        // Task parameters (passed to the task function)
-        tskIDLE_PRIORITY + 1,        // Task priority (adjust as needed)
+        GuiInterfaceHandler.TaskPriority,        // Task priority (adjust as needed)
         xLVGLStack,                  // Stack buffer
         xTaskLVGLBuffer              // Task control block
     );
@@ -68,6 +68,10 @@ void GUI_mainTask(void *pvParameter)
     }
 }
 
+void KillGUI_Task()
+{
+    
+}
 /**
  * @brief Function to update the LVGL screen
  * @param Artist: Artist name

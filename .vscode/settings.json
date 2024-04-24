@@ -11,7 +11,10 @@
         "lvglinterface.h": "c",
         "gui_guider.h": "c",
         "cstdint": "cpp",
-        "cstdlib": "cpp"
+        "cstdlib": "cpp",
+        "rm67162lilygo.h": "c",
+        "param.h": "c",
+        "lvgl_helpers.h": "c"
     },
     "idf.openOcdConfigs": [
         "board/esp32s3-builtin.cfg"
