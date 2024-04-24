@@ -7,7 +7,7 @@ void GUI_mainTask(void *pvParameter);
 /**
  * @brief Function to creat GUI task in staticly
  */
-void GUI_TaskInit(void)
+void GUI_TaskInit(GuiInterfaceHandler_t *GuiInterfaceHandler)
 {
     StaticTask_t *xTaskLVGLBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
     StackType_t *xLVGLStack = (StackType_t *)malloc(LVGL_STACK * 8 * MULTIPLIER * sizeof(StackType_t));
@@ -18,12 +18,12 @@ void GUI_TaskInit(void)
         free(xLVGLStack);
         return; // Exit with an error code
     }
-    GuiInterfaceHandler.GuiTaskHandler=xTaskCreateStatic(
+    GuiInterfaceHandler->GuiTaskHandler=xTaskCreateStatic(
         GUI_mainTask,                // Task function
         "GUI_mainTask",              // Task name (for debugging)
         LVGL_STACK * 8 * MULTIPLIER, // Stack size (in words)
         NULL,                        // Task parameters (passed to the task function)
-        GuiInterfaceHandler.TaskPriority,        // Task priority (adjust as needed)
+        GuiInterfaceHandler->TaskPriority,        // Task priority (adjust as needed)
         xLVGLStack,                  // Stack buffer
         xTaskLVGLBuffer              // Task control block
     );
@@ -70,7 +70,7 @@ void GUI_mainTask(void *pvParameter)
 
 void KillGUI_Task()
 {
-    
+    //to do
 }
 /**
  * @brief Function to update the LVGL screen

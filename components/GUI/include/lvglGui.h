@@ -14,7 +14,7 @@ extern "C" {
 /**
  * @brief      create guiTask and its global method
  */
-void GUI_TaskInit(void);
+void GUI_TaskInit(GuiInterfaceHandler_t *GuiInterfaceHandler);
 
 /**
  * @brief Function to update the LVGL screen

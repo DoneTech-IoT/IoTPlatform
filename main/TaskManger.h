@@ -16,7 +16,7 @@
 
 
 
-TaskHandle_t xTaskGUIHandle;
+TaskHandle_t xTaskGUIHandler;
 
 
 

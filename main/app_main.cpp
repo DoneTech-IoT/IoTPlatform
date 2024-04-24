@@ -76,8 +76,8 @@ extern "C" void app_main()
     size_t freeHeapSize;
     freeHeapSize = xPortGetFreeHeapSize();
     GuiInterfaceHandler.TaskPriority=tskIDLE_PRIORITY + 1;
-    GuiInterfaceHandler.GuiTaskHandler=xTaskGUIHandle;
-    GUI_TaskInit();
+    GuiInterfaceHandler.GuiTaskHandler=xTaskGUIHandler;
+    GUI_TaskInit(&GuiInterfaceHandler);
     freeHeapSize = xPortGetFreeHeapSize();
     ESP_LOGW("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);
     GlobalInit();

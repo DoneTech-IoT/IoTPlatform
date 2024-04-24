@@ -32,7 +32,7 @@ typedef struct GuiInterfaceHandler_t
 {
    UBaseType_t TaskPriority;
    TaskHandle_t GuiTaskHandler;
-};
+}GuiInterfaceHandler_t;
 #ifdef __cplusplus
 }
 #endif
