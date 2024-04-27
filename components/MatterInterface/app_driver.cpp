@@ -277,3 +277,8 @@ app_driver_handle_t app_driver_switch_init()
 
     return (app_driver_handle_t)handle;
 }
+
+app_driver_handle_t app_driver_coffee_maker_init()
+{    
+    return (app_driver_handle_t) handle;
+}

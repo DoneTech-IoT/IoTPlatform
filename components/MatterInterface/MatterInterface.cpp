@@ -7,10 +7,12 @@
 #endif
 
 #include "MatterInterface.h"
+#include "DoneMatterEndpoint.h"
 
 // ****************************** Local Variables 
 static const char *TAG = "MatterTask";
 uint16_t switch_endpoint_id = 0;
+uint16_t coffee_maker_endpoint_id = 0;
 static MatterInterfaceHandler_t *InterfaceHandler;
 // ****************************** Local Functions 
 
@@ -94,24 +96,35 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         app_driver_handle_t switch_handle = app_driver_switch_init();
         app_reset_button_register(switch_handle);
 
+        app_driver_handle_t coffee_maker_handle = app_driver_coffee_maker_init();        
+
         /* Create a Matter node and add the mandatory Root Node device type on endpoint 0 */
         node::config_t node_config;
         node_t *node = node::create(&node_config, app_attribute_update_cb, app_identification_cb);
 
         on_off_switch::config_t switch_config;
-        endpoint_t *endpoint = on_off_switch::create(node, &switch_config, ENDPOINT_FLAG_NONE, switch_handle);
+        endpoint_t *endpoint1 = on_off_switch::create(node, &switch_config, ENDPOINT_FLAG_NONE, switch_handle);
+
+        done_coffee_maker::config_t coffee_maker_config;
+        endpoint_t *endpoint2 = on_off_switch::create(node, &coffee_maker_config, ENDPOINT_FLAG_NONE, coffe_maker_handle);
 
         /* These node and endpoint handles can be used to create/add other endpoints and clusters. */
-        if (!node || !endpoint) {
+        if (!node || !endpoint1 || !endpoint2) {
             ESP_LOGE(TAG, "Matter node creation failed");
         }
 
+        //SEZ@Done on_off_switch doesn't have group user by default.
+        //so add it manually.
+
         /* Add group cluster to the switch endpoint */
         cluster::groups::config_t groups_config;
-        cluster::groups::create(endpoint, &groups_config, CLUSTER_FLAG_SERVER | CLUSTER_FLAG_CLIENT);
+        cluster::groups::create(endpoint1, &groups_config, CLUSTER_FLAG_SERVER | CLUSTER_FLAG_CLIENT);
 
-        switch_endpoint_id = endpoint::get_id(endpoint);
+        switch_endpoint_id = endpoint::get_id(endpoint1);
         ESP_LOGI(TAG, "Switch created with endpoint_id %d", switch_endpoint_id);
+
+        coffee_maker_endpoint_id = endpoint::get_id(endpoint2);
+        ESP_LOGI(TAG, "Coffee Maker created with endpoint_id %d", coffee_maker_endpoint_id);
 
     #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         /* Set OpenThread platform config */

@@ -8,7 +8,7 @@ namespace esp_matter {
 using namespace cluster;
 
 namespace endpoint {
-namespace coffee_maker {
+namespace done_coffee_maker {
 uint32_t get_device_type_id()
 {
     return ESP_MATTER_COFFEE_MAKER_DEVICE_TYPE_ID;
@@ -41,12 +41,12 @@ esp_err_t add(endpoint_t *endpoint, config_t *config)
     descriptor::create(endpoint, &(config->descriptor), CLUSTER_FLAG_SERVER);
     cluster_t *identify_cluster = identify::create(endpoint, &(config->identify), CLUSTER_FLAG_SERVER);
     identify::command::create_trigger_effect(identify_cluster);
-    groups::create(endpoint, &(config->groups), CLUSTER_FLAG_SERVER);
-    scenes::create(endpoint, &(config->scenes), CLUSTER_FLAG_SERVER);
+    // groups::create(endpoint, &(config->groups), CLUSTER_FLAG_SERVER);
+    // scenes::create(endpoint, &(config->scenes), CLUSTER_FLAG_SERVER);
     on_off::create(endpoint, &(config->on_off), CLUSTER_FLAG_SERVER, on_off::feature::lighting::get_id());
 
     return ESP_OK;
 }
-
+} /* done_coffee_maker */
 } /* endpoint */
 } /* esp_matter */
