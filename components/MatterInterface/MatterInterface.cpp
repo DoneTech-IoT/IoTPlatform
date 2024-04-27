@@ -10,7 +10,7 @@
 #include "DoneMatterEndpoint.h"
 
 // ****************************** Local Variables 
-static const char *TAG = "MatterTask";
+static const char *TAG = "MatterInterface";
 uint16_t switch_endpoint_id = 0;
 uint16_t coffee_maker_endpoint_id = 0;
 static MatterInterfaceHandler_t *InterfaceHandler;
@@ -106,7 +106,7 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         endpoint_t *endpoint1 = on_off_switch::create(node, &switch_config, ENDPOINT_FLAG_NONE, switch_handle);
 
         done_coffee_maker::config_t coffee_maker_config;
-        endpoint_t *endpoint2 = on_off_switch::create(node, &coffee_maker_config, ENDPOINT_FLAG_NONE, coffe_maker_handle);
+        endpoint_t *endpoint2 = done_coffee_maker::create(node, &coffee_maker_config, ENDPOINT_FLAG_NONE, coffee_maker_handle);
 
         /* These node and endpoint handles can be used to create/add other endpoints and clusters. */
         if (!node || !endpoint1 || !endpoint2) {
