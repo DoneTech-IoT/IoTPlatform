@@ -280,5 +280,10 @@ app_driver_handle_t app_driver_switch_init()
 
 app_driver_handle_t app_driver_coffee_maker_init()
 {    
-    return (app_driver_handle_t) handle;
+    //just repeat body of above func.
+    button_config_t config = button_driver_get_config();
+    button_handle_t handle = iot_button_create(&config);
+    iot_button_register_cb(handle, BUTTON_PRESS_DOWN, app_driver_button_toggle_cb, NULL);
+
+    return (app_driver_handle_t)handle;
 }
