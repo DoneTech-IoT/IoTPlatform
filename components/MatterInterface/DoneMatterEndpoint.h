@@ -18,7 +18,9 @@ typedef struct config {
     cluster::groups::config_t groups;
     cluster::scenes::config_t scenes;
     cluster::on_off::config_t on_off;
-    //cluster::level_control::config_t level_control;
+    cluster::level_control::config_t level_control;
+    cluster::temperature_measurement::config_t temperature_measurement;
+    cluster::temperature_control::config_t temperature_control;
 } config_t;
 
 uint32_t get_device_type_id();

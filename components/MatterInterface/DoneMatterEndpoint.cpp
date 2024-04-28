@@ -44,7 +44,15 @@ esp_err_t add(endpoint_t *endpoint, config_t *config)
     identify::command::create_trigger_effect(identify_cluster);
     groups::create(endpoint, &(config->groups), CLUSTER_FLAG_SERVER);
     scenes::create(endpoint, &(config->scenes), CLUSTER_FLAG_SERVER);
+
+    //on_off::create(endpoint, &(config->on_off), CLUSTER_FLAG_SERVER, ESP_MATTER_NONE_FEATURE_ID);
+
     on_off::create(endpoint, &(config->on_off), CLUSTER_FLAG_SERVER, on_off::feature::lighting::get_id());
+    level_control::create(endpoint, &(config->level_control), CLUSTER_FLAG_SERVER,
+                          level_control::feature::on_off::get_id() | level_control::feature::lighting::get_id());
+
+    temperature_measurement::create(endpoint, &(config->temperature_measurement), CLUSTER_FLAG_SERVER);
+    temperature_control::create(endpoint, &(config->temperature_control), CLUSTER_FLAG_SERVER, ESP_MATTER_NONE_FEATURE_ID);
 
     return ESP_OK;
 }

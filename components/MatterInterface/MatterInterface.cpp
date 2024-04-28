@@ -13,6 +13,7 @@
 static const char *TAG = "MatterInterface";
 uint16_t switch_endpoint_id = 0;
 uint16_t coffee_maker_endpoint_id = 0;
+static uint16_t temp_ctrl_endpoint_id = 0;
 static MatterInterfaceHandler_t *InterfaceHandler;
 // ****************************** Local Functions 
 
@@ -96,7 +97,7 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         app_driver_handle_t switch_handle = app_driver_switch_init();
         app_reset_button_register(switch_handle);
 
-        app_driver_handle_t coffee_maker_handle = app_driver_coffee_maker_init();        
+        //app_driver_handle_t coffee_maker_handle = app_driver_coffee_maker_init();        
 
         /* Create a Matter node and add the mandatory Root Node device type on endpoint 0 */
         node::config_t node_config;
@@ -106,10 +107,14 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         endpoint_t *endpoint1 = on_off_switch::create(node, &switch_config, ENDPOINT_FLAG_NONE, switch_handle);
 
         done_coffee_maker::config_t coffee_maker_config;
-        endpoint_t *endpoint2 = done_coffee_maker::create(node, &coffee_maker_config, ENDPOINT_FLAG_NONE, coffee_maker_handle);
+        endpoint_t *endpoint2 = done_coffee_maker::create(node, &coffee_maker_config, ENDPOINT_FLAG_NONE, NULL/*coffee_maker_handle*/);
+
+        // "Temperature Measurement", "Refrigerator and Temperature Controlled Cabinet Mode Select" are optional cluster for temperature_controlled_cabinet device type so we are not adding them by default.
+        // temperature_controlled_cabinet::config_t temperature_controlled_cabinet_config;
+        // endpoint_t *endpoint3 = temperature_controlled_cabinet::create(node, &temperature_controlled_cabinet_config, ENDPOINT_FLAG_NONE, NULL);
 
         /* These node and endpoint handles can be used to create/add other endpoints and clusters. */
-        if (!node || !endpoint1 || !endpoint2) {
+        if (!node || !endpoint1 || !endpoint2 /*|| !endpoint3*/) {
             ESP_LOGE(TAG, "Matter node creation failed");
         }
 
@@ -125,6 +130,15 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
 
         coffee_maker_endpoint_id = endpoint::get_id(endpoint2);
         ESP_LOGI(TAG, "Coffee Maker created with endpoint_id %d", coffee_maker_endpoint_id);
+
+        // esp_matter::cluster_t *cluster = esp_matter::cluster::get(endpoint1, chip::app::Clusters::TemperatureControl::Id);
+
+        // // Atleast one of temperature_number and temperature_level feature is mandatory.    
+        // cluster::temperature_control::feature::temperature_number::config_t temperature_number_config;
+        // cluster::temperature_control::feature::temperature_number::add(cluster, &temperature_number_config);    
+
+        // temp_ctrl_endpoint_id = endpoint::get_id(endpoint3);
+        // ESP_LOGI(TAG, "Temperature controlled cabinet created with endpoint_id %d", temp_ctrl_endpoint_id);
 
     #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         /* Set OpenThread platform config */
