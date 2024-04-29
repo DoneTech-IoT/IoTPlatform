@@ -17,7 +17,6 @@
 
 #include <app_priv.h>
 #include <app_reset.h>
-
 using chip::kInvalidClusterId;
 static constexpr chip::CommandId kInvalidCommandId = 0xFFFF'FFFF;
 
@@ -32,6 +31,7 @@ extern uint16_t switch_endpoint_id;
 static char console_buffer[101] = {0};
 static esp_err_t app_driver_bound_console_handler(int argc, char **argv)
 {
+    ESP_LOGW("TAG","app_driver_bound_console_handler");
     if (argc == 1 && strncmp(argv[0], "help", sizeof("help")) == 0) {
         printf("Bound commands:\n"
                "\thelp: Print help\n"
@@ -91,6 +91,7 @@ static esp_err_t app_driver_bound_console_handler(int argc, char **argv)
 
 static esp_err_t app_driver_client_console_handler(int argc, char **argv)
 {
+    ESP_LOGW("TAG","app_driver_client_console_handler");
     if (argc == 1 && strncmp(argv[0], "help", sizeof("help")) == 0) {
         printf("Client commands:\n"
                "\thelp: Print help\n"
@@ -154,6 +155,7 @@ static esp_err_t app_driver_client_console_handler(int argc, char **argv)
 
 static void app_driver_register_commands()
 {
+    ESP_LOGW("TAG","app_driver_register_commands");
     /* Add console command for bound devices */
     static const esp_matter::console::command_t bound_command = {
         .name = "bound",
@@ -179,6 +181,7 @@ static void app_driver_register_commands()
 void app_driver_client_command_callback(client::peer_device_t *peer_device, client::command_handle_t *cmd_handle,
                                         void *priv_data)
 {
+    ESP_LOGW("TAG","app_driver_client_command_callback");
     // on_off light switch should support on_off cluster and identify cluster commands sending.
     if (cmd_handle->cluster_id == OnOff::Id) {
         switch (cmd_handle->command_id) {
@@ -217,6 +220,7 @@ void app_driver_client_group_command_callback(uint8_t fabric_index, client::comm
                                               void *priv_data)
 {
     // on_off light switch should support on_off cluster and identify cluster commands sending.
+    ESP_LOGW("TAG","app_driver_client_group_command_callback");
     if (cmd_handle->cluster_id == OnOff::Id) {
         switch (cmd_handle->command_id) {
         case OnOff::Commands::Off::Id: {

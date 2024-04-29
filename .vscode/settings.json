@@ -9,7 +9,9 @@
         "initializer_list": "cpp",
         "lvglgui.h": "c",
         "lvglinterface.h": "c",
-        "gui_guider.h": "c"
+        "gui_guider.h": "c",
+        "cstdint": "cpp",
+        "cstdlib": "cpp"
     },
     "idf.openOcdConfigs": [
         "board/esp32s3-builtin.cfg"
@@ -35,5 +37,6 @@
         "titleBar.inactiveBackground": "#dd053199",
         "titleBar.inactiveForeground": "#e7e7e799"
     },
-    "peacock.color": "#dd0531"
+    "peacock.color": "#dd0531",
+    "C_Cpp.dimInactiveRegions": false
 }

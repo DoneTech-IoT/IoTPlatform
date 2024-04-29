@@ -21,7 +21,8 @@
 
 #include <app_priv.h>
 #include <app_reset.h>
-
+#include <app/server/CommissioningWindowManager.h>
+#include <app/server/Server.h>
 using namespace esp_matter;
 using namespace esp_matter::attribute;
 using namespace esp_matter::endpoint;
@@ -37,12 +38,14 @@ typedef void (*MatterIdentificationCBPtr)(
                 uint32_t attribute_id, esp_matter_attr_val_t *val, 
                 void *priv_data);
 
+typedef void (*UpdateGUI_AddMatterIconPtr)();
 typedef struct {
     QueueHandle_t *SharedBufQueue;
     SemaphoreHandle_t *SharedSemaphore;    
     MatterNetworkEventCBPtr MatterNetworkEventCB;
     MatterIdentificationCBPtr MatterIdentificationCB;
     MatterAttributeUpdateCBPtr MatterAttributeUpdateCB;
+    UpdateGUI_AddMatterIconPtr ConnectToMatterNetwork;
 } MatterInterfaceHandler_t;
 
 bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler);
