@@ -84,7 +84,7 @@ extern "C" void app_main()
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
-    MatterInterfaceHandler.UpdateGUI_AddMatterIcon=MatterNetworkConnected;
+    MatterInterfaceHandler.ConnectToMatterNetwork=MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
 
     vTaskDelay((pdMS_TO_TICKS(SEC * 5)));

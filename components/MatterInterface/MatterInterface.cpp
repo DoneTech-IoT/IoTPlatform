@@ -26,7 +26,8 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
         chip::CommissioningWindowManager &commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
         if (!commissionMgr.IsCommissioningWindowOpen())
         {
-            InterfaceHandler->UpdateGUI_AddMatterIcon();
+            if (InterfaceHandler->ConnectToMatterNetwork != NULL)
+                InterfaceHandler->ConnectToMatterNetwork();
         }
         break;
     }
@@ -68,7 +69,7 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
 
     case chip::DeviceLayer::DeviceEventType::kFabricCommitted:
         ESP_LOGW(TAG, "Fabric is committed");
-        InterfaceHandler->UpdateGUI_AddMatterIcon();
+        InterfaceHandler->ConnectToMatterNetwork();
         break;
 
     case chip::DeviceLayer::DeviceEventType::kBLEDeinitialized:
@@ -107,7 +108,6 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
 
     if (InterfaceHandler->SharedBufQueue != NULL &&
         InterfaceHandler->SharedSemaphore != NULL &&
-        InterfaceHandler->UpdateGUI_AddMatterIcon != NULL &&
         InterfaceHandler->MatterAttributeUpdateCB != NULL)
     {
         esp_err_t err = ESP_OK;
