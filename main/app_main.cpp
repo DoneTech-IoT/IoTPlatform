@@ -6,13 +6,12 @@
 #include "freertos/task.h"
 #include "Setup_GPIO.h"
 #include "MatterInterface.h"
-#include"TaskManger.h"
+#include "ServiceManger.h"
 
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
 MatterInterfaceHandler_t MatterInterfaceHandler;
-GuiInterfaceHandler_t GuiInterfaceHandler;
 // ****************************** GLobal Variables ****************************** //
 static const char *TAG = "Main";
 SpotifyInterfaceHandler_t SpotifyInterfaceHandler;
@@ -75,20 +74,20 @@ extern "C" void app_main()
 {
     size_t freeHeapSize;
     freeHeapSize = xPortGetFreeHeapSize();
-    GuiInterfaceHandler.TaskPriority=tskIDLE_PRIORITY + 1;
-    GuiInterfaceHandler.GuiTaskHandler=xTaskGUIHandler;
-    GUI_TaskInit(&GuiInterfaceHandler);
+    UBaseType_t TaskPriority = tskIDLE_PRIORITY + 1;
+    TaskHandle_t GuiTaskHandler ;
+    GUI_TaskInit(&GuiTaskHandler, TaskPriority);
     freeHeapSize = xPortGetFreeHeapSize();
     ESP_LOGW("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);
     GlobalInit();
     nvsFlashInit();
     SpiffsGlobalConfig();
-
-    // MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
-    // MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
-    // MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
-    // MatterInterfaceHandler.UpdateGUI_AddMatterIcon=MatterNetworkConnected;
-    // Matter_TaskInit(&MatterInterfaceHandler);
+    // testServiceManger();
+    MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
+    MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
+    MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
+    MatterInterfaceHandler.UpdateGUI_AddMatterIcon = MatterNetworkConnected;
+    Matter_TaskInit(&MatterInterfaceHandler);
 
     // vTaskDelay((pdMS_TO_TICKS(SEC * 5)));
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
@@ -120,7 +119,6 @@ extern "C" void app_main()
             }
         }
     }
-    
 }
 
 void MatterAttributeUpdateCBMain(

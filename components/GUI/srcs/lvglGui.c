@@ -1,29 +1,47 @@
 #include "lvglGui.h"
 #include "gui_guider.h"
 
+StaticTask_t *xTaskLVGLBuffer;
+StackType_t *xLVGLStack;
+lv_color_t *LVGL_BigBuf1;
+lv_color_t *LVGL_BigBuf2;
 static const char *TAG = "LVGL_GUI";
 void GUI_mainTask(void *pvParameter);
-
+uint8_t GUI_AllocationMemory()
+{
+    LVGL_BigBuf1 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
+    LVGL_BigBuf2 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
+    if (LVGL_BigBuf1 == NULL || LVGL_BigBuf2 == NULL)
+    {
+        ESP_LOGE(TAG, "Memory allocation failed!");
+        free(LVGL_BigBuf2);
+        free(LVGL_BigBuf1);
+        return 0; // Exit with an error code
+    }
+    xTaskLVGLBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
+    xLVGLStack = (StackType_t *)malloc(LVGL_STACK * 8 * MULTIPLIER * sizeof(StackType_t));
+    if (xTaskLVGLBuffer == NULL || xLVGLStack == NULL)
+    {
+        ESP_LOGE(TAG, "Memory allocation failed!");
+        free(xTaskLVGLBuffer);
+        free(xLVGLStack);
+        return 0; // Exit with an error code
+    }
+    return 1;
+}
 /**
  * @brief Function to creat GUI task in staticly
  */
-void GUI_TaskInit(GuiInterfaceHandler_t *GuiInterfaceHandler)
+void GUI_TaskInit(TaskHandle_t *GuiTaskHandler, UBaseType_t TaskPriority)
 {
-    StaticTask_t *xTaskLVGLBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
-    StackType_t *xLVGLStack = (StackType_t *)malloc(LVGL_STACK * 8 * MULTIPLIER * sizeof(StackType_t));
-    if (xTaskLVGLBuffer == NULL || xLVGLStack == NULL)
-    {
-        ESP_LOGE("TAG", "Memory allocation failed!");
-        free(xTaskLVGLBuffer);
-        free(xLVGLStack);
-        return; // Exit with an error code
-    }
-    GuiInterfaceHandler->GuiTaskHandler=xTaskCreateStatic(
+    if (!GUI_AllocationMemory())
+        return;
+    *GuiTaskHandler = xTaskCreateStatic(
         GUI_mainTask,                // Task function
         "GUI_mainTask",              // Task name (for debugging)
         LVGL_STACK * 8 * MULTIPLIER, // Stack size (in words)
         NULL,                        // Task parameters (passed to the task function)
-        GuiInterfaceHandler->TaskPriority,        // Task priority (adjust as needed)
+        TaskPriority,                // Task priority (adjust as needed)
         xLVGLStack,                  // Stack buffer
         xTaskLVGLBuffer              // Task control block
     );
@@ -40,15 +58,7 @@ void GUI_TaskInit(GuiInterfaceHandler_t *GuiInterfaceHandler)
 void GUI_mainTask(void *pvParameter)
 {
     lv_disp_draw_buf_t disp_draw_buf;
-    lv_color_t *LVGL_BigBuf1 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
-    lv_color_t *LVGL_BigBuf2 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
-    if (LVGL_BigBuf1 == NULL || LVGL_BigBuf2 == NULL)
-    {
-        ESP_LOGE("TAG", "Memory allocation failed!");
-        free(LVGL_BigBuf2);
-        free(LVGL_BigBuf1);
-        vTaskDelete(NULL);
-    }
+
     lv_init();
     lvgl_driver_init();
     lv_disp_draw_buf_init(&disp_draw_buf, LVGL_BigBuf1, LVGL_BigBuf2, LV_HOR_RES_MAX * 100);
@@ -68,9 +78,13 @@ void GUI_mainTask(void *pvParameter)
     }
 }
 
-void KillGUI_Task()
+void KillGUI_Task(TaskHandle_t GUITaskHandler)
 {
-    //to do
+    vTaskDelete(GUITaskHandler);
+    free(xTaskLVGLBuffer);
+    free(xLVGLStack);
+    free(LVGL_BigBuf2);
+    free(LVGL_BigBuf1);
 }
 /**
  * @brief Function to update the LVGL screen

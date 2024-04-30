@@ -14,7 +14,9 @@
         "cstdlib": "cpp",
         "rm67162lilygo.h": "c",
         "param.h": "c",
-        "lvgl_helpers.h": "c"
+        "lvgl_helpers.h": "c",
+        "stdio.h": "c",
+        "servicemanger.h": "c"
     },
     "idf.openOcdConfigs": [
         "board/esp32s3-builtin.cfg"
