@@ -29,7 +29,7 @@ void SpotifyPeriodicTimer(TimerHandle_t xTimer)
         return;
     }
 
-    bool isNewSong = strcmp(SpotifyInterfaceHandler.PlaybackInfo->SongImageURL, &imgLink);
+    bool isNewSong = strcmp(SpotifyInterfaceHandler.PlaybackInfo->SongImageURL, imgLink);
     if (isNewSong)
     {
         CommandResult = Spotify_SendCommand(SpotifyInterfaceHandler, GetCoverPhoto);
@@ -43,12 +43,12 @@ void SpotifyPeriodicTimer(TimerHandle_t xTimer)
     }
 
     GUI_UpdateSpotifyScreen(isNewSong,
-                    SpotifyInterfaceHandler.PlaybackInfo->ArtistName,
-                    SpotifyInterfaceHandler.PlaybackInfo->SongName,
-                    SpotifyInterfaceHandler.PlaybackInfo->AlbumName,
-                    SpotifyInterfaceHandler.PlaybackInfo->Duration,
-                    SpotifyInterfaceHandler.PlaybackInfo->Progress,
-                    SpotifyInterfaceHandler.CoverPhoto);
+                            SpotifyInterfaceHandler.PlaybackInfo->ArtistName,
+                            SpotifyInterfaceHandler.PlaybackInfo->SongName,
+                            SpotifyInterfaceHandler.PlaybackInfo->AlbumName,
+                            SpotifyInterfaceHandler.PlaybackInfo->Duration,
+                            SpotifyInterfaceHandler.PlaybackInfo->Progress,
+                            SpotifyInterfaceHandler.CoverPhoto);
     ESP_LOGI(TAG, "Playback info updated");
 }
 void IRAM_ATTR BackBottomCallBack_(void *arg, void *data)
@@ -101,7 +101,7 @@ extern "C" void app_main()
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
-    MatterInterfaceHandler.ConnectToMatterNetwork=MatterNetworkConnected;
+    MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
 
     vTaskDelay((pdMS_TO_TICKS(SEC * 5)));
@@ -134,7 +134,6 @@ extern "C" void app_main()
             }
         }
     }
-    
 }
 
 void MatterAttributeUpdateCBMain(
