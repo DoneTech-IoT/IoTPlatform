@@ -5,30 +5,28 @@ StaticTask_t *xTaskLVGLBuffer;
 StackType_t *xLVGLStack;
 lv_color_t *LVGL_BigBuf1;
 lv_color_t *LVGL_BigBuf2;
+
 static const char *TAG = "LVGL_GUI";
 void GUI_mainTask(void *pvParameter);
+
 uint8_t GUI_AllocationMemory()
 {
-    LVGL_BigBuf1 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
-    LVGL_BigBuf2 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
-    if (LVGL_BigBuf1 == NULL || LVGL_BigBuf2 == NULL)
-    {
-        ESP_LOGE(TAG, "Memory allocation failed!");
-        free(LVGL_BigBuf2);
-        free(LVGL_BigBuf1);
-        return 0; // Exit with an error code
-    }
     xTaskLVGLBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
     xLVGLStack = (StackType_t *)malloc(LVGL_STACK * 8 * MULTIPLIER * sizeof(StackType_t));
-    if (xTaskLVGLBuffer == NULL || xLVGLStack == NULL)
+    LVGL_BigBuf1 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
+    LVGL_BigBuf2 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
+    if (xTaskLVGLBuffer == NULL || xLVGLStack == NULL || LVGL_BigBuf1 == NULL || LVGL_BigBuf2 == NULL)
     {
         ESP_LOGE(TAG, "Memory allocation failed!");
         free(xTaskLVGLBuffer);
         free(xLVGLStack);
-        return 0; // Exit with an error code
+        free(LVGL_BigBuf2);
+        free(LVGL_BigBuf1);
+        return 0;
     }
     return 1;
 }
+
 /**
  * @brief Function to creat GUI task in staticly
  */
@@ -117,7 +115,7 @@ void GUI_UpdateSpotifyScreen(bool songUpdated, char *Artist, char *Song, char *A
     lv_event_send(guider_ui.Spotify_Page_Song_name, LV_EVENT_VALUE_CHANGED, Song);
     lv_event_send(guider_ui.Spotify_Page_Album_name, LV_EVENT_VALUE_CHANGED, Album);
     lv_event_send(guider_ui.Matter_logo, LV_EVENT_VALUE_CHANGED, NULL);
-    
+
     lv_event_send(guider_ui.Spotify_Page_img_song, LV_EVENT_VALUE_CHANGED, coverPhoto);
 }
 
