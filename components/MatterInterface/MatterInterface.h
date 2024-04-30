@@ -45,7 +45,7 @@ typedef struct {
     MatterNetworkEventCBPtr MatterNetworkEventCB;
     MatterIdentificationCBPtr MatterIdentificationCB;
     MatterAttributeUpdateCBPtr MatterAttributeUpdateCB;
-    UpdateGUI_AddMatterIconPtr UpdateGUI_AddMatterIcon;
+    UpdateGUI_AddMatterIconPtr ConnectToMatterNetwork;
 } MatterInterfaceHandler_t;
 
 bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler);

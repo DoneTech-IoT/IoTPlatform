@@ -22,17 +22,34 @@ SpotifyInterfaceHandler_t SpotifyInterfaceHandler;
  */
 void SpotifyPeriodicTimer(TimerHandle_t xTimer)
 {
+    static char imgLink[100];
     bool CommandResult = Spotify_SendCommand(SpotifyInterfaceHandler, GetNowPlaying);
     if (CommandResult == false)
     {
         ESP_LOGE(TAG, "Playback info update failed");
         return;
     }
-    // GUI_UpdateSpotifyScreen(SpotifyInterfaceHandler.PlaybackInfo->ArtistName,
-    //                         SpotifyInterfaceHandler.PlaybackInfo->SongName,
-    //                         SpotifyInterfaceHandler.PlaybackInfo->AlbumName,
-    //                         SpotifyInterfaceHandler.PlaybackInfo->Duration,
-    //                         SpotifyInterfaceHandler.PlaybackInfo->Progress);
+
+    bool isNewSong = strcmp(SpotifyInterfaceHandler.PlaybackInfo->SongImageURL, imgLink);
+    if (isNewSong)
+    {
+        CommandResult = Spotify_SendCommand(SpotifyInterfaceHandler, GetCoverPhoto);
+        vTaskDelay(pdMS_TO_TICKS(100));
+        if (CommandResult == false)
+        {
+            ESP_LOGE(TAG, "Cover photo update failed");
+            return;
+        }
+        strcpy(imgLink, SpotifyInterfaceHandler.PlaybackInfo->SongImageURL);
+    }
+
+    GUI_UpdateSpotifyScreen(isNewSong,
+                            SpotifyInterfaceHandler.PlaybackInfo->ArtistName,
+                            SpotifyInterfaceHandler.PlaybackInfo->SongName,
+                            SpotifyInterfaceHandler.PlaybackInfo->AlbumName,
+                            SpotifyInterfaceHandler.PlaybackInfo->Duration,
+                            SpotifyInterfaceHandler.PlaybackInfo->Progress,
+                            SpotifyInterfaceHandler.CoverPhoto);
     ESP_LOGI(TAG, "Playback info updated");
 }
 void IRAM_ATTR BackBottomCallBack_(void *arg, void *data)
@@ -86,7 +103,7 @@ extern "C" void app_main()
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
-    MatterInterfaceHandler.UpdateGUI_AddMatterIcon = MatterNetworkConnected;
+    MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
 
     // vTaskDelay((pdMS_TO_TICKS(SEC * 5)));
