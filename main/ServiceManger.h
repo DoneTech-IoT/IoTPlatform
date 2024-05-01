@@ -28,7 +28,7 @@ typedef enum {
 // Define struct for Task
 typedef struct {
     char name[32];        // Task name
-    uint8_t priority;     // Priority of the task
+    UBaseType_t priority;     // Priority of the task
     uint32_t startupRAM;  // Amount of RAM needed at startup time
     TaskHandle_t taskHandler;
     void (*taskKiller)(void*); // Pointer to the task handler function
