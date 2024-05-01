@@ -9,6 +9,13 @@ lv_color_t *LVGL_BigBuf2;
 static const char *TAG = "LVGL_GUI";
 void GUI_mainTask(void *pvParameter);
 
+/**
+ * @brief Allocates memory for LVGL components.
+ * This function allocates memory for LVGL components such as task buffer, task stack,
+ * and two big buffers.
+ * @param Stack Size of the LVGL task stack.
+ * @return 1 if memory allocation succeeds, 0 otherwise.
+ */
 uint8_t GUI_AllocationMemory(uint32_t Stack)
 {
     xTaskLVGLBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
@@ -28,7 +35,12 @@ uint8_t GUI_AllocationMemory(uint32_t Stack)
 }
 
 /**
- * @brief Function to creat GUI task in staticly
+ * @brief Initializes the GUI task.
+ * This function initializes the GUI task by allocating memory and creating the task.
+ * @param GuiTaskHandler Pointer to the variable that will hold the GUI task handler.
+ * @param TaskPriority Priority of the GUI task.
+ * @param TaskStack Size of the GUI task stack.
+ * @return void
  */
 void GUI_TaskInit(TaskHandle_t *GuiTaskHandler, UBaseType_t TaskPriority, uint32_t TaskStack)
 {
@@ -48,10 +60,12 @@ void GUI_TaskInit(TaskHandle_t *GuiTaskHandler, UBaseType_t TaskPriority, uint32
 }
 
 /**
- * @brief main LVGL gui task this is important that know
- * all LVGL deriver function should be call in main task
- * you can not call them in other function !
- * this task run GUI with all thing that needed
+ * @brief Main task for LVGL GUI operations.
+ * This function initializes LVGL, sets up the display driver,
+ * registers the display driver, sets up the user interface,
+ * starts the LVGL timer, and handles LVGL tasks continuously.
+ * @param pvParameter Pointer to task parameters (unused).
+ * @return void
  */
 void GUI_mainTask(void *pvParameter)
 {
@@ -76,6 +90,12 @@ void GUI_mainTask(void *pvParameter)
     }
 }
 
+/**
+ * @brief Kills the GUI task and frees allocated memory.
+ * This function deletes the GUI task and frees the memory allocated for LVGL components.
+ * @param GUITaskHandler Handler of the GUI task to be killed.
+ * @return void
+ */
 void KillGUI_Task(TaskHandle_t GUITaskHandler)
 {
     vTaskDelete(GUITaskHandler);
@@ -86,18 +106,24 @@ void KillGUI_Task(TaskHandle_t GUITaskHandler)
 }
 
 /**
- * @brief Function to update the LVGL screen
- * @param Artist: Artist name
- * @param Title: Title of the song
- * @param Album: Album name
+ * @brief Updates the LVGL screen with Spotify information.
+ * This function updates various elements on the LVGL screen with Spotify information
+ * such as artist name, song title, album name, playback progress, and cover photo.
+ * @param songUpdated Flag indicating whether the song information has been updated.
+ * @param Artist Artist name.
+ * @param Song Title of the song.
+ * @param Album Album name.
+ * @param DurationMS Duration of the song in milliseconds.
+ * @param ProgressMS Current playback progress in milliseconds.
+ * @param coverPhoto Pointer to the cover photo image data.
  * @return void
  */
 void GUI_UpdateSpotifyScreen(bool songUpdated, char *Artist, char *Song, char *Album, int DurationMS, int ProgressMS, uint8_t *coverPhoto)
 {
-    int minutues = ProgressMS / 60000;
+    int minutes = ProgressMS / 60000;
     int second = (ProgressMS % 60000) / 1000;
     char time[20];
-    sprintf(time, "%d:%d", minutues, second);
+    sprintf(time, "%d:%d", minutes, second);
     lv_event_send(guider_ui.Spotify_Page_label_time, LV_EVENT_VALUE_CHANGED, time);
 
     if (DurationMS == 0)
@@ -119,6 +145,12 @@ void GUI_UpdateSpotifyScreen(bool songUpdated, char *Artist, char *Song, char *A
     lv_event_send(guider_ui.Spotify_Page_img_song, LV_EVENT_VALUE_CHANGED, coverPhoto);
 }
 
+/**
+ * @brief Handles the event of Matter network connection.
+ * This function is called when the Matter network is connected. It sends an event
+ * to update the Matter logo on the LVGL UI.
+ * @return void
+ */
 void MatterNetworkConnected()
 {
     lv_event_send(guider_ui.Matter_logo, LV_EVENT_VALUE_CHANGED, NULL);
