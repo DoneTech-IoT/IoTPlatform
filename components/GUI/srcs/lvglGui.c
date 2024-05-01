@@ -9,10 +9,10 @@ lv_color_t *LVGL_BigBuf2;
 static const char *TAG = "LVGL_GUI";
 void GUI_mainTask(void *pvParameter);
 
-uint8_t GUI_AllocationMemory()
+uint8_t GUI_AllocationMemory(uint32_t Stack)
 {
     xTaskLVGLBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
-    xLVGLStack = (StackType_t *)malloc(LVGL_STACK * 8 * MULTIPLIER * sizeof(StackType_t));
+    xLVGLStack = (StackType_t *)malloc(Stack * MULTIPLIER * sizeof(StackType_t));
     LVGL_BigBuf1 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
     LVGL_BigBuf2 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
     if (xTaskLVGLBuffer == NULL || xLVGLStack == NULL || LVGL_BigBuf1 == NULL || LVGL_BigBuf2 == NULL)
@@ -30,18 +30,18 @@ uint8_t GUI_AllocationMemory()
 /**
  * @brief Function to creat GUI task in staticly
  */
-void GUI_TaskInit(TaskHandle_t *GuiTaskHandler, UBaseType_t TaskPriority)
+void GUI_TaskInit(TaskHandle_t *GuiTaskHandler, UBaseType_t TaskPriority, uint32_t TaskStack)
 {
-    if (!GUI_AllocationMemory())
+    if (!GUI_AllocationMemory(TaskStack))
         return;
     *GuiTaskHandler = xTaskCreateStatic(
-        GUI_mainTask,                // Task function
-        "GUI_mainTask",              // Task name (for debugging)
-        LVGL_STACK * 8 * MULTIPLIER, // Stack size (in words)
-        NULL,                        // Task parameters (passed to the task function)
-        TaskPriority,                // Task priority (adjust as needed)
-        xLVGLStack,                  // Stack buffer
-        xTaskLVGLBuffer              // Task control block
+        GUI_mainTask,           // Task function
+        "GUI_mainTask",         // Task name (for debugging)
+        TaskStack * MULTIPLIER, // Stack size (in words)
+        NULL,                   // Task parameters (passed to the task function)
+        TaskPriority,           // Task priority (adjust as needed)
+        xLVGLStack,             // Stack buffer
+        xTaskLVGLBuffer         // Task control block
     );
     // this delay so important
     vTaskDelay(500);
@@ -84,6 +84,7 @@ void KillGUI_Task(TaskHandle_t GUITaskHandler)
     free(LVGL_BigBuf2);
     free(LVGL_BigBuf1);
 }
+
 /**
  * @brief Function to update the LVGL screen
  * @param Artist: Artist name
@@ -115,7 +116,6 @@ void GUI_UpdateSpotifyScreen(bool songUpdated, char *Artist, char *Song, char *A
     lv_event_send(guider_ui.Spotify_Page_Song_name, LV_EVENT_VALUE_CHANGED, Song);
     lv_event_send(guider_ui.Spotify_Page_Album_name, LV_EVENT_VALUE_CHANGED, Album);
     lv_event_send(guider_ui.Matter_logo, LV_EVENT_VALUE_CHANGED, NULL);
-
     lv_event_send(guider_ui.Spotify_Page_img_song, LV_EVENT_VALUE_CHANGED, coverPhoto);
 }
 

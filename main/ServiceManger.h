@@ -16,28 +16,30 @@
 
 
 
-TaskHandle_t xTaskGUIHandler;
+
 #include <stdint.h>
 
 // Define enum for RAM type
 typedef enum {
     PSRAM,
     SRAM
-} RAM_Type;
+} RAM_Types;
 
 // Define struct for Task
 typedef struct {
     char name[32];        // Task name
     uint8_t priority;     // Priority of the task
     uint32_t startupRAM;  // Amount of RAM needed at startup time
-    void (*taskHandler)(void*); // Pointer to the task handler function
-    RAM_Type ramType;     // RAM type where task occupies (PSRAM or SRAM)
+    TaskHandle_t taskHandler;
+    void (*taskKiller)(void*); // Pointer to the task handler function
+    RAM_Types ramType;     // RAM type where task occupies (PSRAM or SRAM)
+    uint32_t taskStack;
+     uint32_t maximumRAM_Needed;     // Maximum SRAM needed by any task
 } Task;
 
 // Define struct for Task Manager
 typedef struct {
     Task tasks[10];       // Array of tasks (assuming a maximum of 10 tasks)
-    uint32_t maxSRAM;     // Maximum SRAM needed by any task
 } ServiceManger;
 void testServiceManger();
 

@@ -14,8 +14,7 @@ extern "C" {
 /**
  * @brief      create guiTask and its global method
  */
-void GUI_TaskInit(TaskHandle_t *GuiTaskHandler, UBaseType_t TaskPriority);
-
+void GUI_TaskInit(TaskHandle_t *GuiTaskHandler, UBaseType_t TaskPriority, uint32_t TaskStack);
 /**
  * @brief Function to update the LVGL screen
  * @param Artist: Artist name
