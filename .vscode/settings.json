@@ -16,7 +16,9 @@
         "param.h": "c",
         "lvgl_helpers.h": "c",
         "stdio.h": "c",
-        "servicemanger.h": "c"
+        "servicemanger.h": "c",
+        "lvgltimer.h": "c",
+        "compare": "cpp"
     },
     "idf.openOcdConfigs": [
         "board/esp32s3-builtin.cfg"

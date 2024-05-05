@@ -25,7 +25,6 @@ extern "C"
 
 #define MULTIPLIER 2
 #define LV_TICK_PERIOD_MS 1
-#define LVGL_STACK 2500
 #define TIMER_CALLBACK_TIME 10 * 1000 /* in milliseconds */
 
 typedef struct GuiInterfaceHandler_t

@@ -96,9 +96,9 @@ void GUI_mainTask(void *pvParameter)
  * @param GUITaskHandler Handler of the GUI task to be killed.
  * @return void
  */
-void KillGUI_Task(TaskHandle_t GUITaskHandler)
+void KillGUI_Task(TaskHandle_t *TaskHandler)
 {
-    vTaskDelete(GUITaskHandler);
+    vTaskDelete(TaskHandler);
     free(xTaskLVGLBuffer);
     free(xLVGLStack);
     free(LVGL_BigBuf2);

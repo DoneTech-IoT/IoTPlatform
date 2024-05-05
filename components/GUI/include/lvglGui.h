@@ -43,6 +43,14 @@ void GUI_UpdateSpotifyScreen(bool songUpdated, char *Artist, char *Song, char *A
  * @return void
  */
 void MatterNetworkConnected();
+
+/**
+ * @brief Kills the GUI task and frees allocated memory.
+ * This function deletes the GUI task and frees the memory allocated for LVGL components.
+ * @param GUITaskHandler Handler of the GUI task to be killed.
+ * @return void
+ */
+void KillGUI_Task(TaskHandle_t *TaskHandler);
 #ifdef __cplusplus
 }
 #endif
