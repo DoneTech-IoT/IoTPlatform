@@ -1,0 +1,37 @@
+menu "Done Main Config"    
+
+    choice DONE_BOARDS
+        prompt "Select your development board"
+        default DONE_BOARDS_LILYGO_S3
+        help
+            Select predefined board
+            
+        config DONE_BOARDS_LILYGO_S3
+            bool "LILYGO-S3 Display board"                  
+
+        config DONE_BOARDS_WROOM
+            bool "Wroom-S3 board"                                        
+    endchoice
+
+    config PARTITION_TABLE_CUSTOM
+        bool "Done's Custom partition table CSV"        
+        default y
+        help
+            Specify the path to the partition table CSV to use for your project.    
+            
+    config PARTITION_TABLE_CUSTOM_FILENAME
+        depends on PARTITION_TABLE_CUSTOM and DONE_BOARDS_WROOM
+        string "Custom partition CSV file"
+        default "partitions_s3_8g.csv"
+        help
+            Name of the custom partition CSV filename. This path is evaluated
+            relative to the project root directory.        
+
+    config PARTITION_TABLE_CUSTOM_FILENAME 
+        depends on PARTITION_TABLE_CUSTOM and DONE_BOARDS_LILYGO_S3
+        string "Custom partition CSV file"
+        default "partitions_s3_16g.csv"
+        help
+            Name of the custom partition CSV filename. This path is evaluated
+            relative to the project root directory.                            
+endmenu
