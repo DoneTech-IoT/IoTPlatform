@@ -23,8 +23,10 @@ color_gray=$'\E'"[1;37m"       #GRAY
 
 ESP_IDF_PATH="/home/ehsan/espressif-all/esp-idf"
 ESP_IDF_VERSION="esp-idf-v5.2"
-#ESP_MATTER_PATH="/root/rk3566-src/RK356X_Android11.0"
+#ESP_MATTER_PATH=""
 #ESP_MATTER_VERSION=""
+DEFAULT_RESOURCES="./resources/default-resources"
+CHANGED_RESOURCES="./resources/changed-resources"
 
 default_src()
 { 
@@ -33,39 +35,30 @@ default_src()
  echo -n "${color_yellow} >>> SEZ@Done copy default sources <<< " && echo "${color_reset}"
  echo -n "${color_yellow}---------------------------------------" && echo "${color_reset}"
 
- 
- 
+ cp -rv $DEFAULT_RESOURCES/idf-5.2/components/partition_table/Kconfig.projbuild \
+ 	$ESP_IDF_PATH/$ESP_IDF_VERSION/components/partition_table/Kconfig.projbuild
 
- cp -rv ./default-resources/device/rockchip/common/device.mk $SRC_ROOT/device/rockchip/common/
- cp -rv ./default-resources/device/rockchip/common/BoardConfig.mk $SRC_ROOT/device/rockchip/common/
+# cp -rv $DEFAULT_RESOURCES/idf-5.2/ $ESP_IDF_PATH/$ESP_IDF_VERSION/
 
- rm -rfv $DEVICE_ROOT/system.prop
-
- rm -rfv $DEVICE_ROOT/preinstall*
-
-
+ echo -n "${color_yellow}---------------------------------------" && echo "${color_reset}"
+ echo -n "${color_yellow} >>> SEZ@Done copy successfully    <<< " && echo "${color_reset}"
+ echo -n "${color_yellow}---------------------------------------" && echo "${color_reset}"
 }
 
 humanization()
 {
- echo -n "${color_yellow}--------------------------------------------" && echo "${color_reset}"
- echo -n "${color_yellow} >>> SEZ@Done copy Humanization sources <<< " && echo "${color_reset}"
- echo -n "${color_yellow}--------------------------------------------" && echo "${color_reset}"
+ echo -n "${color_yellow}---------------------------------------" && echo "${color_reset}"
+ echo -n "${color_yellow} >>> SEZ@Done copy changed sources <<< " && echo "${color_reset}"
+ echo -n "${color_yellow}---------------------------------------" && echo "${color_reset}"
 
- cp -rv ./huma $SRC_ROOT/vendor/
- cp -rv ./partner_gms $SRC_ROOT/vendor/
+ cp -rv $CHANGED_RESOURCES/idf-5.2/components/partition_table/Kconfig.projbuild \
+ 	$ESP_IDF_PATH/$ESP_IDF_VERSION/components/partition_table/Kconfig.projbuild
 
+ # cp -rv $CHANGED_RESOURCES/idf-5.2/ $ESP_IDF_PATH/$ESP_IDF_VERSION/
 
- cp -rv ./changed-resources/build.sh $SRC_ROOT/
- cp -rv ./changed-resources/kernel/arch/arm64/boot/dts/rockchip/rk3566-firefly-aiojd4-mipi101_JDM101014_BC45_A1.dts $SRC_ROOT/kernel/arch/arm64/boot/dts/rockchip/
- cp -rv ./changed-resources/$DEVICE_ADDR/rk3566_firefly_aiojd4_mipi.mk $DEVICE_ROOT/
- cp -rv ./changed-resources/$DEVICE_ADDR/dt-overlay.in $DEVICE_ROOT/
- cp -arv ./changed-resources/$DEVICE_ADDR/huma_logo $DEVICE_ROOT/
- cp -arv ./changed-resources/$DEVICE_ADDR/overlay $DEVICE_ROOT/
- cp -arv ./changed-resources/device/rockchip/common/overlay $SRC_ROOT/device/rockchip/common
- cp -rv ./changed-resources/$DEVICE_ADDR/BoardConfig.mk $DEVICE_ROOT/
-
-
+ echo -n "${color_yellow}---------------------------------------" && echo "${color_reset}"
+ echo -n "${color_yellow} >>> SEZ@Done copy successfully    <<< " && echo "${color_reset}"
+ echo -n "${color_yellow}---------------------------------------" && echo "${color_reset}"
 }
 
 # check pass argument
@@ -73,16 +66,12 @@ while getopts "DHh" arg
 do
     case $arg in
         D)
-            default_src
-        ;;
+            default_src;;
         H)
-            humanization
-        ;;
-
+            humanization;;
         h)
             usage 0;;
         ?)
             usage 1;;
-
 esac
 done
