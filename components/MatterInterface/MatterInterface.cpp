@@ -72,11 +72,11 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
         InterfaceHandler->ConnectToMatterNetwork();
         break;
 
-    case chip::DeviceLayer::DeviceEventType::kBLEDeinitialized:
-        ESP_LOGW(TAG, "BLE deinitialized and memory reclaimed");
-        break;
-    default:
-        break;
+    // case chip::DeviceLayer::DeviceEventType::kBLEDeinitialized:
+    //     ESP_LOGW(TAG, "BLE deinitialized and memory reclaimed");
+    //     break;
+    // default:
+    //     break;
     }
 }
 static esp_err_t app_identification_cb(identification::callback_type_t type, uint16_t endpoint_id, uint8_t effect_id,
