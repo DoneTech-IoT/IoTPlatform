@@ -6,7 +6,7 @@
 #include "freertos/task.h"
 #include "Setup_GPIO.h"
 #include "MatterInterface.h"
-#include "ServiceManger.h"
+
 
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 QueueHandle_t MatterBufQueue;
@@ -89,7 +89,13 @@ void CallbackTest(char *buffer)
 
 extern "C" void app_main()
 {
-    ServiceMangerTaskInit();
+        TaskHandle_t GuiTaskHandler = NULL;
+    UBaseType_t TaskPriority = tskIDLE_PRIORITY + 1;
+    uint32_t TaskStack = LVGL_STACK;
+    GUI_TaskInit(&GuiTaskHandler, TaskPriority, TaskStack);
+    vTaskDelay(pdMS_TO_TICKS(5000));
+    GUI_TaskKill(&GuiTaskHandler);
+
     GlobalInit();
     nvsFlashInit();
     SpiffsGlobalConfig();
@@ -100,10 +106,10 @@ extern "C" void app_main()
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
 
-    // SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
-    // SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
-    // Spotify_TaskInit(&SpotifyInterfaceHandler);
-    // vTaskDelay(pdMS_TO_TICKS(5000));
+    SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
+    SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
+    Spotify_TaskInit(&SpotifyInterfaceHandler);
+    vTaskDelay(pdMS_TO_TICKS(5000));
 
     if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
     {
