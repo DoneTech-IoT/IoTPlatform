@@ -7,6 +7,7 @@
 #include "Setup_GPIO.h"
 #include "MatterInterface.h"
 
+#define LVGL_STACK 2500
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
@@ -92,8 +93,7 @@ extern "C" void app_main()
     UBaseType_t TaskPriority = tskIDLE_PRIORITY + 1;
     uint32_t TaskStack = LVGL_STACK;
     GUI_TaskInit(&GuiTaskHandler, TaskPriority, TaskStack);
-    vTaskDelay(pdMS_TO_TICKS(5000));
-    GUI_TaskKill(&GuiTaskHandler);
+
 
     GlobalInit();
     nvsFlashInit();
