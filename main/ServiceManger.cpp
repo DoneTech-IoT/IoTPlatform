@@ -28,6 +28,7 @@ void GUI_TaskCreator()
     ServiceManger.tasks[GUI_Task].ramType = PSRAM_;
     ServiceManger.tasks[GUI_Task].startupRAM = GUI_Task;
     ServiceManger.tasks[GUI_Task].TaskCreator = GUI_TaskCreator;
+    ServiceManger.tasks[GUI_Task].TaskKiller = GUI_TaskKill;
     ServiceManger.tasks[GUI_Task].taskStack = LVGL_STACK;
     ServiceManger.tasks[GUI_Task].priority = tskIDLE_PRIORITY + 1;
     ServiceManger.tasks[GUI_Task].taskHandler = NULL;

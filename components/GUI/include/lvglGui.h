@@ -50,7 +50,7 @@ void MatterNetworkConnected();
  * @param GUITaskHandler Handler of the GUI task to be killed.
  * @return void
  */
-void KillGUI_Task(TaskHandle_t *TaskHandler);
+void GUI_TaskKill(TaskHandle_t *TaskHandler);
 #ifdef __cplusplus
 }
 #endif

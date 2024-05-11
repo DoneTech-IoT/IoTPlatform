@@ -33,6 +33,7 @@ typedef enum
 } RAM_Types;
 
 typedef void (*TaskCreatorPtr)(void);
+typedef void (*TaskKillerPtr)(void);
 typedef struct
 {
     char name[32];            // Task name
@@ -40,6 +41,7 @@ typedef struct
     uint32_t startupRAM;      // Amount of RAM needed at startup time
     TaskHandle_t taskHandler; // Pointer to the task handler function
     TaskCreatorPtr TaskCreator;
+    TaskKillerPtr TaskKiller;
     RAM_Types ramType; // RAM type where task occupies (PSRAM or SRAM)
     uint32_t taskStack;
     uint32_t maximumRAM_Needed; // Maximum SRAM needed by any task
