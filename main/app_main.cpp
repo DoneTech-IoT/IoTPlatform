@@ -7,7 +7,6 @@
 #include "Setup_GPIO.h"
 #include "MatterInterface.h"
 
-
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
@@ -89,7 +88,7 @@ void CallbackTest(char *buffer)
 
 extern "C" void app_main()
 {
-        TaskHandle_t GuiTaskHandler = NULL;
+    TaskHandle_t GuiTaskHandler = NULL;
     UBaseType_t TaskPriority = tskIDLE_PRIORITY + 1;
     uint32_t TaskStack = LVGL_STACK;
     GUI_TaskInit(&GuiTaskHandler, TaskPriority, TaskStack);
