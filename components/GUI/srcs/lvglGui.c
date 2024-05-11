@@ -70,7 +70,6 @@ void GUI_TaskInit(TaskHandle_t *GuiTaskHandler, UBaseType_t TaskPriority, uint32
 void GUI_mainTask(void *pvParameter)
 {
     lv_disp_draw_buf_t disp_draw_buf;
-
     lv_init();
     lvgl_driver_init();
     lv_disp_draw_buf_init(&disp_draw_buf, LVGL_BigBuf1, LVGL_BigBuf2, LV_HOR_RES_MAX * 100);
@@ -99,6 +98,7 @@ void GUI_mainTask(void *pvParameter)
  */
 void GUI_TaskKill(TaskHandle_t *TaskHandler)
 {
+    lv_deinit();
     vTaskDelete(TaskHandler);
     free(xTaskLVGLBuffer);
     free(xLVGLStack);

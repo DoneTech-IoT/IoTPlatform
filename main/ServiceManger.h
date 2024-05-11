@@ -33,7 +33,7 @@ typedef enum
 } RAM_Types;
 
 typedef void (*TaskCreatorPtr)(void);
-typedef void (*TaskKillerPtr)(void);
+typedef void (*TaskKillerPtr)(TaskHandle_t *);
 typedef struct
 {
     char name[32];            // Task name
@@ -52,5 +52,10 @@ typedef struct
     Task tasks[10]; // Array of tasks (assuming a maximum of 10 tasks)
 } ServiceManger_t;
 
+/**
+ * @brief Initializes the Service Manager task.
+ * This function initializes the Service Manager task by allocating memory and creating the task.
+ * @return void
+ */
 void ServiceMangerTaskInit();
 #endif
