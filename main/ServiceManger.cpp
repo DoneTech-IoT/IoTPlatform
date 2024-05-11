@@ -17,7 +17,7 @@ void ServiceMangerTaskInit()
         "ServiceMangerTask",
         SERVICE_MANGER_STACK,
         NULL,
-        tskIDLE_PRIORITY,
+        tskIDLE_PRIORITY + 1,
         xServiceMangerStack,
         xTaskServiceMangerBuffer);
 }
@@ -38,22 +38,26 @@ void TaskKiller(int TaskNumber)
     vTaskDelete(ServiceManger.tasks[TaskNumber].taskHandler);
     ESP_LOGI(TAG, "Task %d Deleted !", TaskNumber);
 }
+void SpotifyTaskCreator()
+{
+     ESP_LOGI(TAG, "TO DO");
+}
 void ServiceMangerInit()
 {
     GUI_TaskCreator();
     ESP_LOGI(TAG, "GUI Created !");
-    // SpotifyTaskCreator();
-    // ESP_LOGI(TAG, "Spotify Created !");
+    SpotifyTaskCreator();
+    ESP_LOGI(TAG, "Spotify Created !");
 }
 void ServiceMangerTask(void *pvParameter)
 {
     ServiceMangerInit();
-    vTaskDelay(pdMS_TO_TICKS(5000));
-    TaskKiller(GUI_Task);
-    vTaskDelay(pdMS_TO_TICKS(5000));
-    ServiceManger.tasks[GUI_Task].TaskCreator();
-    // while (true)
-    // {
 
-    // }
+    while (true)
+    {
+        vTaskDelay(pdMS_TO_TICKS(5000));
+        TaskKiller(GUI_Task);
+        vTaskDelay(pdMS_TO_TICKS(5000));
+        ServiceManger.tasks[GUI_Task].TaskCreator();
+    }
 }

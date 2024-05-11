@@ -16,7 +16,7 @@
 #include <stdint.h>
 
 #define LVGL_STACK 2500 // in word not byte
-#define SERVICE_MANGER_STACK 2000
+#define SERVICE_MANGER_STACK 5000
 
 
 
