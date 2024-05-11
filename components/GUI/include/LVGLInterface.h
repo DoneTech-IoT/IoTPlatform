@@ -27,11 +27,6 @@ extern "C"
 #define LV_TICK_PERIOD_MS 1
 #define TIMER_CALLBACK_TIME 10 * 1000 /* in milliseconds */
 
-typedef struct GuiInterfaceHandler_t
-{
-   UBaseType_t TaskPriority;
-   TaskHandle_t GuiTaskHandler;
-}GuiInterfaceHandler_t;
 #ifdef __cplusplus
 }
 #endif

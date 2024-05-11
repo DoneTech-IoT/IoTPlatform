@@ -89,28 +89,10 @@ void CallbackTest(char *buffer)
 
 extern "C" void app_main()
 {
-    ServiceManger ServiceManger;
-    ServiceManger.tasks[0].maximumRAM_Needed = LVGL_STACK * 2;
-    strcpy(ServiceManger.tasks[0].name, "GUI");
-    ServiceManger.tasks[0].ramType = PSRAM_;
-    ServiceManger.tasks[0].startupRAM = 0;
-    ServiceManger.tasks[0].TaskKiller = KillGUI_Task;
-    ServiceManger.tasks[0].taskStack = LVGL_STACK;
-    ServiceManger.tasks[0].priority = tskIDLE_PRIORITY + 1;
-    ServiceManger.tasks[0].taskHandler=NULL;
-    
-    GUI_TaskInit(&ServiceManger.tasks[0].taskHandler, ServiceManger.tasks[0].priority, ServiceManger.tasks[0].taskStack);
-
+    ServiceMangerTaskInit();
     GlobalInit();
     nvsFlashInit();
     SpiffsGlobalConfig();
-
-        // ServiceManger.tasks[0].TaskKiller(&ServiceManger.tasks[0].taskHandler);
-    // KillGUI_Task(&ServiceManger.tasks[0].taskHandler);
-    vTaskDelete(ServiceManger.tasks[0].taskHandler);
-    ESP_LOGE(TAG, "GUI killed");
-
-
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
