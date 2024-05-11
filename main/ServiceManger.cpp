@@ -1,7 +1,7 @@
 #include "ServiceManger.h"
 #include "lvglGui.h"
 #include <stdio.h>
-
+static const char *TAG = "Service_Manger";
 /**
  * @brief Task function for the Service Manager task.
  * This task initializes and manages other tasks.
@@ -63,7 +63,7 @@ void GUI_TaskCreator()
  */
 void TaskKiller(int TaskNumber)
 {
-    ServiceManger.tasks[TaskNumber].TaskKiller( ServiceManger.tasks[TaskNumber].taskHandler);
+    ServiceManger.tasks[TaskNumber].TaskKiller( &ServiceManger.tasks[TaskNumber].taskHandler);
     ESP_LOGI(TAG, "Task %d Deleted !", TaskNumber);
 }
 
@@ -104,7 +104,7 @@ void ServiceMangerTask(void *pvParameter)
     {
         vTaskDelay(pdMS_TO_TICKS(5000));
         TaskKiller(GUI_Task);
-        // vTaskDelay(pdMS_TO_TICKS(5000));
-        // ServiceManger.tasks[GUI_Task].TaskCreator();
+        vTaskDelay(pdMS_TO_TICKS(5000));
+        ServiceManger.tasks[GUI_Task].TaskCreator();
     }
 }

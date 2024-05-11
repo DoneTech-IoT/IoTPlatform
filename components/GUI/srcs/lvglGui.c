@@ -73,7 +73,6 @@ void GUI_mainTask(void *pvParameter)
     lv_init();
     lvgl_driver_init();
     lv_disp_draw_buf_init(&disp_draw_buf, LVGL_BigBuf1, LVGL_BigBuf2, LV_HOR_RES_MAX * 100);
-    lv_disp_remove();
     lv_disp_drv_t disp_drv;
     lv_disp_drv_init(&disp_drv);
     disp_drv.hor_res = LV_HOR_RES_MAX;
