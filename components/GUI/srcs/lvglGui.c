@@ -16,7 +16,7 @@ void GUI_mainTask(void *pvParameter);
  * @param Stack Size of the LVGL task stack.
  * @return 1 if memory allocation succeeds, 0 otherwise.
  */
-uint8_t GUI_AllocationMemory(uint32_t Stack)
+uint8_t GUI_MemoryAllocation(uint32_t Stack)
 {
     xTaskLVGLBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
     xLVGLStack = (StackType_t *)malloc(Stack * MULTIPLIER * sizeof(StackType_t));
@@ -29,9 +29,9 @@ uint8_t GUI_AllocationMemory(uint32_t Stack)
         free(xLVGLStack);
         free(LVGL_BigBuf2);
         free(LVGL_BigBuf1);
-        return 0;
+        return false;
     }
-    return 1;
+    return true;
 }
 
 /**
@@ -45,7 +45,10 @@ uint8_t GUI_AllocationMemory(uint32_t Stack)
 void GUI_TaskInit(TaskHandle_t *GuiTaskHandler, UBaseType_t TaskPriority, uint32_t TaskStack)
 {
     if (!GUI_AllocationMemory(TaskStack))
+    {
+        ESP_LOGE(TAG, "GUI task can not be creating ");
         return;
+    }
     *GuiTaskHandler = xTaskCreateStatic(
         GUI_mainTask,           // Task function
         "GUI_mainTask",         // Task name (for debugging)
@@ -57,6 +60,7 @@ void GUI_TaskInit(TaskHandle_t *GuiTaskHandler, UBaseType_t TaskPriority, uint32
     );
     // this delay so important
     vTaskDelay(500);
+    ESP_LOGI(TAG, "GUI task successfully created!");
 }
 
 /**
@@ -97,12 +101,15 @@ void GUI_mainTask(void *pvParameter)
  */
 void GUI_TaskKill(TaskHandle_t *TaskHandler)
 {
-    lv_deinit();
-    vTaskDelete(TaskHandler);
-    free(xTaskLVGLBuffer);
-    free(xLVGLStack);
-    free(LVGL_BigBuf2);
-    free(LVGL_BigBuf1);
+    if (*TaskHandler == NULL)
+    {
+        lv_deinit();
+        vTaskDelete(TaskHandler);
+        free(xTaskLVGLBuffer);
+        free(xLVGLStack);
+        free(LVGL_BigBuf2);
+        free(LVGL_BigBuf1);
+    }
 }
 
 /**
