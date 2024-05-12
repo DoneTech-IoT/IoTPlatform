@@ -44,7 +44,7 @@ uint8_t GUI_MemoryAllocation(uint32_t Stack)
  */
 void GUI_TaskInit(TaskHandle_t *GuiTaskHandler, UBaseType_t TaskPriority, uint32_t TaskStack)
 {
-    if (!GUI_AllocationMemory(TaskStack))
+    if (!GUI_MemoryAllocation(TaskStack))
     {
         ESP_LOGE(TAG, "GUI task can not be creating ");
         return;
