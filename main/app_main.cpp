@@ -98,7 +98,6 @@ extern "C" void app_main()
     GlobalInit();
     nvsFlashInit();
     SpiffsGlobalConfig();
-
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
