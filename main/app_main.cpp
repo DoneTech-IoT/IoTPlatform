@@ -90,7 +90,7 @@ void CallbackTest(char *buffer)
 extern "C" void app_main()
 {
     TaskHandle_t GuiTaskHandler = NULL;
-    UBaseType_t TaskPriority = tskIDLE_PRIORITY + 1;
+    UBaseType_t TaskPriority = tskIDLE_PRIORITY + 2;
     uint32_t TaskStack = LVGL_STACK;
     GUI_TaskInit(&GuiTaskHandler, TaskPriority, TaskStack);
 
