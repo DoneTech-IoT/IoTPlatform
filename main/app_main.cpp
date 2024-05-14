@@ -7,7 +7,7 @@
 #include "Setup_GPIO.h"
 #include "MatterInterface.h"
 
-#define LVGL_STACK 25000
+#define LVGL_STACK 50 * 1000
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
@@ -93,7 +93,7 @@ extern "C" void app_main()
     UBaseType_t TaskPriority = tskIDLE_PRIORITY + 2;
     uint32_t TaskStack = LVGL_STACK;
     GUI_TaskInit(&GuiTaskHandler, TaskPriority, TaskStack);
-
+    vTaskDelay(pdMS_TO_TICKS(1 * SEC));
 
     GlobalInit();
     nvsFlashInit();
@@ -103,11 +103,11 @@ extern "C" void app_main()
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
-    vTaskDelay(pdMS_TO_TICKS(5000));
+    vTaskDelay(pdMS_TO_TICKS(5 * SEC));
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
     SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
     Spotify_TaskInit(&SpotifyInterfaceHandler);
-    vTaskDelay(pdMS_TO_TICKS(5000));
+    vTaskDelay(pdMS_TO_TICKS(SEC));
 
     if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
     {
