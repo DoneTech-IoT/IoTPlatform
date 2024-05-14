@@ -94,9 +94,7 @@ extern "C" void app_main()
     uint32_t TaskStack = LVGL_STACK;
     GUI_TaskInit(&GuiTaskHandler, TaskPriority, TaskStack);
 
-    size_t freeHeapSize;
-    freeHeapSize = xPortGetFreeHeapSize();
-    ESP_LOGW("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);
+
     GlobalInit();
     nvsFlashInit();
     SpiffsGlobalConfig();
@@ -106,17 +104,11 @@ extern "C" void app_main()
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
 
-    freeHeapSize = xPortGetFreeHeapSize();
-    ESP_LOGW("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);
-
-    vTaskDelay(pdMS_TO_TICKS(SEC*5));
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
     SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
     Spotify_TaskInit(&SpotifyInterfaceHandler);
+    vTaskDelay(pdMS_TO_TICKS(5000));
 
-    freeHeapSize = xPortGetFreeHeapSize();
-    ESP_LOGW("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);
-    vTaskDelay(pdMS_TO_TICKS(SEC*5000));
     if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
     {
         bool CommandResult = false;
