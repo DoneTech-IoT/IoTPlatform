@@ -7,7 +7,7 @@
 #include "Setup_GPIO.h"
 #include "MatterInterface.h"
 
-#define LVGL_STACK 50 * 1000
+#define LVGL_STACK 100 * 1000
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
