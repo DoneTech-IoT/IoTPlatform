@@ -71,10 +71,7 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
         ESP_LOGW(TAG, "Fabric is committed");
         InterfaceHandler->ConnectToMatterNetwork();
         break;
-
-    case chip::DeviceLayer::DeviceEventType::kBLEDeinitialized:
-        ESP_LOGW(TAG, "BLE deinitialized and memory reclaimed");
-        break;
+            
     default:
         break;
     }
