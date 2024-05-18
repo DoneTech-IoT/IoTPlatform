@@ -21,7 +21,7 @@ void GUI_TaskInit(void)
     xTaskCreateStatic(
         GUI_mainTask,         // Task function
         "GUI_mainTask",       // Task name (for debugging)
-        LVGL_STACK *,         // Stack size (in words)
+        LVGL_STACK ,         // Stack size (in words)
         NULL,                 // Task parameters (passed to the task function)
         tskIDLE_PRIORITY + 1, // Task priority (adjust as needed)
         xLVGLStack,           // Stack buffer

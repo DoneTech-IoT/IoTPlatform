@@ -23,7 +23,7 @@ extern "C"
 #include "rm67162Lilygo.h"
 #include "rm67162.h"
 
-
+#define MULTIPLIER 2
 #define LV_TICK_PERIOD_MS 1
 #define LVGL_STACK 100*1000
 #define TIMER_CALLBACK_TIME 10 * 1000 /* in milliseconds */
