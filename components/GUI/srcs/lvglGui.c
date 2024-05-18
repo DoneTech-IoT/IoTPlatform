@@ -10,7 +10,7 @@ void GUI_mainTask(void *pvParameter);
 void GUI_TaskInit(void)
 {
     StaticTask_t *xTaskLVGLBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
-    StackType_t *xLVGLStack = (StackType_t *)malloc(LVGL_STACK * 8 * MULTIPLIER * sizeof(StackType_t));
+    StackType_t *xLVGLStack = (StackType_t *)malloc(LVGL_STACK * sizeof(StackType_t));
     if (xTaskLVGLBuffer == NULL || xLVGLStack == NULL)
     {
         ESP_LOGE("TAG", "Memory allocation failed!");
@@ -19,13 +19,13 @@ void GUI_TaskInit(void)
         return; // Exit with an error code
     }
     xTaskCreateStatic(
-        GUI_mainTask,                // Task function
-        "GUI_mainTask",              // Task name (for debugging)
-        LVGL_STACK * 8 * MULTIPLIER, // Stack size (in words)
-        NULL,                        // Task parameters (passed to the task function)
-        tskIDLE_PRIORITY + 1,        // Task priority (adjust as needed)
-        xLVGLStack,                  // Stack buffer
-        xTaskLVGLBuffer              // Task control block
+        GUI_mainTask,         // Task function
+        "GUI_mainTask",       // Task name (for debugging)
+        LVGL_STACK ,         // Stack size (in words)
+        NULL,                 // Task parameters (passed to the task function)
+        tskIDLE_PRIORITY + 1, // Task priority (adjust as needed)
+        xLVGLStack,           // Stack buffer
+        xTaskLVGLBuffer       // Task control block
     );
     // this delay so important
     vTaskDelay(500);
@@ -99,7 +99,7 @@ void GUI_UpdateSpotifyScreen(bool songUpdated, char *Artist, char *Song, char *A
     lv_event_send(guider_ui.Spotify_Page_Song_name, LV_EVENT_VALUE_CHANGED, Song);
     lv_event_send(guider_ui.Spotify_Page_Album_name, LV_EVENT_VALUE_CHANGED, Album);
     lv_event_send(guider_ui.Matter_logo, LV_EVENT_VALUE_CHANGED, NULL);
-    
+
     lv_event_send(guider_ui.Spotify_Page_img_song, LV_EVENT_VALUE_CHANGED, coverPhoto);
 }
 
