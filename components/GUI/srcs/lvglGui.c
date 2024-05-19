@@ -49,7 +49,7 @@ void GUI_TaskInit(TaskHandle_t *GuiTaskHandler, UBaseType_t TaskPriority, uint32
     *GuiTaskHandler = xTaskCreateStatic(
         GUI_mainTask,           // Task function
         "GUI_mainTask",         // Task name (for debugging)
-        TaskStack * MULTIPLIER, // Stack size (in words)
+        TaskStack , // Stack size (in words)
         NULL,                   // Task parameters (passed to the task function)
         TaskPriority,           // Task priority (adjust as needed)
         xLVGLStack,             // Stack buffer

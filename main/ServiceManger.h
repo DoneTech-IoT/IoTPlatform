@@ -15,8 +15,13 @@
 
 #include <stdint.h>
 
-#define LVGL_STACK 2500 // in word not byte
+#define LVGL_STACK 100*1000 // in word not byte
 #define SERVICE_MANGER_STACK 5000
+
+
+
+#define GUI_ENABLE
+#define SPOTIFY_ENABLE
 
 
 
