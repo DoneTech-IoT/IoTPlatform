@@ -108,9 +108,9 @@ void ServiceMangerTask(void *pvParameter)
 
     while (true)
     {
-        vTaskDelay(pdMS_TO_TICKS(5000));
-        TaskKiller(GUI_Task);
-        vTaskDelay(pdMS_TO_TICKS(5000));
-        ServiceManger.tasks[GUI_Task].TaskCreator();
+        // vTaskDelay(pdMS_TO_TICKS(5000));
+        // TaskKiller(GUI_Task);
+        // vTaskDelay(pdMS_TO_TICKS(5000));
+        // ServiceManger.tasks[GUI_Task].TaskCreator();
     }
 }
