@@ -100,10 +100,10 @@ extern "C" void app_main()
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
 
-    // SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
-    // SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
-    // Spotify_TaskInit(&SpotifyInterfaceHandler);
-    // vTaskDelay(pdMS_TO_TICKS(5000));
+    SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
+    SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
+    Spotify_TaskInit(&SpotifyInterfaceHandler);
+    vTaskDelay(pdMS_TO_TICKS(5000));
 
     if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
     {

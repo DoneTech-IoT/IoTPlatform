@@ -17,7 +17,7 @@
 
 #define LVGL_STACK 100*1000 // in word not byte
 #define SERVICE_MANGER_STACK 5000
-
+#define NUMBER_OF_COSTUME_TASK 10
 
 
 #define GUI_ENABLE
@@ -54,7 +54,7 @@ typedef struct
 
 typedef struct
 {
-    Task tasks[10]; // Array of tasks (assuming a maximum of 10 tasks)
+    Task tasks[NUMBER_OF_COSTUME_TASK]; // Array of tasks (assuming a maximum of 10 tasks)
 } ServiceManger_t;
 
 /**

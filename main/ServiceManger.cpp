@@ -2,6 +2,8 @@
 #include "lvglGui.h"
 #include <stdio.h>
 static const char *TAG = "Service_Manger";
+#define TASK_LIST_BUFFER_SIZE 512
+// #define MONITORING
 /**
  * @brief Task function for the Service Manager task.
  * This task initializes and manages other tasks.
@@ -105,12 +107,13 @@ void ServiceMangerInit()
 void ServiceMangerTask(void *pvParameter)
 {
     ServiceMangerInit();
-
+    char pcTaskList[TASK_LIST_BUFFER_SIZE];
     while (true)
     {
-        // vTaskDelay(pdMS_TO_TICKS(5000));
-        // TaskKiller(GUI_Task);
-        // vTaskDelay(pdMS_TO_TICKS(5000));
-        // ServiceManger.tasks[GUI_Task].TaskCreator();
+        vTaskList(pcTaskList);
+#ifdef MONITORING
+        ESP_LOGI(TAG, "Task List:\n%s\n", pcTaskList);
+#endif
+        vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
