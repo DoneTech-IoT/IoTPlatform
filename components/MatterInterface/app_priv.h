@@ -25,6 +25,7 @@ typedef void *app_driver_handle_t;
  * @return NULL in case of failure.
  */
 app_driver_handle_t app_driver_switch_init();
+app_driver_handle_t app_driver_coffee_maker_init();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #define ESP_OPENTHREAD_DEFAULT_RADIO_CONFIG()                                                  \
