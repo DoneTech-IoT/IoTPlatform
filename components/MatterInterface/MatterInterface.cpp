@@ -18,6 +18,8 @@ using namespace esp_matter::endpoint;
 
 static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
 {
+    size_t PSRAM_Size;
+    size_t SRAM_Size;
     switch (event->Type)
     {
     case chip::DeviceLayer::DeviceEventType::kInterfaceIpAddressChanged:
@@ -29,49 +31,83 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
             if (InterfaceHandler->ConnectToMatterNetwork != NULL)
                 InterfaceHandler->ConnectToMatterNetwork();
         }
+
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "  %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
         break;
     }
     case chip::DeviceLayer::DeviceEventType::kCommissioningComplete:
         ESP_LOGW(TAG, "Commissioning complete");
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "  %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
         break;
 
     case chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired:
         ESP_LOGW(TAG, "Commissioning failed, fail safe timer expired");
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "  %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
         break;
 
     case chip::DeviceLayer::DeviceEventType::kCommissioningSessionStarted:
         ESP_LOGW(TAG, "Commissioning session started");
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "  %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
         break;
 
     case chip::DeviceLayer::DeviceEventType::kCommissioningSessionStopped:
         ESP_LOGW(TAG, "Commissioning session stopped");
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "  %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
         break;
 
     case chip::DeviceLayer::DeviceEventType::kCommissioningWindowOpened:
         ESP_LOGW(TAG, "Commissioning window opened");
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "  %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
         break;
 
     case chip::DeviceLayer::DeviceEventType::kCommissioningWindowClosed:
         ESP_LOGW(TAG, "Commissioning window closed");
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "  %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
         break;
 
     case chip::DeviceLayer::DeviceEventType::kFabricRemoved:
         ESP_LOGW(TAG, "Fabric removed successfully");
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "  %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
         break;
 
     case chip::DeviceLayer::DeviceEventType::kFabricWillBeRemoved:
         ESP_LOGW(TAG, "Fabric will be removed");
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "  %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
         break;
 
     case chip::DeviceLayer::DeviceEventType::kFabricUpdated:
         ESP_LOGW(TAG, "Fabric is updated");
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "  %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
         break;
 
     case chip::DeviceLayer::DeviceEventType::kFabricCommitted:
         ESP_LOGW(TAG, "Fabric is committed");
         InterfaceHandler->ConnectToMatterNetwork();
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "  %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
         break;
-            
+
     default:
         break;
     }
@@ -109,16 +145,51 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
     {
         esp_err_t err = ESP_OK;
 
+
+
+        size_t PSRAM_Size;
+        size_t SRAM_Size;
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "  %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
         /* Initialize driver */
         app_driver_handle_t switch_handle = app_driver_switch_init();
         app_reset_button_register(switch_handle);
+        PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
+        SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "switch_handle: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+
+
+
+
 
         /* Create a Matter node and add the mandatory Root Node device type on endpoint 0 */
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "  %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
         node::config_t node_config;
         node_t *node = node::create(&node_config, app_attribute_update_cb, app_identification_cb);
+        PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
+        SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "switch_handle: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
 
+
+
+
+
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "  %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
         on_off_switch::config_t switch_config;
         endpoint_t *endpoint = on_off_switch::create(node, &switch_config, ENDPOINT_FLAG_NONE, switch_handle);
+        PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
+        SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "on_off_switch: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+
+
+
+
+
 
         /* These node and endpoint handles can be used to create/add other endpoints and clusters. */
         if (!node || !endpoint)
@@ -127,11 +198,23 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         }
 
         /* Add group cluster to the switch endpoint */
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "  %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
         cluster::groups::config_t groups_config;
         cluster::groups::create(endpoint, &groups_config, CLUSTER_FLAG_SERVER | CLUSTER_FLAG_CLIENT);
 
         switch_endpoint_id = endpoint::get_id(endpoint);
         ESP_LOGI(TAG, "Switch created with endpoint_id %d", switch_endpoint_id);
+        PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
+        SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "switch_endpoint_id: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+
+
+
+
+
+
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         /* Set OpenThread platform config */
@@ -151,10 +234,15 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         }
 
 #if CONFIG_ENABLE_CHIP_SHELL
-
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "  %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
         esp_matter::console::diagnostics_register_commands();
         esp_matter::console::wifi_register_commands();
         esp_matter::console::init();
+        PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
+        SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("Matter heap", "CONFIG_ENABLE_CHIP_SHELL: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
 #endif
 
         ESP_LOGI(TAG, "Matter app initiated successfully");

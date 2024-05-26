@@ -91,30 +91,49 @@ extern "C" void app_main()
 
     size_t PSRAM_Size;
     size_t SRAM_Size;
-    PSRAM_Size = esp_get_PSRAM_Size_size();
-    SRAM_Size = xPortGetFreeHeapSize();
-    ESP_LOGW("HEAP_MONITOR", "Free Heap Size befor GUI: %u bytes SRAM %u PSRAM\nn", SRAM_Size, PSRAM_Size);
+    PSRAM_Size = (esp_get_free_heap_size() / 1000);
+    SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+    ESP_LOGW("HEAP_MONITOR", "Free Heap Size befor GUI: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
     GUI_TaskInit();
-    ESP_LOGW("HEAP_MONITOR", "GUI memory: %u bytes SRAM %u PSRAM\n", (SRAM_Size - xPortGetFreeHeapSize()), (PSRAM_Size - esp_get_PSRAM_Size_size()));
-    PSRAM_Size = esp_get_PSRAM_Size_size();
-    SRAM_Size = xPortGetFreeHeapSize();
-    ESP_LOGW("HEAP_MONITOR", "Free Heap Size befor GlobalInit: %u bytes SRAM %u PSRAM\nn", SRAM_Size, PSRAM_Size);
-    GlobalInit();
-    ESP_LOGW("HEAP_MONITOR", "GlobalInit memory: %u bytes SRAM %u PSRAM\n", (SRAM_Size - xPortGetFreeHeapSize()), (PSRAM_Size - esp_get_PSRAM_Size_size()));
-    PSRAM_Size = esp_get_PSRAM_Size_size();
-    SRAM_Size = xPortGetFreeHeapSize();
-    ESP_LOGW("HEAP_MONITOR", "Free Heap Size befor nvsFlashInit: %u bytes SRAM %u PSRAM\nn", SRAM_Size, PSRAM_Size);
-    nvsFlashInit();
-    ESP_LOGW("HEAP_MONITOR", "nvsFlashInit memory: %u bytes SRAM %u PSRAM\n", (SRAM_Size - xPortGetFreeHeapSize()), (PSRAM_Size - esp_get_PSRAM_Size_size()));
-    PSRAM_Size = esp_get_PSRAM_Size_size();
-    SRAM_Size = xPortGetFreeHeapSize();
-    ESP_LOGW("HEAP_MONITOR", "Free Heap Size befor SpiffsGlobalConfig: %u bytes SRAM %u PSRAM\nn", SRAM_Size, PSRAM_Size);
-    SpiffsGlobalConfig();
-    ESP_LOGW("HEAP_MONITOR", "SpiffsGlobalConfig memory: %u bytes SRAM %u PSRAM\n", (SRAM_Size - xPortGetFreeHeapSize()), (PSRAM_Size - esp_get_PSRAM_Size_size()));
-    PSRAM_Size = esp_get_PSRAM_Size_size();
-    SRAM_Size = xPortGetFreeHeapSize();
-    ESP_LOGW("HEAP_MONITOR", "Free Heap Size befor Matter_TaskInit: %u bytes SRAM %u PSRAM\nn", SRAM_Size, PSRAM_Size);
+    PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
+    SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
+    ESP_LOGW("HEAP_MONITOR", " GUI: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
 
+
+
+    PSRAM_Size = (esp_get_free_heap_size() / 1000);
+    SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+    ESP_LOGW("HEAP_MONITOR", "Free Heap Size befor GlobalInit: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+    GlobalInit();
+    PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
+    SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
+    ESP_LOGW("HEAP_MONITOR", "GlobalInit: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+
+
+
+    PSRAM_Size = (esp_get_free_heap_size() / 1000);
+    SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+    ESP_LOGW("HEAP_MONITOR", "Free Heap Size befor nvsFlashInit: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+    nvsFlashInit();
+    PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
+    SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
+    ESP_LOGW("HEAP_MONITOR", "nvsFlashInit: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+
+
+
+
+    PSRAM_Size = (esp_get_free_heap_size() / 1000);
+    SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+    ESP_LOGW("HEAP_MONITOR", "Free Heap Size befor SpiffsGlobalConfig: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+    SpiffsGlobalConfig();
+    PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
+    SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
+    ESP_LOGW("HEAP_MONITOR", "nvsFlashInit: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+
+
+    PSRAM_Size = (esp_get_free_heap_size() / 1000);
+    SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+    ESP_LOGW("HEAP_MONITOR", "Free Heap Size befor Matter_TaskInit: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
@@ -122,16 +141,27 @@ extern "C" void app_main()
     Matter_TaskInit(&MatterInterfaceHandler);
 
     vTaskDelay((pdMS_TO_TICKS(SEC * 5)));
-    ESP_LOGW("HEAP_MONITOR", "SpiffsGlobalConfig memory: %u bytes SRAM %u PSRAM\n", (SRAM_Size - xPortGetFreeHeapSize()), (PSRAM_Size - esp_get_PSRAM_Size_size()));
-    PSRAM_Size = esp_get_PSRAM_Size_size();
-    SRAM_Size = xPortGetFreeHeapSize();
-    ESP_LOGW("HEAP_MONITOR", "Free Heap Size befor Spotify_TaskInit: %u bytes SRAM %u PSRAM\nn", SRAM_Size, PSRAM_Size);
+    PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
+    SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
+    ESP_LOGW("HEAP_MONITOR", "Matter_TaskInit: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+
+
+
+    PSRAM_Size = (esp_get_free_heap_size() / 1000);
+    SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+    ESP_LOGW("HEAP_MONITOR", "Free Heap Size befor Spotify_TaskInit: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
     SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
     Spotify_TaskInit(&SpotifyInterfaceHandler);
     unsigned int numberOfTasks = uxTaskGetNumberOfTasks();
     printf("Number of tasks: %u\n", numberOfTasks);
-    ESP_LOGW("HEAP_MONITOR", "Spotify_TaskInit memory: %u bytes SRAM %u PSRAM\n", (SRAM_Size - xPortGetFreeHeapSize()), (PSRAM_Size - esp_get_PSRAM_Size_size()));
+    PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
+    SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
+    ESP_LOGW("HEAP_MONITOR", "Spotify_TaskInit: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+
+
+
+
 
     // after this semaphore you can use playback command function in every where !
     if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)

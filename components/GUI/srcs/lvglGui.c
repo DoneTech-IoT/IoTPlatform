@@ -9,6 +9,10 @@ void GUI_mainTask(void *pvParameter);
  */
 void GUI_TaskInit(void)
 {
+    size_t PSRAM_Size;
+    size_t SRAM_Size;
+    PSRAM_Size = (esp_get_free_heap_size() / 1000);
+    SRAM_Size = (xPortGetFreeHeapSize() / 1000);
     StaticTask_t *xTaskLVGLBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
     StackType_t *xLVGLStack = (StackType_t *)malloc(LVGL_STACK * sizeof(StackType_t));
     if (xTaskLVGLBuffer == NULL || xLVGLStack == NULL)
@@ -21,12 +25,15 @@ void GUI_TaskInit(void)
     xTaskCreateStatic(
         GUI_mainTask,         // Task function
         "GUI_mainTask",       // Task name (for debugging)
-        LVGL_STACK ,         // Stack size (in words)
+        LVGL_STACK,           // Stack size (in words)
         NULL,                 // Task parameters (passed to the task function)
         tskIDLE_PRIORITY + 1, // Task priority (adjust as needed)
         xLVGLStack,           // Stack buffer
         xTaskLVGLBuffer       // Task control block
     );
+    PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
+    SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
+    ESP_LOGW("internal LVGL", " after gui creation : %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
     // this delay so important
     vTaskDelay(500);
 }
@@ -40,8 +47,17 @@ void GUI_TaskInit(void)
 void GUI_mainTask(void *pvParameter)
 {
     lv_disp_draw_buf_t disp_draw_buf;
+    size_t PSRAM_Size;
+    size_t SRAM_Size;
+    PSRAM_Size = (esp_get_free_heap_size() / 1000);
+    SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+    ESP_LOGW("LVGL", "Free Heap Size befor LVGL_BigBuf: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
     lv_color_t *LVGL_BigBuf1 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
     lv_color_t *LVGL_BigBuf2 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
+    PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
+    SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
+    ESP_LOGW("LVGL", " LVGL_BigBuf 1&2: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+
     if (LVGL_BigBuf1 == NULL || LVGL_BigBuf2 == NULL)
     {
         ESP_LOGE("TAG", "Memory allocation failed!");
