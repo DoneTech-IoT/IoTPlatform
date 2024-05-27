@@ -13,7 +13,7 @@ void GUI_TaskInit(void)
     size_t SRAM_Size;
     PSRAM_Size = (esp_get_free_heap_size() / 1000);
     SRAM_Size = (xPortGetFreeHeapSize() / 1000);
-    ESP_LOGE("internal LVGL", "Free Heap Size befor GUI: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+    ////ESP_LOGE("LVGL", "Free Heap Size befor GUI: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
     StaticTask_t *xTaskLVGLBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
     StackType_t *xLVGLStack = (StackType_t *)malloc(LVGL_STACK * sizeof(StackType_t));
     if (xTaskLVGLBuffer == NULL || xLVGLStack == NULL)
@@ -34,7 +34,10 @@ void GUI_TaskInit(void)
     );
     PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
     SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
-    ESP_LOGW("internal LVGL", " after gui creation : %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+    ESP_LOGW("LVGL", " after gui creation : %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+    PSRAM_Size = (esp_get_free_heap_size() / 1000);
+    SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+    ////ESP_LOGE("LVGL", "Free Heap Size after GUI: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
     // this delay so important
     vTaskDelay(500);
 }
@@ -52,12 +55,16 @@ void GUI_mainTask(void *pvParameter)
     size_t SRAM_Size;
     PSRAM_Size = (esp_get_free_heap_size() / 1000);
     SRAM_Size = (xPortGetFreeHeapSize() / 1000);
-    ESP_LOGE("LVGL", "Free Heap Size befor LVGL_BigBuf: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+    ////ESP_LOGE("LVGL", "Free Heap Size befor LVGL_BigBuf: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
     lv_color_t *LVGL_BigBuf1 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
     lv_color_t *LVGL_BigBuf2 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
     PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
     SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
     ESP_LOGW("LVGL", " LVGL_BigBuf 1&2: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+    PSRAM_Size = (esp_get_free_heap_size() / 1000);
+    SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+    ////ESP_LOGE("LVGL", "Free Heap Size after LVGL_BigBuf: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+
 
     if (LVGL_BigBuf1 == NULL || LVGL_BigBuf2 == NULL)
     {

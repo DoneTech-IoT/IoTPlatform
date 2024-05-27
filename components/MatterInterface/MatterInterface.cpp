@@ -155,6 +155,13 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
         SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
         ESP_LOGE("Matter heap", "switch_handle: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGE("Matter heap", "free heap after switch_handle: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+
+
+
+
 
         /* Create a Matter node and add the mandatory Root Node device type on endpoint 0 */
         PSRAM_Size = (esp_get_free_heap_size() / 1000);
@@ -164,6 +171,14 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
         SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
         ESP_LOGE("Matter heap", "node: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGE("Matter heap", "free heap after node: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+
+
+
+
+
 
         PSRAM_Size = (esp_get_free_heap_size() / 1000);
         SRAM_Size = (xPortGetFreeHeapSize() / 1000);
@@ -171,7 +186,15 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         endpoint_t *endpoint = on_off_switch::create(node, &switch_config, ENDPOINT_FLAG_NONE, switch_handle);
         PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
         SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
-        ESP_LOGE("Matter heap", "on_off_switch: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+        ESP_LOGE("Matter heap", "endpoint: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGE("Matter heap", "free heap after endpoint: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+
+
+
+
+
 
         /* These node and endpoint handles can be used to create/add other endpoints and clusters. */
         if (!node || !endpoint)
@@ -186,15 +209,20 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         cluster::groups::create(endpoint, &groups_config, CLUSTER_FLAG_SERVER | CLUSTER_FLAG_CLIENT);
         PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
         SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
-        ESP_LOGE("Matter heap", "switch_endpoint_id: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
-
+        ESP_LOGE("Matter heap", "groups::create: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
         PSRAM_Size = (esp_get_free_heap_size() / 1000);
         SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGE("Matter heap", "free heap after groups::create: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+
+
+
+
+
+
+
         switch_endpoint_id = endpoint::get_id(endpoint);
         ESP_LOGI(TAG, " endpoint_id %d", switch_endpoint_id);
-        PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
-        SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
-        ESP_LOGE("Matter heap", "switch_endpoint_id: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         /* Set OpenThread platform config */
@@ -222,6 +250,9 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         PSRAM_Size = PSRAM_Size - (esp_get_free_heap_size() / 1000);
         SRAM_Size = SRAM_Size - (xPortGetFreeHeapSize() / 1000);
         ESP_LOGE("Matter heap", "CONFIG_ENABLE_CHIP_SHELL: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
+        PSRAM_Size = (esp_get_free_heap_size() / 1000);
+        SRAM_Size = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGE("Matter heap", "free heap after console::create: %u K bytes SRAM %u K byte PSRAM ", SRAM_Size, PSRAM_Size);
 #endif
 
         ESP_LOGI(TAG, "Matter app initiated successfully");
