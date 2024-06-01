@@ -1,6 +1,7 @@
 #include "ServiceManger.h"
 #include "lvglGui.h"
 #include <stdio.h>
+#include"string.h"
 static const char *TAG = "Service_Manger";
 #define TASK_LIST_BUFFER_SIZE 512
 // #define MONITORING

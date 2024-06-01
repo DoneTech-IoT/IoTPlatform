@@ -89,17 +89,20 @@ void CallbackTest(char *buffer)
 
 extern "C" void app_main()
 {
+    // RamStatus("main","stage 1");
     ServiceMangerTaskInit();
+
     GlobalInit();
     nvsFlashInit();
     SpiffsGlobalConfig();
 
+    // RamOccupy(LogStart, "Matter");
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
-
+    // RamOccupy(LogEnd, "GUI");
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
     SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
     Spotify_TaskInit(&SpotifyInterfaceHandler);

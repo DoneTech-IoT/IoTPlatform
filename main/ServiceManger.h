@@ -12,18 +12,16 @@
 #include <esp_log.h>
 #include <esp_system.h>
 #include <sys/param.h>
-
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #include <stdint.h>
 
-#define LVGL_STACK 100*1000 // in word not byte
+#define LVGL_STACK 100 * 1000 // in word not byte
 #define SERVICE_MANGER_STACK 5000
 #define NUMBER_OF_COSTUME_TASK 10
 
-
 #define GUI_ENABLE
 #define SPOTIFY_ENABLE
-
-
 
 typedef enum
 {
@@ -36,7 +34,11 @@ typedef enum
     PSRAM_,
     SRAM_
 } RAM_Types;
-
+typedef enum
+{
+    LogEnd = 0,
+    LogStart
+} LogFlag;
 typedef void (*TaskCreatorPtr)(void);
 typedef void (*TaskKillerPtr)(TaskHandle_t *);
 typedef struct
