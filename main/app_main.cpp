@@ -7,7 +7,7 @@
 #include "Setup_GPIO.h"
 #include "MatterInterface.h"
 #include "ServiceManger.h"
-
+#include "Custom_Log.h"
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
@@ -89,25 +89,29 @@ void CallbackTest(char *buffer)
 
 extern "C" void app_main()
 {
-    // RamStatus("main","stage 1");
+    RamStatus("stage 1");
     ServiceMangerTaskInit();
 
     GlobalInit();
     nvsFlashInit();
     SpiffsGlobalConfig();
 
-    // RamOccupy(LogStart, "Matter");
+    RamOccupy(LogStart, "stage 2");
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
-    // RamOccupy(LogEnd, "GUI");
+    vTaskDelay(pdMS_TO_TICKS(5000));
+    RamOccupy(LogEnd, "stage 2");
+
+    RamStatus("stage 3");
+    RamOccupy(LogStart, "stage 4");
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
     SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
     Spotify_TaskInit(&SpotifyInterfaceHandler);
-    vTaskDelay(pdMS_TO_TICKS(5000));
-
+    vTaskDelay(pdMS_TO_TICKS(3000));
+    RamOccupy(LogEnd, "stage 4");
     if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
     {
         bool CommandResult = false;

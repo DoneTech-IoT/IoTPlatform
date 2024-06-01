@@ -1,9 +1,36 @@
 #include "Custom_Log.h"
 #include "string.h"
+
+#define LOG_MAX_EVENT 20
+#define LOG_MAX_COMPONENT 3
+#define STRING_LEN 20
+// typedef struct
+// {
+//     int Psram[10];
+//     int Sram[10];
+// } Ram_;
+// typedef struct
+// {
+//     Ram_ RAM;
+
+// } EventName_;
+// typedef struct
+// {
+//     EventName_ Event[LOG_MAX_EVENT];
+//     char EventName[STRING_LEN];
+
+// } ComponentName_;
+
+// typedef struct
+// {
+//     ComponentName_ ComponentName[LOG_MAX_COMPONENT];
+// } Log;
+
 void RamOccupyFunction(bool TimingFlag, char *Component, char *ProgramStage)
 {
+    Log Log;
 #ifdef CONFIG_DONE_LOG_RAM
-    static size_t PsramSize;
+        static size_t PsramSize;
     static size_t SramSize;
     static char LastLogTag[20];
     if (TimingFlag == 1)
@@ -48,31 +75,31 @@ void RamStatusFunction(char *Component, char *ProgramStage)
 void RamOStatus(char *ProgramStage)
 {
 #ifdef CONFIG_DONE_OATH_LOG_RAM
-    ServiceMangerRamStatus("OAth", ProgramStage);
+    RamStatusFunction("OAth", ProgramStage);
 #endif
 #ifdef CONFIG_DONE_GUI_LOG_RAM
-    ServiceMangerRamStatus("GUI", ProgramStage);
+    RamStatusFunction("GUI", ProgramStage);
 #endif
 #ifdef CONFIG_DONE_MATTER_INTERFACE_LOG_RAM
-    ServiceMangerRamStatus("Matter_Interface", ProgramStage);
+    RamStatusFunction("Matter_Interface", ProgramStage);
 #endif
-#ifdef CONFIG_DONE_MATTER_INTERFACE_LOG_RAM
-    ServiceMangerRamStatus("Main", ProgramStage);
+#ifdef CONFIG_DONE_MAIN_LOG_RAM
+    RamStatusFunction("Main", ProgramStage);
 #endif
 }
 
 void RamOccupy(bool TimingFlag, char *ProgramStage)
 {
 #ifdef CONFIG_DONE_OATH_LOG_RAM
-    ServiceMangerRamOccupy(TimingFlag, "OAth", ProgramStage);
+    RamOccupyFunction(TimingFlag, "OAth", ProgramStage);
 #endif
 #ifdef CONFIG_DONE_GUI_LOG_RAM
-    ServiceMangerRamOccupy(TimingFlag, "GUI", ProgramStage);
+    RamOccupyFunction(TimingFlag, "GUI", ProgramStage);
 #endif
 #ifdef CONFIG_DONE_MATTER_INTERFACE_LOG_RAM
-    ServiceMangerRamOccupy(TimingFlag, "Matter_Interface", ProgramStage);
+    RamOccupyFunction(TimingFlag, "Matter_Interface", ProgramStage);
 #endif
-#ifdef CONFIG_DONE_MATTER_INTERFACE_LOG_RAM
-    ServiceMangerRamOccupy(TimingFlag, "Main", ProgramStage);
+#ifdef CONFIG_DONE_MAIN_LOG_RAM
+    RamOccupyFunction(TimingFlag, "Main", ProgramStage);
 #endif
 }

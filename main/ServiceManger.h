@@ -34,11 +34,7 @@ typedef enum
     PSRAM_,
     SRAM_
 } RAM_Types;
-typedef enum
-{
-    LogEnd = 0,
-    LogStart
-} LogFlag;
+
 typedef void (*TaskCreatorPtr)(void);
 typedef void (*TaskKillerPtr)(TaskHandle_t *);
 typedef struct
