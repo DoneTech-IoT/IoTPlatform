@@ -45,10 +45,7 @@ void tset(bool TimingFlag, char *Component, char *EventName)
     else // existence component
     {
         eventNumber = FindEventInComponent(&Log, Component, EventName);
-        if (eventNumber = 0)
-        {
-            Log.Component[componentNumber].Event
-        }
+            strncpy(Log.Component[componentNumber].Event[eventNumber].Name,EventName);
     }
 }
 uint8_t FindEventInComponent(Log *Log, int ComponentNumber, char *EventName)
