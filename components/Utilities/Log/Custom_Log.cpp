@@ -8,23 +8,23 @@ typedef struct
 {
     int Psram[10];
     int Sram[10];
-} Ram_str;
+} Ram_srt;
 typedef struct
 {
-    Ram_str RAM;
+    Ram_srt RAM;
     char Name[STRING_LEN];
 
 } Event_str;
 typedef struct
 {
-    Event_str Event[LOG_MAX_EVENT];
+    Event_srt Event[LOG_MAX_EVENT];
     char Name[STRING_LEN];
 
 } Component_str;
 
 typedef struct
 {
-    Component_str Component[LOG_MAX_COMPONENT];
+    Component_srt Component[LOG_MAX_COMPONENT];
 } Log;
 
 uint8_t FindComponent(Log *Log, char *Component);
@@ -35,7 +35,8 @@ void tset(bool TimingFlag, char *Component, char *EventName)
     static Log Log;
     int componentNumber;
     int eventNumber;
-    if (FindComponent(&Log, Component) == 0) // this is new component
+    componentNumber = FindComponent(&Log, Component);
+    if (componentNumber == 0) // this is new component
     {
         componentNumber = WhereIsEmpty(&Log);
         strncpy(Log.Component[componentNumber].name, Component, strlen(Component));
@@ -45,7 +46,7 @@ void tset(bool TimingFlag, char *Component, char *EventName)
     else // existence component
     {
         eventNumber = FindEventInComponent(&Log, Component, EventName);
-            strncpy(Log.Component[componentNumber].Event[eventNumber].Name,EventName);
+        strncpy(Log.Component[componentNumber].Event[eventNumber].Name, EventName);
     }
 }
 uint8_t FindEventInComponent(Log *Log, int ComponentNumber, char *EventName)
