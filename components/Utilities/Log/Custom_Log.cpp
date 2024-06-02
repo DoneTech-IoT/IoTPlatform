@@ -4,33 +4,91 @@
 #define LOG_MAX_EVENT 20
 #define LOG_MAX_COMPONENT 3
 #define STRING_LEN 20
-// typedef struct
-// {
-//     int Psram[10];
-//     int Sram[10];
-// } Ram_;
-// typedef struct
-// {
-//     Ram_ RAM;
+typedef struct
+{
+    int Psram[10];
+    int Sram[10];
+} Ram_str;
+typedef struct
+{
+    Ram_str RAM;
+    char Name[STRING_LEN];
 
-// } EventName_;
-// typedef struct
-// {
-//     EventName_ Event[LOG_MAX_EVENT];
-//     char EventName[STRING_LEN];
+} Event_str;
+typedef struct
+{
+    Event_str Event[LOG_MAX_EVENT];
+    char Name[STRING_LEN];
 
-// } ComponentName_;
+} Component_str;
 
-// typedef struct
-// {
-//     ComponentName_ ComponentName[LOG_MAX_COMPONENT];
-// } Log;
+typedef struct
+{
+    Component_str Component[LOG_MAX_COMPONENT];
+} Log;
 
+uint8_t FindComponent(Log *Log, char *Component);
+uint8_t WhereIsEmpty(Log *Log);
+
+void tset(bool TimingFlag, char *Component, char *EventName)
+{
+    static Log Log;
+    int componentNumber;
+    int eventNumber;
+    if (FindComponent(&Log, Component) == 0) // this is new component
+    {
+        componentNumber = WhereIsEmpty(&Log);
+        strncpy(Log.Component[componentNumber].name, Component, strlen(Component));
+        // add event without finding space because new component don't any event
+        strncpy(Log.Component[componentNumber].Event[0].Name, EventName, strlen(EventName));
+    }
+    else // existence component
+    {
+        eventNumber = FindEventInComponent(&Log, Component, EventName);
+        if (eventNumber = 0)
+        {
+            Log.Component[componentNumber].Event
+        }
+    }
+}
+uint8_t FindEventInComponent(Log *Log, int ComponentNumber, char *EventName)
+{
+    uint8_t eventNumber = 0;
+    for (int i = 0; i < LOG_MAX_EVENT; i++)
+    {
+        if (!(strcmp(Log->Component[ComponentNumber].Event[i].Name, EventName)))
+        {
+            eventNumber++;
+            break;
+        }
+    }
+    return eventNumber;
+}
+uint8_t FindComponent(Log *Log, char *Component)
+{
+    uint8_t componentNumber = 0;
+    for (int i = 0; i < LOG_MAX_COMPONENT; i++)
+    {
+        if (!(strcmp(Log->ComponentComponent[i].Name, Component)))
+        {
+            componentNumber = i;
+        }
+    }
+    return componentNumber;
+}
+uint8_t WhereIsEmpty(Log *Log)
+{
+    for (int i = 0; i < LOG_MAX_COMPONENT; i++)
+    {
+        if (strlen(Log->ComponentComponent[i].Name) == 0)
+            return i;
+    }
+}
 void RamOccupyFunction(bool TimingFlag, char *Component, char *ProgramStage)
 {
     Log Log;
 #ifdef CONFIG_DONE_LOG_RAM
-        static size_t PsramSize;
+    static size_t PsramSize;
     static size_t SramSize;
     static char LastLogTag[20];
     if (TimingFlag == 1)

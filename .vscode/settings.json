@@ -18,7 +18,17 @@
         "stdio.h": "c",
         "servicemanger.h": "c",
         "lvgltimer.h": "c",
-        "compare": "cpp"
+        "compare": "cpp",
+        "charconv": "cpp",
+        "chrono": "cpp",
+        "optional": "cpp",
+        "format": "cpp",
+        "ratio": "cpp",
+        "system_error": "cpp",
+        "functional": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp"
     },
     "idf.openOcdConfigs": [
         "board/esp32s3-builtin.cfg"
