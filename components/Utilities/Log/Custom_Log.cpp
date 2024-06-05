@@ -30,45 +30,69 @@ uint8_t EmptyPlaceInComponentPool(Log *Log);
 uint8_t FindEventInEventPool(Log *Log, int ComponentNumber, char *EventName);
 void RecordStatus(Log *Log, int ComponentNumber, int EventNumber, int FistTimeFlag);
 uint8_t IsEventExist(Log *Log, int ComponentNumber, char *EventName);
+uint8_t IsComponentExist(Log *Log, char *ComponentName);
 void RamOccupyFunction(char *Component, char *EventName)
 {
+    ESP_LOGW("log test", "state  0");
     static Log Log;
     int componentNumber;
     int eventNumber;
-    componentNumber = FindComponentLocationInPool(&Log, Component);
-    if (componentNumber == 0) // this is new component
+
+    if (IsComponentExist(&Log, Component) == false)
     {
-        componentNumber = EmptyPlaceInComponentPool(&Log);
-        strncpy(Log.Component[componentNumber].Name, Component, strlen(Component));
-        // add event without finding space because new component don't any event
-        strncpy(Log.Component[componentNumber].Event[0].Name, EventName, strlen(EventName));
-        RecordStatus(&Log, componentNumber, 0, LogStart);
-    }
-    else if (componentNumber == ERROR_CODE)
-    {
-        ESP_LOGE(Component, "there is not any espace in Component pool for creating new component");
-        return;
-    }
-    else if (componentNumber != ERROR_CODE || componentNumber != 0) // existence component
-    {
-        if (IsEventExist(&Log, componentNumber, EventName))
+        componentNumber = 0;
+        if (componentNumber == 0) // this is new component
         {
-            eventNumber = FindEventInEventPool(&Log, componentNumber, EventName);
+            ESP_LOGW("log test", "state  1 there is not any component ");
+            componentNumber = EmptyPlaceInComponentPool(&Log);
+            strncpy(Log.Component[componentNumber].Name, Component, strlen(Component));
+            // add event without finding space because new component don't any event
+            eventNumber = 0;
             strncpy(Log.Component[componentNumber].Event[eventNumber].Name, EventName, strlen(EventName));
-            RecordStatus(&Log, componentNumber, eventNumber, LogEnd); // add log
+            ESP_LOGW("log test", "state  2 ,componentNumber=%d , event name = %s", componentNumber, Log.Component[componentNumber].Event[eventNumber].Name);
+            RecordStatus(&Log, componentNumber, eventNumber, 1);
         }
-        else
+    }
+    else
+    {
+        componentNumber = FindComponentLocationInPool(&Log, Component);
+        if (componentNumber == 0)
         {
-            eventNumber = FindEventInEventPool(&Log, componentNumber, EventName);
-            if (eventNumber == ERROR_CODE)
+            eventNumber = 0;
+            ESP_LOGW("log test", "state  6");
+            strncpy(Log.Component[componentNumber].Event[eventNumber].Name, EventName, strlen(EventName));
+            RecordStatus(&Log, componentNumber, eventNumber, 0); // add log
+        }
+        else if (componentNumber == ERROR_CODE)
+        {
+            ESP_LOGE(Component, "there is not any espace in Component pool for creating new component");
+            return;
+        }
+        else if (componentNumber != ERROR_CODE || componentNumber != 0) // existence component
+        {
+            if (IsEventExist(&Log, componentNumber, EventName))
             {
-                ESP_LOGE(Component, "there is not any espace in Event pool creating new event");
-                return;
+                ESP_LOGW("log test", "state  4 IsEventExist=true");
+                eventNumber = FindEventInEventPool(&Log, componentNumber, EventName);
+                strncpy(Log.Component[componentNumber].Event[eventNumber].Name, EventName, strlen(EventName));
+                RecordStatus(&Log, componentNumber, eventNumber, LogEnd); // add log
             }
             else
             {
-                strncpy(Log.Component[componentNumber].Event[eventNumber].Name, EventName, strlen(EventName));
-                RecordStatus(&Log, componentNumber, eventNumber, LogStart); // add log
+                ESP_LOGW("log test", "state  4 IsEventExist=flase");
+                eventNumber = FindEventInEventPool(&Log, componentNumber, EventName);
+                ESP_LOGW("log test", "state  5 FindEventInEventPool");
+                if (eventNumber == ERROR_CODE)
+                {
+                    ESP_LOGE(Component, "there is not any espace in Event pool creating new event");
+                    return;
+                }
+                else
+                {
+                    ESP_LOGW("log test", "state  6");
+                    strncpy(Log.Component[componentNumber].Event[eventNumber].Name, EventName, strlen(EventName));
+                    RecordStatus(&Log, componentNumber, eventNumber, 0); // add log
+                }
             }
         }
     }
@@ -79,6 +103,7 @@ void RecordStatus(Log *Log, int ComponentNumber, int EventNumber, int FistTimeFl
     {
         Log->Component[ComponentNumber].Event[EventNumber].RAM.Psram = (esp_get_free_heap_size() / 1000);
         Log->Component[ComponentNumber].Event[EventNumber].RAM.Sram = (xPortGetFreeHeapSize() / 1000);
+        ESP_LOGW("log test", "state  3 ,SRAM: %u K bytes PSRAM K bytes occupy: %u", Log->Component[ComponentNumber].Event[EventNumber].RAM.Sram, Log->Component[ComponentNumber].Event[EventNumber].RAM.Psram);
     }
     else if (FistTimeFlag == 0)
     {
@@ -89,6 +114,17 @@ void RecordStatus(Log *Log, int ComponentNumber, int EventNumber, int FistTimeFl
         size_t TimeFromBootUp = pdTICKS_TO_MS(xTaskGetTickCount());
         ESP_LOGE(Log->Component[ComponentNumber].Name, "Event name :%s SRAM: %u K bytes PSRAM occupy: %u K bytes occupy at %u millis", Log->Component[ComponentNumber].Event[EventNumber].Name, SramSize, PsramSize, TimeFromBootUp);
     }
+}
+uint8_t IsComponentExist(Log *Log, char *ComponentName)
+{
+    for (int i = 0; i < LOG_MAX_COMPONENT; i++)
+    {
+        if (!(strcmp(Log->Component[i].Name, ComponentName)))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 uint8_t IsEventExist(Log *Log, int ComponentNumber, char *EventName)
 {

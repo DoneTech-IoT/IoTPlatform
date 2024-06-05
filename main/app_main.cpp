@@ -96,14 +96,15 @@ extern "C" void app_main()
     nvsFlashInit();
     SpiffsGlobalConfig();
 
-    RamOccupyFunction("main","state1");
+    RamOccupyFunction("main", "event_1");
+    RamOccupyFunction("main", "event_1");
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
     vTaskDelay(pdMS_TO_TICKS(5000));
-    RamOccupyFunction("main","state1");
+    // RamOccupyFunction("main","event_1");
 
     // RamStatus("stage 3");
     // RamOccupy(LogStart, "stage 4");
