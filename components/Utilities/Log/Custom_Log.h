@@ -21,8 +21,5 @@ typedef enum
     LogEnd = 0,
     LogStart
 } LogFlag;
-
-void RamOStatus(char *ProgramStage);
-void RamOccupy(bool TimingFlag, char *ProgramStage);
-
+void RamOccupyFunction(char *Component, char *EventName);
 #endif
