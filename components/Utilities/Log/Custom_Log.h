@@ -36,13 +36,12 @@ typedef struct
     Ram_srt RAM;
     char Name[STRING_LEN];
     size_t TimeStamp;
+    uint8_t Counter;
 } Event_str;
 typedef struct
 {
     Event_str Event[LOG_MAX_EVENT];
     char Name[STRING_LEN];
-    uint8_t Counter;
-
 } Component_str;
 typedef struct
 {
