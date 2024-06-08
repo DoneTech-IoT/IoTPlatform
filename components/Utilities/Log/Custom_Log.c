@@ -1,34 +1,9 @@
 #include "Custom_Log.h"
 #include "string.h"
 const char *TAG = "Heap log";
-
-#define LOG_MAX_EVENT 40
-#define LOG_MAX_COMPONENT 3
-#define STRING_LEN 20
-#define ERROR_CODE 100
-
 static Log Log2;
-typedef struct
-{
-    size_t Psram;
-    size_t Sram;
-} Ram_srt;
-typedef struct
-{
-    Ram_srt RAM;
-    char Name[STRING_LEN];
-    size_t TimeStamp;
-} Event_str;
-typedef struct
-{
-    Event_str Event[LOG_MAX_EVENT];
-    char Name[STRING_LEN];
+static Log log;
 
-} Component_str;
-typedef struct
-{
-    Component_str Component[LOG_MAX_COMPONENT];
-} Log;
 uint8_t FindComponentLocationInPool(Log *Log, char *Component);
 uint8_t EmptyPlaceInComponentPool(Log *Log);
 uint8_t FindEventInEventPool(Log *Log, int ComponentNumber, char *EventName);
@@ -38,10 +13,8 @@ uint8_t IsComponentExist(Log *Log, char *ComponentName);
 void RamOccupyFunction(char *Component, char *EventName)
 {
     ESP_LOGW("log test", "state  0");
-    static Log log;
     int componentNumber;
     int eventNumber;
-
     if (IsComponentExist(&log, Component) == false)
     {
         componentNumber = 0;
@@ -98,11 +71,14 @@ void RamOccupyFunction(char *Component, char *EventName)
 }
 void RecordStatus(Log *Log, int ComponentNumber, int EventNumber, int FistTimeFlag)
 {
-    if (FistTimeFlag == 1)
+
+    if (FistTimeFlag == 1 || (Log->Component[ComponentNumber].Event[EventNumber].Counter == 2))
     {
+
         Log->Component[ComponentNumber].Event[EventNumber].RAM.Psram = (esp_get_free_heap_size() / 1000);
         Log->Component[ComponentNumber].Event[EventNumber].RAM.Sram = (xPortGetFreeHeapSize() / 1000);
         ESP_LOGW("log test", "state  3 ,SRAM: %u K bytes PSRAM K bytes occupy: %u", Log->Component[ComponentNumber].Event[EventNumber].RAM.Sram, Log->Component[ComponentNumber].Event[EventNumber].RAM.Psram);
+        Log->Component[ComponentNumber].Event[EventNumber].Counter = 1;
     }
     else if (FistTimeFlag == 0)
     {
@@ -112,6 +88,7 @@ void RecordStatus(Log *Log, int ComponentNumber, int EventNumber, int FistTimeFl
         sramSize = sramSize - Log->Component[ComponentNumber].Event[EventNumber].RAM.Sram;
         size_t TimeFromBootUp = pdTICKS_TO_MS(xTaskGetTickCount());
         ESP_LOGE(Log->Component[ComponentNumber].Name, "Event name :%s SRAM: %u K bytes PSRAM occupy: %u K bytes occupy at %u millis", Log->Component[ComponentNumber].Event[EventNumber].Name, sramSize, psramSize, TimeFromBootUp);
+        Log->Component[ComponentNumber].Event[EventNumber].Counter = 2;
     }
 }
 uint8_t IsComponentExist(Log *Log, char *ComponentName)
@@ -193,6 +170,8 @@ void RamStatusFunction(char *ComponentName, char *EventName)
     int eventNumber;
     size_t psramSize;
     size_t sramSize;
+    if (Log2.Component[componentNumber].Event[eventNumber].Counter == (LOG_MAX_EVENT - 1))
+        Log2 = {0};
     if (IsComponentExist(&Log2, ComponentName) == false)
     {
         componentNumber = 0;
@@ -205,6 +184,7 @@ void RamStatusFunction(char *ComponentName, char *EventName)
         Log2.Component[componentNumber].Event[eventNumber].RAM.Psram = psramSize;
         Log2.Component[componentNumber].Event[eventNumber].RAM.Sram = sramSize;
         Log2.Component[componentNumber].Event[eventNumber].TimeStamp = TimeFromBootUp;
+        Log2.Component[componentNumber].Event[eventNumber].Counter++;
         ESP_LOGE(TAG, "component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at %d millis is FREE", ComponentName, EventName, sramSize, psramSize, TimeFromBootUp);
     }
     else
@@ -219,6 +199,7 @@ void RamStatusFunction(char *ComponentName, char *EventName)
         Log2.Component[componentNumber].Event[eventNumber].RAM.Psram = psramSize;
         Log2.Component[componentNumber].Event[eventNumber].RAM.Sram = sramSize;
         Log2.Component[componentNumber].Event[eventNumber].TimeStamp = TimeFromBootUp;
+        Log2.Component[componentNumber].Event[eventNumber].Counter++;
         ESP_LOGE(TAG, "component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at %d millis is FREE", ComponentName, EventName, sramSize, psramSize, TimeFromBootUp);
     }
 }

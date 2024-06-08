@@ -4,7 +4,7 @@ idf_component_register(
 "nvsFlash/nvsFlash.c"
 "nvsFlash/SpiffsManger.c"
 "JsonUtility/JsonUtility.c"
-"Log/Custom_Log.cpp"
+"Log/Custom_Log.c"
  INCLUDE_DIRS 
 
 "JsonUtility/include"
