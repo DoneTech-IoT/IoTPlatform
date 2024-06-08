@@ -89,35 +89,30 @@ void CallbackTest(char *buffer)
 
 extern "C" void app_main()
 {
-    // RamStatus("stage 1");
     ServiceMangerTaskInit();
-
+    RamOccupyFunction("main", "event1");
     GlobalInit();
     nvsFlashInit();
     SpiffsGlobalConfig();
-
-    // RamOccupyFunction("main", "event_1");
-    // RamOccupyFunction("main", "event_1");
-    RamStatusFunction("main", "event_1");
+    RamOccupyFunction("main", "event1");
+    RamOccupyFunction("main", "event2");
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
+    RamOccupyFunction("main", "event2");
+    RamOccupyFunction("main", "event3");
+    RamOccupyFunction("main", "event4");
     vTaskDelay(pdMS_TO_TICKS(5000));
-    RamStatusFunction("main", "event_2");
-    // RamOccupyFunction("main","event_1");
 
-    // RamStatus("stage 3");
-    // RamOccupy(LogStart, "stage 4");
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
     SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
     Spotify_TaskInit(&SpotifyInterfaceHandler);
-    RamStatusFunction("main", "event_3");
+    RamOccupyFunction("main", "event3");
     vTaskDelay(pdMS_TO_TICKS(3000));
-    RamStatusFunction("main", "event_4");
-    ReportRamStatus("main");
-    // RamOccupy(LogEnd, "stage 4");
+    RamOccupyFunction("main", "event4");
+    ReportComponentRamUsed("main");
     if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
     {
         bool CommandResult = false;
@@ -128,6 +123,7 @@ extern "C" void app_main()
             return;
         }
         ESP_LOGI(TAG, "User info updated");
+
         TimerHandle_t xTimer = xTimerCreate("update", TIMER_TIME, pdTRUE, NULL, SpotifyPeriodicTimer);
         xTimerStart(xTimer, 0);
         if (xTimer != NULL)

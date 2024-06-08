@@ -42,18 +42,25 @@ void RamOccupyFunction(char *Component, char *EventName)
         }
         else if (componentNumber != ERROR_CODE || componentNumber != 0) // existence component
         {
-            if (IsEventExist(&log, componentNumber, EventName))
+            uint8_t isEventExist = IsEventExist(&log, componentNumber, EventName);
+            if (isEventExist == 1 && (log.Component[componentNumber].Counter != 2))
             {
-                ESP_LOGW("log test", "state  4 IsEventExist=true");
+                if (log.Component[componentNumber].Counter == 2)
+                    ESP_LOGW("log test", "state  4 IsEventExist=true");
                 eventNumber = FindEventInEventPool(&log, componentNumber, EventName);
                 strncpy(log.Component[componentNumber].Event[eventNumber].Name, EventName, strlen(EventName));
                 RecordStatus(&log, componentNumber, eventNumber, LogEnd); // add log
             }
-            else
+            else if (isEventExist == 1 && (log.Component[componentNumber].Counter == 2))
             {
-                ESP_LOGW("log test", "state  4 IsEventExist=flase");
                 eventNumber = FindEventInEventPool(&log, componentNumber, EventName);
-                ESP_LOGW("log test", "state  5 FindEventInEventPool");
+                strncpy(log.Component[componentNumber].Event[eventNumber].Name, EventName, strlen(EventName));
+                log.Component[componentNumber].Counter = 0;
+                RecordStatus(&log, componentNumber, eventNumber, LogStart); // add log
+            }
+            else if (isEventExist == 0)
+            {
+                eventNumber = FindEventInEventPool(&log, componentNumber, EventName);
                 if (eventNumber == ERROR_CODE)
                 {
                     ESP_LOGE(Component, "there is not any espace in Event pool creating new event");
@@ -61,9 +68,8 @@ void RamOccupyFunction(char *Component, char *EventName)
                 }
                 else
                 {
-                    ESP_LOGW("log test", "state  6");
                     strncpy(log.Component[componentNumber].Event[eventNumber].Name, EventName, strlen(EventName));
-                    RecordStatus(&log, componentNumber, eventNumber, 0); // add log
+                    RecordStatus(&log, componentNumber, eventNumber, LogStart); // add log
                 }
             }
         }
@@ -72,13 +78,12 @@ void RamOccupyFunction(char *Component, char *EventName)
 void RecordStatus(Log *Log, int ComponentNumber, int EventNumber, int FistTimeFlag)
 {
 
-    if (FistTimeFlag == 1 || (Log->Component[ComponentNumber].Event[EventNumber].Counter == 2))
+    if (FistTimeFlag == 1)
     {
-
         Log->Component[ComponentNumber].Event[EventNumber].RAM.Psram = (esp_get_free_heap_size() / 1000);
         Log->Component[ComponentNumber].Event[EventNumber].RAM.Sram = (xPortGetFreeHeapSize() / 1000);
         ESP_LOGW("log test", "state  3 ,SRAM: %u K bytes PSRAM K bytes occupy: %u", Log->Component[ComponentNumber].Event[EventNumber].RAM.Sram, Log->Component[ComponentNumber].Event[EventNumber].RAM.Psram);
-        Log->Component[ComponentNumber].Event[EventNumber].Counter = 1;
+        Log->Component[ComponentNumber].Counter = 1;
     }
     else if (FistTimeFlag == 0)
     {
@@ -88,7 +93,7 @@ void RecordStatus(Log *Log, int ComponentNumber, int EventNumber, int FistTimeFl
         sramSize = sramSize - Log->Component[ComponentNumber].Event[EventNumber].RAM.Sram;
         size_t TimeFromBootUp = pdTICKS_TO_MS(xTaskGetTickCount());
         ESP_LOGE(Log->Component[ComponentNumber].Name, "Event name :%s SRAM: %u K bytes PSRAM occupy: %u K bytes occupy at %u millis", Log->Component[ComponentNumber].Event[EventNumber].Name, sramSize, psramSize, TimeFromBootUp);
-        Log->Component[ComponentNumber].Event[EventNumber].Counter = 2;
+        Log->Component[ComponentNumber].Counter = 2;
     }
 }
 uint8_t IsComponentExist(Log *Log, char *ComponentName)
@@ -170,8 +175,6 @@ void RamStatusFunction(char *ComponentName, char *EventName)
     int eventNumber;
     size_t psramSize;
     size_t sramSize;
-    if (Log2.Component[componentNumber].Event[eventNumber].Counter == (LOG_MAX_EVENT - 1))
-        Log2 = {0};
     if (IsComponentExist(&Log2, ComponentName) == false)
     {
         componentNumber = 0;
@@ -184,7 +187,7 @@ void RamStatusFunction(char *ComponentName, char *EventName)
         Log2.Component[componentNumber].Event[eventNumber].RAM.Psram = psramSize;
         Log2.Component[componentNumber].Event[eventNumber].RAM.Sram = sramSize;
         Log2.Component[componentNumber].Event[eventNumber].TimeStamp = TimeFromBootUp;
-        Log2.Component[componentNumber].Event[eventNumber].Counter++;
+        Log2.Component[componentNumber].Counter++;
         ESP_LOGE(TAG, "component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at %d millis is FREE", ComponentName, EventName, sramSize, psramSize, TimeFromBootUp);
     }
     else
@@ -194,16 +197,18 @@ void RamStatusFunction(char *ComponentName, char *EventName)
         size_t TimeFromBootUp = pdTICKS_TO_MS(xTaskGetTickCount());
         componentNumber = FindComponentLocationInPool(&Log2, ComponentName);
         eventNumber = EmptyPlaceInEventPool(&Log2, componentNumber);
+        if (Log2.Component[componentNumber].Counter == (LOG_MAX_EVENT - 1))
+            memset(&Log2, 0, sizeof(Log2));
         strncpy(Log2.Component[componentNumber].Name, ComponentName, strlen(ComponentName));
         strncpy(Log2.Component[componentNumber].Event[eventNumber].Name, EventName, strlen(EventName));
         Log2.Component[componentNumber].Event[eventNumber].RAM.Psram = psramSize;
         Log2.Component[componentNumber].Event[eventNumber].RAM.Sram = sramSize;
         Log2.Component[componentNumber].Event[eventNumber].TimeStamp = TimeFromBootUp;
-        Log2.Component[componentNumber].Event[eventNumber].Counter++;
+        Log2.Component[componentNumber].Counter++;
         ESP_LOGE(TAG, "component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at %d millis is FREE", ComponentName, EventName, sramSize, psramSize, TimeFromBootUp);
     }
 }
-void ReportRamStatus(char *ComponentName)
+void ReportComponentRamStatus(char *ComponentName)
 {
     int componentNumber;
     if (IsComponentExist(&Log2, ComponentName) == false)
@@ -218,6 +223,32 @@ void ReportRamStatus(char *ComponentName)
             if (strlen(Log2.Component[componentNumber].Event[i].Name) != 0)
             {
                 ESP_LOGE(TAG, "component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at %d millis is FREE",
+                         ComponentName,
+                         Log2.Component[componentNumber].Event[i].Name,
+                         Log2.Component[componentNumber].Event[i].RAM.Sram,
+                         Log2.Component[componentNumber].Event[i].RAM.Psram,
+                         Log2.Component[componentNumber].Event[i].TimeStamp);
+            }
+            else
+                break;
+        }
+    }
+}
+void ReportComponentRamUsed(char *ComponentName)
+{
+    int componentNumber;
+    if (IsComponentExist(&Log2, ComponentName) == false)
+    {
+        ESP_LOGE(TAG, "there is not any Log for Component %s", ComponentName);
+    }
+    else
+    {
+        componentNumber = FindComponentLocationInPool(&Log2, ComponentName);
+        for (int i = 0; i < LOG_MAX_EVENT; i++)
+        {
+            if (strlen(Log2.Component[componentNumber].Event[i].Name) != 0)
+            {
+                ESP_LOGE(TAG, "component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at %d millis is occupy",
                          ComponentName,
                          Log2.Component[componentNumber].Event[i].Name,
                          Log2.Component[componentNumber].Event[i].RAM.Sram,

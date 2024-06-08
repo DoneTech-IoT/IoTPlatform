@@ -36,12 +36,12 @@ typedef struct
     Ram_srt RAM;
     char Name[STRING_LEN];
     size_t TimeStamp;
-    uint8_t Counter;
 } Event_str;
 typedef struct
 {
     Event_str Event[LOG_MAX_EVENT];
     char Name[STRING_LEN];
+    uint8_t Counter;
 
 } Component_str;
 typedef struct
@@ -50,5 +50,6 @@ typedef struct
 } Log;
 void RamOccupyFunction(char *Component, char *EventName);
 void RamStatusFunction(char *Component, char *EventName);
-void ReportRamStatus(char *ComponentName);
+void ReportComponentRamStatus(char *ComponentName);
+void ReportComponentRamUsed(char *ComponentName);
 #endif
