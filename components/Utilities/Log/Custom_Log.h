@@ -22,4 +22,6 @@ typedef enum
     LogStart
 } LogFlag;
 void RamOccupyFunction(char *Component, char *EventName);
+void RamStatusFunction(char *Component, char *EventName);
+void ReportRamStatus(char *ComponentName);
 #endif
