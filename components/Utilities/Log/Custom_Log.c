@@ -46,6 +46,13 @@ uint8_t FindEventInEventPool(Log *Log, int ComponentNumber, char *EventName);
 void RecordStatus(Log *Log, int ComponentNumber, int EventNumber, int FistTimeFlag);
 uint8_t IsEventExist(Log *Log, int ComponentNumber, char *EventName);
 uint8_t IsComponentExist(Log *Log, char *ComponentName);
+void RamOccupyFunction(char *Component, char *EventName);
+void RamStatusFunction(char *ComponentName, char *EventName);
+uint8_t NumberSavedEvent(Log *Log, char *ComponentName);
+void ReportComponentRamUsed(char *ComponentName);
+void ReportComponentRamStatus(char *ComponentName);
+uint8_t EmptyPlaceInEventPool(Log *Log, int ComponentNumber);
+
 void RamOccupyFunction(char *Component, char *EventName)
 {
     static Log log = {0}; // Ensure the Log is initialized once
