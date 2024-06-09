@@ -94,19 +94,19 @@ extern "C" void app_main()
     GlobalInit();
     nvsFlashInit();
     SpiffsGlobalConfig();
-    RamStatusFunction("main", "event2");
+    // RamStatusFunction("main", "event2");
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
-    RamStatusFunction("main", "event3");
+    // RamStatusFunction("main", "event3");
     vTaskDelay(pdMS_TO_TICKS(5000));
-    RamStatusFunction("main", "event4");
+    // RamStatusFunction("main", "event4");
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
     SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
     Spotify_TaskInit(&SpotifyInterfaceHandler);
-    RamStatusFunction("main", "event5");
+    // RamStatusFunction("main", "event5");
     vTaskDelay(pdMS_TO_TICKS(3000));
     // ReportComponentRamStatus("main");
     if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)

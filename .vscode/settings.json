@@ -28,7 +28,9 @@
         "functional": "cpp",
         "tuple": "cpp",
         "type_traits": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "custom_log.h": "c",
+        "stdint.h": "c"
     },
     "idf.openOcdConfigs": [
         "board/esp32s3-builtin.cfg"

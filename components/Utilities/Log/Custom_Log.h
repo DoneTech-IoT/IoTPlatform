@@ -11,11 +11,11 @@
 #include <sys/param.h>
 #include <stdint.h>
 
-#define CONFIG_DONE_LOG_RAM
-#define CONFIG_DONE_OATH_LOG_RAM
-#define CONFIG_DONE_GUI_LOG_RAM
-#define CONFIG_DONE_MATTER_INTERFACE_LOG_RAM
-#define CONFIG_DONE_MAIN_LOG_RAM
+// #define CONFIG_DONE_LOG_RAM
+// #define CONFIG_DONE_OATH_LOG_RAM
+// #define CONFIG_DONE_GUI_LOG_RAM
+// #define CONFIG_DONE_MATTER_INTERFACE_LOG_RAM
+// #define CONFIG_DONE_MAIN_LOG_RAM
 
 #define LOG_MAX_EVENT 40
 #define LOG_MAX_COMPONENT 3
@@ -36,22 +36,19 @@ typedef struct
     Ram_srt RAM;
     char Name[STRING_LEN];
     size_t TimeStamp;
+        uint8_t Counter;
 } Event_str;
 typedef struct
 {
     Event_str Event[LOG_MAX_EVENT];
     char Name[STRING_LEN];
-    uint8_t Counter;
-
 } Component_str;
 typedef struct
 {
     Component_str Component[LOG_MAX_COMPONENT];
 } Log;
 void RamOccupyFunction(char *Component, char *EventName);
-void RamStatusFunction(char *Component, char *EventName);
-void ReportComponentRamStatus(char *ComponentName);
-void ReportComponentRamUsed(char *ComponentName);
+void RamStatusFunction(char *ComponentName, char *EventName);
 #endif
 
 
