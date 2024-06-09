@@ -89,25 +89,26 @@ void CallbackTest(char *buffer)
 
 extern "C" void app_main()
 {
-    Log_RamStatus("main", "event1");
+    Log_RamOccupy("main", "event1");
     ServiceMangerTaskInit();
     GlobalInit();
     nvsFlashInit();
     SpiffsGlobalConfig();
-    Log_RamStatus("main", "event2");
+    Log_RamOccupy("main", "event1");
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
-    Log_RamStatus("main", "event3");
+    Log_RamOccupy("main", "event2");
     vTaskDelay(pdMS_TO_TICKS(5000));
-    Log_RamStatus("main", "event4");
+    Log_RamOccupy("main", "event3");
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
     SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
     Spotify_TaskInit(&SpotifyInterfaceHandler);
-    Log_RamStatus("main", "event5");
+    Log_RamOccupy("main", "event2");
     vTaskDelay(pdMS_TO_TICKS(3000));
+    Log_RamOccupy("main", "event3");
     Log_ReportComponentRamStatus("main");
     if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
     {
