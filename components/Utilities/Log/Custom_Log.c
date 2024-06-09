@@ -2,7 +2,8 @@
 #include "string.h"
 
 const char *TAG = "Heap log";
-static Log Log2;
+static Log log2;
+static Log log;
 
 uint8_t Log_FindComponentLocationInPool(Log *Log, char *Component);
 uint8_t Log_EmptyPlaceInComponentPool(Log *Log);
@@ -14,10 +15,17 @@ uint8_t Log_NumberSavedEvent(Log *Log, int ComponentNumber);
 void Log_RamStatus(char *ComponentName, char *EventName);
 void Log_RecordStatus(Log *Log, int ComponentNumber, int EventNumber, int FistTimeFlag);
 
-
+/**
+ * @brief Occupies RAM for a component and event.
+ * This function manages the RAM occupation for a specified component and event,
+ * creating new entries or updating existing ones as necessary.
+ * @param Component Name of the component.
+ * @param EventName Name of the event.
+ * @return void
+ */
 void Log_RamOccupy(char *Component, char *EventName)
 {
-    static Log log;
+    
     int componentNumber;
     int eventNumber;
     if (Log_IsComponentExist(&log, Component) == false)
@@ -70,6 +78,15 @@ void Log_RamOccupy(char *Component, char *EventName)
     }
 }
 
+/**
+ * @brief Records the status of an event.
+ * This function logs the current RAM usage for a given event and component.
+ * @param Log Pointer to the Log structure.
+ * @param ComponentNumber Index of the component.
+ * @param EventNumber Index of the event.
+ * @param FirstTimeFlag Indicates if this is the first time logging the event (LogStart or LogEnd).
+ * @return void
+ */
 void Log_RecordStatus(Log *Log, int ComponentNumber, int EventNumber,
                   int FistTimeFlag)
 {
@@ -102,6 +119,13 @@ void Log_RecordStatus(Log *Log, int ComponentNumber, int EventNumber,
     }
 }
 
+/**
+ * @brief Checks if a component exists in the log.
+ * This function checks if a component with the specified name exists within the log.
+ * @param Log Pointer to the Log structure.
+ * @param ComponentName Name of the component to find.
+ * @return true if the component exists, false otherwise.
+ */
 uint8_t Log_IsComponentExist(Log *Log, char *ComponentName)
 {
     for (int i = 0; i < LOG_MAX_COMPONENT; i++)
@@ -114,6 +138,14 @@ uint8_t Log_IsComponentExist(Log *Log, char *ComponentName)
     return false;
 }
 
+/**
+ * @brief Checks if an event exists within a component.
+ * This function checks if an event with the specified name exists within a given component.
+ * @param Log Pointer to the Log structure.
+ * @param ComponentNumber Index of the component to check.
+ * @param EventName Name of the event to find.
+ * @return true if the event exists, false otherwise.
+ */
 uint8_t Log_IsEventExist(Log *Log, int ComponentNumber, char *EventName)
 {
     for (int i = 0; i < LOG_MAX_EVENT; i++)
@@ -127,6 +159,14 @@ uint8_t Log_IsEventExist(Log *Log, int ComponentNumber, char *EventName)
     return false;
 }
 
+/**
+ * @brief Finds the index of an event within a component.
+ * This function returns the index of an event with the specified name within a given component.
+ * @param Log Pointer to the Log structure.
+ * @param ComponentNumber Index of the component to check.
+ * @param EventName Name of the event to find.
+ * @return Index of the event if found, ERROR_CODE otherwise.
+ */
 uint8_t Log_FindEventInEventPool(Log *Log, int ComponentNumber, char *EventName)
 {
     uint8_t eventNumber = ERROR_CODE;
@@ -142,6 +182,13 @@ uint8_t Log_FindEventInEventPool(Log *Log, int ComponentNumber, char *EventName)
     return eventNumber;
 }
 
+/**
+ * @brief Finds the location of a component in the pool.
+ * This function returns the index of a component with the specified name within the log.
+ * @param Log Pointer to the Log structure.
+ * @param Component Name of the component to find.
+ * @return Index of the component if found, ERROR_CODE otherwise.
+ */
 uint8_t Log_FindComponentLocationInPool(Log *Log, char *Component)
 {
     uint8_t componentNumber = ERROR_CODE;
@@ -155,6 +202,12 @@ uint8_t Log_FindComponentLocationInPool(Log *Log, char *Component)
     return componentNumber;
 }
 
+/**
+ * @brief Finds an empty place in the component pool.
+ * This function returns the index of the first empty component slot in the log.
+ * @param Log Pointer to the Log structure.
+ * @return Index of the empty component slot if found, ERROR_CODE otherwise.
+ */
 uint8_t Log_EmptyPlaceInComponentPool(Log *Log)
 {
     uint8_t emptyPlace = ERROR_CODE;
@@ -169,6 +222,13 @@ uint8_t Log_EmptyPlaceInComponentPool(Log *Log)
     return emptyPlace;
 }
 
+/**
+ * @brief Finds an empty place in the event pool of a component.
+ * This function returns the index of the first empty event slot in a given component.
+ * @param Log Pointer to the Log structure.
+ * @param ComponentNumber Index of the component.
+ * @return Index of the empty event slot if found, ERROR_CODE otherwise.
+ */
 uint8_t Log_EmptyPlaceInEventPool(Log *Log, int ComponentNumber)
 {
     uint8_t emptyPlace = ERROR_CODE;
@@ -183,6 +243,13 @@ uint8_t Log_EmptyPlaceInEventPool(Log *Log, int ComponentNumber)
     return emptyPlace;
 }
 
+/**
+ * @brief Finds the number of saved events in a component.
+ * This function returns the number of non-empty event slots in a given component.
+ * @param Log Pointer to the Log structure.
+ * @param ComponentName Name of the component.
+ * @return Number of saved events in the component.
+ */
 uint8_t Log_NumberSavedEvent(Log *Log, int ComponentNumber)
 {
     uint8_t numberOfEvent = 0;
@@ -194,27 +261,34 @@ uint8_t Log_NumberSavedEvent(Log *Log, int ComponentNumber)
     return numberOfEvent;
 }
 
+/**
+ * @brief Logs the status of RAM usage for a component and event.
+ * This function logs the current RAM usage and timestamp for a specified component and event.
+ * @param ComponentName Name of the component.
+ * @param EventName Name of the event.
+ * @return void
+ */
 void Log_RamStatus(char *ComponentName, char *EventName)
 {
     int componentNumber;
     int eventNumber;
     size_t psramSize;
     size_t sramSize;
-    if (Log_IsComponentExist(&Log2, ComponentName) == false)
+    if (Log_IsComponentExist(&log2, ComponentName) == false)
     {
         componentNumber = 0;
         eventNumber = 0;
         psramSize = (esp_get_free_heap_size() / 1000);
         sramSize = (xPortGetFreeHeapSize() / 1000);
         size_t TimeFromBootUp = pdTICKS_TO_MS(xTaskGetTickCount());
-        strncpy(Log2.Component[componentNumber].Name, ComponentName,
+        strncpy(log2.Component[componentNumber].Name, ComponentName,
                 strlen(ComponentName));
-        strncpy(Log2.Component[componentNumber].Event[eventNumber].Name,
+        strncpy(log2.Component[componentNumber].Event[eventNumber].Name,
                 EventName, strlen(EventName));
-        Log2.Component[componentNumber].Event[eventNumber].RAM.Psram =
+        log2.Component[componentNumber].Event[eventNumber].RAM.Psram =
             psramSize;
-        Log2.Component[componentNumber].Event[eventNumber].RAM.Sram = sramSize;
-        Log2.Component[componentNumber].Event[eventNumber].TimeStamp =
+        log2.Component[componentNumber].Event[eventNumber].RAM.Sram = sramSize;
+        log2.Component[componentNumber].Event[eventNumber].TimeStamp =
             TimeFromBootUp;
         ESP_LOGE(TAG, "component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at %d millis is FREE",
                  ComponentName, EventName, sramSize, psramSize, TimeFromBootUp);
@@ -224,44 +298,50 @@ void Log_RamStatus(char *ComponentName, char *EventName)
         psramSize = (esp_get_free_heap_size() / 1000);
         sramSize = (xPortGetFreeHeapSize() / 1000);
         size_t TimeFromBootUp = pdTICKS_TO_MS(xTaskGetTickCount());
-        componentNumber = Log_FindComponentLocationInPool(&Log2, ComponentName);
-        eventNumber = Log_EmptyPlaceInEventPool(&Log2, componentNumber);
-        if (Log_NumberSavedEvent(&Log2, componentNumber) >= (LOG_MAX_EVENT - 1))
-            memset(&Log2.Component[componentNumber], 0,
-                   sizeof(Log2.Component[componentNumber]));
-        strncpy(Log2.Component[componentNumber].Name, ComponentName,
+        componentNumber = Log_FindComponentLocationInPool(&log2, ComponentName);
+        eventNumber = Log_EmptyPlaceInEventPool(&log2, componentNumber);
+        if (Log_NumberSavedEvent(&log2, componentNumber) >= (LOG_MAX_EVENT - 1))
+            memset(&log2.Component[componentNumber], 0,
+                   sizeof(log2.Component[componentNumber]));
+        strncpy(log2.Component[componentNumber].Name, ComponentName,
                 strlen(ComponentName));
-        strncpy(Log2.Component[componentNumber].Event[eventNumber].Name,
+        strncpy(log2.Component[componentNumber].Event[eventNumber].Name,
                 EventName, strlen(EventName));
-        Log2.Component[componentNumber].Event[eventNumber].RAM.Psram =
+        log2.Component[componentNumber].Event[eventNumber].RAM.Psram =
             psramSize;
-        Log2.Component[componentNumber].Event[eventNumber].RAM.Sram = sramSize;
-        Log2.Component[componentNumber].Event[eventNumber].TimeStamp =
+        log2.Component[componentNumber].Event[eventNumber].RAM.Sram = sramSize;
+        log2.Component[componentNumber].Event[eventNumber].TimeStamp =
             TimeFromBootUp;
         ESP_LOGE(TAG, "component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at %d millis is FREE",
                  ComponentName, EventName, sramSize, psramSize, TimeFromBootUp);
     }
 }
 
+/**
+ * @brief Reports the RAM status of a component.
+ * This function prints the RAM usage status for all events within a specified component.
+ * @param ComponentName Name of the component to report.
+ * @return void
+ */
 void Log_ReportComponentRamStatus(char *ComponentName)
 {
     int componentNumber;
-    if (Log_IsComponentExist(&Log2, ComponentName) == false)
+    if (Log_IsComponentExist(&log2, ComponentName) == false)
     {
         ESP_LOGE(TAG, "there is not any Log for Component %s", ComponentName);
     }
     else
     {
-        componentNumber = Log_FindComponentLocationInPool(&Log2, ComponentName);
+        componentNumber = Log_FindComponentLocationInPool(&log2, ComponentName);
         for (int i = 0; i < LOG_MAX_EVENT; i++)
         {
-            if (strlen(Log2.Component[componentNumber].Event[i].Name) != 0)
+            if (strlen(log2.Component[componentNumber].Event[i].Name) != 0)
             {
                 ESP_LOGE(TAG, "in the report component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at %d millis is FREE",
-                         ComponentName, Log2.Component[componentNumber].Event[i].Name,
-                         Log2.Component[componentNumber].Event[i].RAM.Sram,
-                         Log2.Component[componentNumber].Event[i].RAM.Psram,
-                         Log2.Component[componentNumber].Event[i].TimeStamp);
+                         ComponentName, log2.Component[componentNumber].Event[i].Name,
+                         log2.Component[componentNumber].Event[i].RAM.Sram,
+                         log2.Component[componentNumber].Event[i].RAM.Psram,
+                         log2.Component[componentNumber].Event[i].TimeStamp);
             }
             else
                 break;
@@ -269,25 +349,31 @@ void Log_ReportComponentRamStatus(char *ComponentName)
     }
 }
 
+/**
+ * @brief Reports the RAM usage of a component.
+ * This function prints the RAM usage for all events within a specified component.
+ * @param ComponentName Name of the component to report.
+ * @return void
+ */
 void Log_ReportComponentRamUsed(char *ComponentName)
 {
     int componentNumber;
-    if (Log_IsComponentExist(&Log2, ComponentName) == false)
+    if (Log_IsComponentExist(&log2, ComponentName) == false)
     {
         ESP_LOGE(TAG, "there is not any Log for Component %s", ComponentName);
     }
     else
     {
-        componentNumber = Log_FindComponentLocationInPool(&Log2, ComponentName);
+        componentNumber = Log_FindComponentLocationInPool(&log2, ComponentName);
         for (int i = 0; i < LOG_MAX_EVENT; i++)
         {
-            if (strlen(Log2.Component[componentNumber].Event[i].Name) != 0)
+            if (strlen(log2.Component[componentNumber].Event[i].Name) != 0)
             {
                 ESP_LOGE(TAG, "component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at %d millis is occupy",
-                         ComponentName, Log2.Component[componentNumber].Event[i].Name,
-                         Log2.Component[componentNumber].Event[i].RAM.Sram,
-                         Log2.Component[componentNumber].Event[i].RAM.Psram,
-                         Log2.Component[componentNumber].Event[i].TimeStamp);
+                         ComponentName, log2.Component[componentNumber].Event[i].Name,
+                         log2.Component[componentNumber].Event[i].RAM.Sram,
+                         log2.Component[componentNumber].Event[i].RAM.Psram,
+                         log2.Component[componentNumber].Event[i].TimeStamp);
             }
             else
                 break;
