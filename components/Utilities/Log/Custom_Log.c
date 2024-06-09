@@ -1,45 +1,9 @@
-
+#include"Custom_Log.h"
 #include "string.h"
 const char *TAG = "Heap log";
 static Log Log2;
 
-#define CONFIG_DONE_LOG_RAM
-#define CONFIG_DONE_OATH_LOG_RAM
-#define CONFIG_DONE_GUI_LOG_RAM
-#define CONFIG_DONE_MATTER_INTERFACE_LOG_RAM
-#define CONFIG_DONE_MAIN_LOG_RAM
 
-#define LOG_MAX_EVENT 40
-#define LOG_MAX_COMPONENT 3
-#define STRING_LEN 20
-#define ERROR_CODE 100
-typedef enum
-{
-    LogEnd = 0,
-    LogStart
-} LogFlag;
-typedef struct
-{
-    size_t Psram;
-    size_t Sram;
-} Ram_srt;
-typedef struct
-{
-    Ram_srt RAM;
-    char Name[STRING_LEN];
-    size_t TimeStamp;
-} Event_str;
-typedef struct
-{
-    Event_str Event[LOG_MAX_EVENT];
-    char Name[STRING_LEN];
-    uint8_t Counter;
-
-} Component_str;
-typedef struct
-{
-    Component_str Component[LOG_MAX_COMPONENT];
-} Log;
 uint8_t FindComponentLocationInPool(Log *Log, char *Component);
 uint8_t EmptyPlaceInComponentPool(Log *Log);
 uint8_t FindEventInEventPool(Log *Log, int ComponentNumber, char *EventName);
@@ -55,7 +19,7 @@ uint8_t EmptyPlaceInEventPool(Log *Log, int ComponentNumber);
 
 void RamOccupyFunction(char *Component, char *EventName)
 {
-    static Log log = {0}; // Ensure the Log is initialized once
+    static Log log ;
     int componentNumber;
     int eventNumber;
 
