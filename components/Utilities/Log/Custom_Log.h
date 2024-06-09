@@ -1,3 +1,7 @@
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 #ifndef _LOG_H_
 #define _LOG_H_
 #include "freertos/FreeRTOS.h"
@@ -11,11 +15,11 @@
 #include <sys/param.h>
 #include <stdint.h>
 
-// #define CONFIG_DONE_LOG_RAM
-// #define CONFIG_DONE_OATH_LOG_RAM
-// #define CONFIG_DONE_GUI_LOG_RAM
-// #define CONFIG_DONE_MATTER_INTERFACE_LOG_RAM
-// #define CONFIG_DONE_MAIN_LOG_RAM
+#define CONFIG_DONE_LOG_RAM
+#define CONFIG_DONE_OATH_LOG_RAM
+#define CONFIG_DONE_GUI_LOG_RAM
+#define CONFIG_DONE_MATTER_INTERFACE_LOG_RAM
+#define CONFIG_DONE_MAIN_LOG_RAM
 
 #define LOG_MAX_EVENT 40
 #define LOG_MAX_COMPONENT 3
@@ -47,12 +51,16 @@ typedef struct
 {
     Component_str Component[LOG_MAX_COMPONENT];
 } Log;
-void RamOccupyFunction(char *Component, char *EventName);
-void RamStatusFunction(char *ComponentName, char *EventName);
+void Log_RamOccupy(char *Component, char *EventName);
+void Log_RamStatus(char *ComponentName, char *EventName);
+void Log_ReportComponentRamUsed(char *ComponentName);
+void Log_ReportComponentRamStatus(char *ComponentName);
 #endif
 
 
-
+#ifdef __cplusplus
+}
+#endif
 
 
 
@@ -68,7 +76,7 @@ void RamStatusFunction(char *ComponentName, char *EventName);
 //  * @param Component Name of the component to find.
 //  * @return Index of the component if found, ERROR_CODE otherwise.
 //  */
-// uint8_t FindComponentLocationInPool(Log *Log, char *Component);
+// uint8_t Log_FindComponentLocationInPool(Log *Log, char *Component);
 
 // /**
 //  * @brief Finds an empty place in the component pool.
@@ -76,7 +84,7 @@ void RamStatusFunction(char *ComponentName, char *EventName);
 //  * @param Log Pointer to the Log structure.
 //  * @return Index of the empty component slot if found, ERROR_CODE otherwise.
 //  */
-// uint8_t EmptyPlaceInComponentPool(Log *Log);
+// uint8_t Log_EmptyPlaceInComponentPool(Log *Log);
 
 // /**
 //  * @brief Finds the index of an event within a component.
@@ -86,7 +94,7 @@ void RamStatusFunction(char *ComponentName, char *EventName);
 //  * @param EventName Name of the event to find.
 //  * @return Index of the event if found, ERROR_CODE otherwise.
 //  */
-// uint8_t FindEventInEventPool(Log *Log, int ComponentNumber, char *EventName);
+// uint8_t Log_FindEventInEventPool(Log *Log, int ComponentNumber, char *EventName);
 
 // /**
 //  * @brief Records the status of an event.
@@ -97,7 +105,7 @@ void RamStatusFunction(char *ComponentName, char *EventName);
 //  * @param FistTimeFlag Indicates if this is the first time logging the event (LogStart or LogEnd).
 //  * @return void
 //  */
-// void RecordStatus(Log *Log, int ComponentNumber, int EventNumber, int FistTimeFlag);
+// void Log_RecordStatus(Log *Log, int ComponentNumber, int EventNumber, int FistTimeFlag);
 
 // /**
 //  * @brief Checks if an event exists within a component.
@@ -107,7 +115,7 @@ void RamStatusFunction(char *ComponentName, char *EventName);
 //  * @param EventName Name of the event to find.
 //  * @return true if the event exists, false otherwise.
 //  */
-// uint8_t IsEventExist(Log *Log, int ComponentNumber, char *EventName);
+// uint8_t Log_IsEventExist(Log *Log, int ComponentNumber, char *EventName);
 
 // /**
 //  * @brief Checks if a component exists in the log.
@@ -116,7 +124,7 @@ void RamStatusFunction(char *ComponentName, char *EventName);
 //  * @param ComponentName Name of the component to find.
 //  * @return true if the component exists, false otherwise.
 //  */
-// uint8_t IsComponentExist(Log *Log, char *ComponentName);
+// uint8_t Log_IsComponentExist(Log *Log, char *ComponentName);
 
 // /**
 //  * @brief Handles RAM occupation for a component and event.
@@ -126,7 +134,7 @@ void RamStatusFunction(char *ComponentName, char *EventName);
 //  * @param EventName Name of the event.
 //  * @return void
 //  */
-// void RamOccupyFunction(char *Component, char *EventName);
+// void Log_RamOccupy(char *Component, char *EventName);
 
 // /**
 //  * @brief Logs the status of RAM usage for a component and event.
@@ -144,7 +152,7 @@ void RamStatusFunction(char *ComponentName, char *EventName);
 //  * @param ComponentName Name of the component.
 //  * @return Number of saved events in the component.
 //  */
-// uint8_t NumberSavedEvent(Log *Log, char *ComponentName);
+// uint8_t Log_NumberSavedEvent(Log *Log, char *ComponentName);
 
 // /**
 //  * @brief Reports the RAM usage of a component.
@@ -152,7 +160,7 @@ void RamStatusFunction(char *ComponentName, char *EventName);
 //  * @param ComponentName Name of the component to report.
 //  * @return void
 //  */
-// void ReportComponentRamUsed(char *ComponentName);
+// void Log_ReportComponentRamUsed(char *ComponentName);
 
 // /**
 //  * @brief Reports the RAM status of a component.
@@ -160,7 +168,7 @@ void RamStatusFunction(char *ComponentName, char *EventName);
 //  * @param ComponentName Name of the component to report.
 //  * @return void
 //  */
-// void ReportComponentRamStatus(char *ComponentName);
+// void Log_ReportComponentRamStatus(char *ComponentName);
 
 // /**
 //  * @brief Finds an empty place in the event pool of a component.
@@ -169,4 +177,4 @@ void RamStatusFunction(char *ComponentName, char *EventName);
 //  * @param ComponentNumber Index of the component.
 //  * @return Index of the empty event slot if found, ERROR_CODE otherwise.
 //  */
-// uint8_t EmptyPlaceInEventPool(Log *Log, int ComponentNumber);
+// uint8_t Log_EmptyPlaceInEventPool(Log *Log, int ComponentNumber);

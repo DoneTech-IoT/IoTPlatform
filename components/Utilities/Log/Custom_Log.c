@@ -1,40 +1,37 @@
 #include "Custom_Log.h"
 #include "string.h"
 
-
-
-
 const char *TAG = "Heap log";
 static Log Log2;
 
-uint8_t FindComponentLocationInPool(Log *Log, char *Component);
-uint8_t EmptyPlaceInComponentPool(Log *Log);
-uint8_t FindEventInEventPool(Log *Log, int ComponentNumber, char *EventName);
-void RecordStatus(Log *Log, int ComponentNumber, int EventNumber, int FistTimeFlag);
-uint8_t IsEventExist(Log *Log, int ComponentNumber, char *EventName);
-uint8_t IsComponentExist(Log *Log, char *ComponentName);
-void RamStatusFunction(char *ComponentName, char *EventName);
-uint8_t NumberSavedEvent(Log *Log, int ComponentNumber);
-void ReportComponentRamUsed(char *ComponentName);
-void ReportComponentRamStatus(char *ComponentName);
-uint8_t EmptyPlaceInEventPool(Log *Log, int ComponentNumber);
-void RamOccupyFunction(char *Component, char *EventName)
+uint8_t Log_FindComponentLocationInPool(Log *Log, char *Component);
+uint8_t Log_EmptyPlaceInComponentPool(Log *Log);
+uint8_t Log_FindEventInEventPool(Log *Log, int ComponentNumber, char *EventName);
+uint8_t Log_EmptyPlaceInEventPool(Log *Log, int ComponentNumber);
+uint8_t Log_IsEventExist(Log *Log, int ComponentNumber, char *EventName);
+uint8_t Log_IsComponentExist(Log *Log, char *ComponentName);
+uint8_t Log_NumberSavedEvent(Log *Log, int ComponentNumber);
+void Log_RamStatus(char *ComponentName, char *EventName);
+void Log_RecordStatus(Log *Log, int ComponentNumber, int EventNumber, int FistTimeFlag);
+
+
+void Log_RamOccupy(char *Component, char *EventName)
 {
     static Log log;
     int componentNumber;
     int eventNumber;
-    if (IsComponentExist(&log, Component) == false)
+    if (Log_IsComponentExist(&log, Component) == false)
     {
         componentNumber = 0;
         eventNumber = 0;
         strncpy(log.Component[componentNumber].Name, Component, STRING_LEN);
         strncpy(log.Component[componentNumber].Event[eventNumber].Name,
                 EventName, STRING_LEN);
-        RecordStatus(&log, componentNumber, eventNumber, LogStart);
+        Log_RecordStatus(&log, componentNumber, eventNumber, LogStart);
     }
     else
     {
-        componentNumber = FindComponentLocationInPool(&log, Component);
+        componentNumber = Log_FindComponentLocationInPool(&log, Component);
         if (componentNumber == ERROR_CODE)
         {
             ESP_LOGE(TAG, " there is not any space in Component pool for creating new component");
@@ -43,21 +40,21 @@ void RamOccupyFunction(char *Component, char *EventName)
         else
         {
             uint8_t isEventExist =
-                IsEventExist(&log, componentNumber, EventName);
+                Log_IsEventExist(&log, componentNumber, EventName);
             if (isEventExist == 1)
             {
                 eventNumber =
-                    FindEventInEventPool(&log, componentNumber, EventName);
+                    Log_FindEventInEventPool(&log, componentNumber, EventName);
                 strncpy(log.Component[componentNumber].Event[eventNumber].Name,
                         EventName, STRING_LEN);
                 if (log.Component[componentNumber].Event[eventNumber].Counter == 2)
-                    RecordStatus(&log, componentNumber, eventNumber, LogStart); // add log
+                    Log_RecordStatus(&log, componentNumber, eventNumber, LogStart); // add log
                 else
-                    RecordStatus(&log, componentNumber, eventNumber, LogEnd); // add log
+                    Log_RecordStatus(&log, componentNumber, eventNumber, LogEnd); // add log
             }
             else if (isEventExist == 0)
             {
-                eventNumber = EmptyPlaceInEventPool(&log, componentNumber);
+                eventNumber = Log_EmptyPlaceInEventPool(&log, componentNumber);
                 if (eventNumber == ERROR_CODE)
                 {
                     ESP_LOGE(TAG, "  there is not any space in Event pool for creating new event");
@@ -66,14 +63,14 @@ void RamOccupyFunction(char *Component, char *EventName)
                 else
                 {
                     strncpy(log.Component[componentNumber].Event[eventNumber].Name, EventName, STRING_LEN);
-                    RecordStatus(&log, componentNumber, eventNumber, LogStart); // add log
+                    Log_RecordStatus(&log, componentNumber, eventNumber, LogStart); // add log
                 }
             }
         }
     }
 }
 
-void RecordStatus(Log *Log, int ComponentNumber, int EventNumber,
+void Log_RecordStatus(Log *Log, int ComponentNumber, int EventNumber,
                   int FistTimeFlag)
 {
 
@@ -105,7 +102,7 @@ void RecordStatus(Log *Log, int ComponentNumber, int EventNumber,
     }
 }
 
-uint8_t IsComponentExist(Log *Log, char *ComponentName)
+uint8_t Log_IsComponentExist(Log *Log, char *ComponentName)
 {
     for (int i = 0; i < LOG_MAX_COMPONENT; i++)
     {
@@ -117,7 +114,7 @@ uint8_t IsComponentExist(Log *Log, char *ComponentName)
     return false;
 }
 
-uint8_t IsEventExist(Log *Log, int ComponentNumber, char *EventName)
+uint8_t Log_IsEventExist(Log *Log, int ComponentNumber, char *EventName)
 {
     for (int i = 0; i < LOG_MAX_EVENT; i++)
     {
@@ -130,7 +127,7 @@ uint8_t IsEventExist(Log *Log, int ComponentNumber, char *EventName)
     return false;
 }
 
-uint8_t FindEventInEventPool(Log *Log, int ComponentNumber, char *EventName)
+uint8_t Log_FindEventInEventPool(Log *Log, int ComponentNumber, char *EventName)
 {
     uint8_t eventNumber = ERROR_CODE;
     for (int i = 0; i < LOG_MAX_EVENT; i++)
@@ -145,7 +142,7 @@ uint8_t FindEventInEventPool(Log *Log, int ComponentNumber, char *EventName)
     return eventNumber;
 }
 
-uint8_t FindComponentLocationInPool(Log *Log, char *Component)
+uint8_t Log_FindComponentLocationInPool(Log *Log, char *Component)
 {
     uint8_t componentNumber = ERROR_CODE;
     for (int i = 0; i < LOG_MAX_COMPONENT; i++)
@@ -158,7 +155,7 @@ uint8_t FindComponentLocationInPool(Log *Log, char *Component)
     return componentNumber;
 }
 
-uint8_t EmptyPlaceInComponentPool(Log *Log)
+uint8_t Log_EmptyPlaceInComponentPool(Log *Log)
 {
     uint8_t emptyPlace = ERROR_CODE;
     for (int i = 0; i < LOG_MAX_COMPONENT; i++)
@@ -172,7 +169,7 @@ uint8_t EmptyPlaceInComponentPool(Log *Log)
     return emptyPlace;
 }
 
-uint8_t EmptyPlaceInEventPool(Log *Log, int ComponentNumber)
+uint8_t Log_EmptyPlaceInEventPool(Log *Log, int ComponentNumber)
 {
     uint8_t emptyPlace = ERROR_CODE;
     for (int i = 0; i < LOG_MAX_EVENT; i++)
@@ -186,7 +183,7 @@ uint8_t EmptyPlaceInEventPool(Log *Log, int ComponentNumber)
     return emptyPlace;
 }
 
-uint8_t NumberSavedEvent(Log *Log, int ComponentNumber)
+uint8_t Log_NumberSavedEvent(Log *Log, int ComponentNumber)
 {
     uint8_t numberOfEvent = 0;
     for (int i = 0; i < LOG_MAX_EVENT; i++)
@@ -197,13 +194,13 @@ uint8_t NumberSavedEvent(Log *Log, int ComponentNumber)
     return numberOfEvent;
 }
 
-void RamStatusFunction(char *ComponentName, char *EventName)
+void Log_RamStatus(char *ComponentName, char *EventName)
 {
     int componentNumber;
     int eventNumber;
     size_t psramSize;
     size_t sramSize;
-    if (IsComponentExist(&Log2, ComponentName) == false)
+    if (Log_IsComponentExist(&Log2, ComponentName) == false)
     {
         componentNumber = 0;
         eventNumber = 0;
@@ -227,9 +224,9 @@ void RamStatusFunction(char *ComponentName, char *EventName)
         psramSize = (esp_get_free_heap_size() / 1000);
         sramSize = (xPortGetFreeHeapSize() / 1000);
         size_t TimeFromBootUp = pdTICKS_TO_MS(xTaskGetTickCount());
-        componentNumber = FindComponentLocationInPool(&Log2, ComponentName);
-        eventNumber = EmptyPlaceInEventPool(&Log2, componentNumber);
-        if (NumberSavedEvent(&Log2, componentNumber) >= (LOG_MAX_EVENT - 1))
+        componentNumber = Log_FindComponentLocationInPool(&Log2, ComponentName);
+        eventNumber = Log_EmptyPlaceInEventPool(&Log2, componentNumber);
+        if (Log_NumberSavedEvent(&Log2, componentNumber) >= (LOG_MAX_EVENT - 1))
             memset(&Log2.Component[componentNumber], 0,
                    sizeof(Log2.Component[componentNumber]));
         strncpy(Log2.Component[componentNumber].Name, ComponentName,
@@ -246,16 +243,16 @@ void RamStatusFunction(char *ComponentName, char *EventName)
     }
 }
 
-void ReportComponentRamStatus(char *ComponentName)
+void Log_ReportComponentRamStatus(char *ComponentName)
 {
     int componentNumber;
-    if (IsComponentExist(&Log2, ComponentName) == false)
+    if (Log_IsComponentExist(&Log2, ComponentName) == false)
     {
         ESP_LOGE(TAG, "there is not any Log for Component %s", ComponentName);
     }
     else
     {
-        componentNumber = FindComponentLocationInPool(&Log2, ComponentName);
+        componentNumber = Log_FindComponentLocationInPool(&Log2, ComponentName);
         for (int i = 0; i < LOG_MAX_EVENT; i++)
         {
             if (strlen(Log2.Component[componentNumber].Event[i].Name) != 0)
@@ -272,16 +269,16 @@ void ReportComponentRamStatus(char *ComponentName)
     }
 }
 
-void ReportComponentRamUsed(char *ComponentName)
+void Log_ReportComponentRamUsed(char *ComponentName)
 {
     int componentNumber;
-    if (IsComponentExist(&Log2, ComponentName) == false)
+    if (Log_IsComponentExist(&Log2, ComponentName) == false)
     {
         ESP_LOGE(TAG, "there is not any Log for Component %s", ComponentName);
     }
     else
     {
-        componentNumber = FindComponentLocationInPool(&Log2, ComponentName);
+        componentNumber = Log_FindComponentLocationInPool(&Log2, ComponentName);
         for (int i = 0; i < LOG_MAX_EVENT; i++)
         {
             if (strlen(Log2.Component[componentNumber].Event[i].Name) != 0)
