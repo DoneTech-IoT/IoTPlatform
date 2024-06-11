@@ -86,7 +86,6 @@ void Log_RamOccupy(char *Component, char *EventName)
 void Log_RecordStatus(Log *Log, int ComponentNumber, int EventNumber,
                       int FistTimeFlag)
 {
-
     if (FistTimeFlag == true)
     {
         Log->Component[ComponentNumber].Event[EventNumber].RAM.Psram =
