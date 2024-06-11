@@ -2,10 +2,12 @@
 #include "string.h"
 
 const char *TAG = "Heap log";
+
 #ifdef CONFIG_DONE_LOG
 static Log Log2;
 static Log Log1;
 #endif
+
 uint8_t Log_FindComponentLocationInPool(Log *Log, char *Component);
 uint8_t Log_EmptyPlaceInComponentPool(Log *Log);
 uint8_t Log_FindEventInEventPool(Log *Log, int ComponentNumber, char *EventName);
