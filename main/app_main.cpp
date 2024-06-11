@@ -109,7 +109,7 @@ extern "C" void app_main()
     Log_RamOccupy("main", "event2");
     vTaskDelay(pdMS_TO_TICKS(3000));
     Log_RamOccupy("main", "event3");
-    Log_ReportComponentRamStatus("main");
+    Log_ReportComponentRamUsed("main");
     if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
     {
         bool CommandResult = false;

@@ -86,6 +86,7 @@ void Log_RamOccupy(char *Component, char *EventName)
 void Log_RecordStatus(Log *Log, int ComponentNumber, int EventNumber,
                       int FistTimeFlag)
 {
+
     if (FistTimeFlag == true)
     {
         Log->Component[ComponentNumber].Event[EventNumber].RAM.Psram =
@@ -283,9 +284,7 @@ void Log_RamStatus(char *ComponentName, char *EventName)
         Log2.Component[componentNumber].Event[eventNumber].TimeStamp =
             TimeFromBootUp;
 #ifdef CONFIG_DONE_LOG_PRINT
-        ESP_LOGE(TAG, "component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at
-         %d millis is FREE",
-                 ComponentName, EventName, sramSize, psramSize, TimeFromBootUp);
+        ESP_LOGE(TAG, "component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at %d millis is FREE", ComponentName, EventName, sramSize, psramSize, TimeFromBootUp);
 #endif
     }
     else
