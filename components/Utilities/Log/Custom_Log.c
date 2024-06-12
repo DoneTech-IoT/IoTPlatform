@@ -8,16 +8,6 @@ static Log Log2;
 static Log Log1;
 #endif
 
-// uint8_t Log_FindComponentLocationInPool(Log *Log, char *Component);
-// uint8_t Log_EmptyPlaceInComponentPool(Log *Log);
-// uint8_t Log_FindEventInEventPool(Log *Log, int ComponentNumber, char *EventName);
-// uint8_t Log_EmptyPlaceInEventPool(Log *Log, int ComponentNumber);
-// uint8_t Log_IsEventExist(Log *Log, int ComponentNumber, char *EventName);
-// uint8_t Log_IsComponentExist(Log *Log, char *ComponentName);
-// uint8_t Log_NumberSavedEvent(Log *Log, int ComponentNumber);
-// void Log_RamStatus(char *ComponentName, char *EventName);
-// void Log_RecordStatus(Log *Log, int ComponentNumber, int EventNumber, int FistTimeFlag);
-
 /**
  * @brief Records the status of an event.
  * This function logs the current RAM usage for a given event and component.
@@ -47,6 +37,8 @@ void Log_RecordStatus(Log *Log, int ComponentNumber, int EventNumber,
             Log->Component[ComponentNumber].Event[EventNumber].RAM.Sram;
         psramSize = psramSize - (esp_get_free_heap_size() / 1000);
         sramSize = sramSize - (xPortGetFreeHeapSize() / 1000);
+        Log->Component[ComponentNumber].Event[EventNumber].RAM.Sram = sramSize;
+        Log->Component[ComponentNumber].Event[EventNumber].RAM.Psram = psramSize;
         size_t TimeFromBootUp = pdTICKS_TO_MS(xTaskGetTickCount());
 #ifdef CONFIG_DONE_LOG_PRINT
         ESP_LOGE(TAG, "Event name :%s SRAM: %u K bytes PSRAM occupy: %u K bytes occupy at %u millis",

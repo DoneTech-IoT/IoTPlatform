@@ -91,10 +91,6 @@ extern "C" void app_main()
 {
     Log_RamOccupy("main", "event1");
     ServiceMangerTaskInit();
-    TaskHandle_t GuiTaskHandler = NULL;
-    UBaseType_t TaskPriority = tskIDLE_PRIORITY + 2;
-    uint32_t TaskStack = LVGL_STACK;
-    GUI_TaskInit(&GuiTaskHandler, TaskPriority, TaskStack);
     vTaskDelay(pdMS_TO_TICKS(1 * SEC));
 
     GlobalInit();
