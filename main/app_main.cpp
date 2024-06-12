@@ -6,8 +6,8 @@
 #include "freertos/task.h"
 #include "Setup_GPIO.h"
 #include "MatterInterface.h"
-
-#define LVGL_STACK 100 * 1000
+#include "ServiceManger.h"
+#include "Custom_Log.h"
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
@@ -89,6 +89,8 @@ void CallbackTest(char *buffer)
 
 extern "C" void app_main()
 {
+    Log_RamOccupy("main", "event1");
+    ServiceMangerTaskInit();
     TaskHandle_t GuiTaskHandler = NULL;
     UBaseType_t TaskPriority = tskIDLE_PRIORITY + 2;
     uint32_t TaskStack = LVGL_STACK;
@@ -98,17 +100,22 @@ extern "C" void app_main()
     GlobalInit();
     nvsFlashInit();
     SpiffsGlobalConfig();
+    Log_RamOccupy("main", "event1");
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
-    vTaskDelay(pdMS_TO_TICKS(5 * SEC));
+    Log_RamOccupy("main", "event2");
+    vTaskDelay(pdMS_TO_TICKS(5000));
+    Log_RamOccupy("main", "event3");
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
     SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
     Spotify_TaskInit(&SpotifyInterfaceHandler);
-    vTaskDelay(pdMS_TO_TICKS(SEC));
-
+    Log_RamOccupy("main", "event2");
+    vTaskDelay(pdMS_TO_TICKS(3000));
+    Log_RamOccupy("main", "event3");
+    Log_ReportComponentRamUsed("main");
     if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
     {
         bool CommandResult = false;
@@ -119,6 +126,7 @@ extern "C" void app_main()
             return;
         }
         ESP_LOGI(TAG, "User info updated");
+
         TimerHandle_t xTimer = xTimerCreate("update", TIMER_TIME, pdTRUE, NULL, SpotifyPeriodicTimer);
         xTimerStart(xTimer, 0);
         if (xTimer != NULL)

@@ -18,7 +18,27 @@ menu "Done Main Config"
 
     config DONE_PARTITION_TABLE_CUSTOM_FILENAME           
         string         
+<<<<<<< HEAD
         default "partitions_s3_8g.csv"  if DONE_BOARDS_WROOM
         default "partitions_s3_16g.csv" if DONE_BOARDS_LILYGO_S3                        
                      
+=======
+        default "partitions_s3_8m.csv"  if DONE_BOARDS_WROOM
+        default "partitions_s3_16m.csv" if DONE_BOARDS_LILYGO_S3                            
+
+    menu "Done Firmware components"
+        config DONE_COMPONENT_SPOTIFY
+            bool "Spotify component"        
+            default y     
+
+        config DONE_COMPONENT_LVGL
+            bool "LVGL component"      
+            depends on DONE_BOARDS_LILYGO_S3
+            default y         
+
+        config DONE_COMPONENT_MATTER
+            bool "Matter component"        
+            default y        
+    endmenu                 
+>>>>>>> origin/main
 endmenu
