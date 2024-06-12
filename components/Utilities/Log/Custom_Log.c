@@ -7,18 +7,19 @@ const char *TAG = "Heap log";
 static Log Log2;
 static Log Log1;
 #endif
-extera 
-/**
- * @brief Records the status of an event.
- * This function logs the current RAM usage for a given event and component.
- * @param Log Pointer to the Log structure.
- * @param ComponentNumber Index of the component.
- * @param EventNumber Index of the event.
- * @param FirstTimeFlag Indicates if this is the first time logging the event (LogStart or LogEnd).
- * @return void
- */
-void Log_RecordStatus(Log *Log, int ComponentNumber, int EventNumber,
-                      int FistTimeFlag)
+extera
+    /**
+     * @brief Records the status of an event.
+     * This function logs the current RAM usage for a given event and component.
+     * @param Log Pointer to the Log structure.
+     * @param ComponentNumber Index of the component.
+     * @param EventNumber Index of the event.
+     * @param FirstTimeFlag Indicates if this is the first time logging the event (LogStart or LogEnd).
+     * @return void
+     */
+    void
+    Log_RecordStatus(Log *Log, int ComponentNumber, int EventNumber,
+                     int FistTimeFlag)
 {
 
     if (FistTimeFlag == true)
@@ -37,6 +38,8 @@ void Log_RecordStatus(Log *Log, int ComponentNumber, int EventNumber,
             Log->Component[ComponentNumber].Event[EventNumber].RAM.Sram;
         psramSize = psramSize - (esp_get_free_heap_size() / 1000);
         sramSize = sramSize - (xPortGetFreeHeapSize() / 1000);
+        Log->Component[ComponentNumber].Event[EventNumber].RAM.Sram = sramSize;
+        Log->Component[ComponentNumber].Event[EventNumber].RAM.Psram = psramSize;
         size_t TimeFromBootUp = pdTICKS_TO_MS(xTaskGetTickCount());
 #ifdef CONFIG_DONE_LOG_PRINT
         ESP_LOGE(TAG, "Event name :%s SRAM: %u K bytes PSRAM occupy: %u K bytes occupy at %u millis",
