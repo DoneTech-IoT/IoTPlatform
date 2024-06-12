@@ -6,7 +6,8 @@
 #include "freertos/task.h"
 #include "Setup_GPIO.h"
 #include "MatterInterface.h"
-
+#include "ServiceManger.h"
+#include "Custom_Log.h"
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
@@ -88,31 +89,27 @@ void CallbackTest(char *buffer)
 
 extern "C" void app_main()
 {
-    size_t freeHeapSize;
-    freeHeapSize = xPortGetFreeHeapSize();
-    ESP_LOGW("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);
-    GUI_TaskInit();
-    freeHeapSize = xPortGetFreeHeapSize();
-    ESP_LOGW("TAG", "Free Heap Size: %u bytes\n", freeHeapSize);
+    Log_RamOccupy("main", "event1");
+    ServiceMangerTaskInit();
     GlobalInit();
     nvsFlashInit();
     SpiffsGlobalConfig();
+    Log_RamOccupy("main", "event1");
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
-
-    vTaskDelay((pdMS_TO_TICKS(SEC * 5)));
+    Log_RamOccupy("main", "event2");
+    vTaskDelay(pdMS_TO_TICKS(5000));
+    Log_RamOccupy("main", "event3");
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
     SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
     Spotify_TaskInit(&SpotifyInterfaceHandler);
-    unsigned int numberOfTasks = uxTaskGetNumberOfTasks();
-    printf("Number of tasks: %u\n", numberOfTasks);
-    printf("CONFIG_FREERTOS_HZ =%d\n", CONFIG_FREERTOS_HZ);
-    freeHeapSize = xPortGetFreeHeapSize();
-    ESP_LOGE(TAG, "Free Heap Size: %u bytes\n", freeHeapSize);
-    // after this semaphore you can use playback command function in every where !
+    Log_RamOccupy("main", "event2");
+    vTaskDelay(pdMS_TO_TICKS(3000));
+    Log_RamOccupy("main", "event3");
+    Log_ReportComponentRamUsed("main");
     if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
     {
         bool CommandResult = false;
@@ -123,6 +120,7 @@ extern "C" void app_main()
             return;
         }
         ESP_LOGI(TAG, "User info updated");
+
         TimerHandle_t xTimer = xTimerCreate("update", TIMER_TIME, pdTRUE, NULL, SpotifyPeriodicTimer);
         xTimerStart(xTimer, 0);
         if (xTimer != NULL)

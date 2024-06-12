@@ -11,7 +11,27 @@
         "lvglinterface.h": "c",
         "gui_guider.h": "c",
         "cstdint": "cpp",
-        "cstdlib": "cpp"
+        "cstdlib": "cpp",
+        "rm67162lilygo.h": "c",
+        "param.h": "c",
+        "lvgl_helpers.h": "c",
+        "stdio.h": "c",
+        "servicemanger.h": "c",
+        "lvgltimer.h": "c",
+        "compare": "cpp",
+        "charconv": "cpp",
+        "chrono": "cpp",
+        "optional": "cpp",
+        "format": "cpp",
+        "ratio": "cpp",
+        "system_error": "cpp",
+        "functional": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "custom_log.h": "c",
+        "stdint.h": "c",
+        "cmath": "c"
     },
     "idf.openOcdConfigs": [
         "board/esp32s3-builtin.cfg"
@@ -35,8 +55,15 @@
         "titleBar.activeBackground": "#dd0531",
         "titleBar.activeForeground": "#e7e7e7",
         "titleBar.inactiveBackground": "#dd053199",
-        "titleBar.inactiveForeground": "#e7e7e799"
+        "titleBar.inactiveForeground": "#e7e7e799",
+        "editor.minimap.maxColumn": 80,
+        "editor.rulers": [
+            80
+        ]
     },
     "peacock.color": "#dd0531",
-    "C_Cpp.dimInactiveRegions": false
+    "C_Cpp.dimInactiveRegions": false,
+    "editor.minimap.maxColumn": 80,
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 100
 }
