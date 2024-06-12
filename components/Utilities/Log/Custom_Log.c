@@ -7,17 +7,7 @@ const char *TAG = "Heap log";
 static Log Log2;
 static Log Log1;
 #endif
-
-// uint8_t Log_FindComponentLocationInPool(Log *Log, char *Component);
-// uint8_t Log_EmptyPlaceInComponentPool(Log *Log);
-// uint8_t Log_FindEventInEventPool(Log *Log, int ComponentNumber, char *EventName);
-// uint8_t Log_EmptyPlaceInEventPool(Log *Log, int ComponentNumber);
-// uint8_t Log_IsEventExist(Log *Log, int ComponentNumber, char *EventName);
-// uint8_t Log_IsComponentExist(Log *Log, char *ComponentName);
-// uint8_t Log_NumberSavedEvent(Log *Log, int ComponentNumber);
-// void Log_RamStatus(char *ComponentName, char *EventName);
-// void Log_RecordStatus(Log *Log, int ComponentNumber, int EventNumber, int FistTimeFlag);
-
+extera 
 /**
  * @brief Records the status of an event.
  * This function logs the current RAM usage for a given event and component.
