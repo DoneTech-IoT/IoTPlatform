@@ -101,7 +101,7 @@ void GUI_mainTask(void *pvParameter)
  */
 void GUI_TaskKill(TaskHandle_t *TaskHandler)
 {
-    if (*TaskHandler == NULL)
+    if (*TaskHandler != NULL)
     {
         lv_deinit();
         vTaskDelete(TaskHandler);
