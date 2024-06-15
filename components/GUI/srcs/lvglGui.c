@@ -44,9 +44,10 @@ uint8_t GUI_MemoryAllocation(uint32_t Stack)
  */
 void GUI_TaskInit(TaskHandle_t *GuiTaskHandler, UBaseType_t TaskPriority, uint32_t TaskStack)
 {
-    if (!GUI_MemoryAllocation(TaskStack))
+    uint8_t  GUI_MemoryAllocationStatus=GUI_MemoryAllocation(TaskStack);
+    if (GUI_MemoryAllocationStatus==false)
     {
-        ESP_LOGE(TAG, "GUI task can not be creating ");
+        ESP_LOGE(TAG, "GUI task can not be created ");
         return;
     }
     *GuiTaskHandler = xTaskCreateStatic(
@@ -86,7 +87,7 @@ void GUI_mainTask(void *pvParameter)
     lv_disp_drv_register(&disp_drv);
     setup_ui(&guider_ui);
     LVGL_Timer();
-    while (1)
+    while (true)
     {
         vTaskDelay(pdMS_TO_TICKS(1));
         lv_task_handler();
@@ -101,7 +102,7 @@ void GUI_mainTask(void *pvParameter)
  */
 void GUI_TaskKill(TaskHandle_t *TaskHandler)
 {
-    if (*TaskHandler != NULL)
+    if (*TaskHandler == NULL)
     {
         lv_deinit();
         vTaskDelete(TaskHandler);
