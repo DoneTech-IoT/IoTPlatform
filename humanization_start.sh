@@ -3,13 +3,9 @@ usage()
 {
    echo "USAGE: [-D] [-H] [-h] "
    echo "       -h = Don't panic! SEZ@Done helps you :D    "
-<<<<<<< HEAD
-    
-=======
    echo "       -D = copy default resources from ./resources/default-resources to any framework that changed."
    echo "       -H = copy modified resources from ./resources/changed-resources to any framework for force our modification to them."
    echo "please change some Env.var in script (eg:ESP_IDF_PATH) for packages local address" 
->>>>>>> origin/main
 #    exit 1
 if [ ! -z $1 ] ; then
     exit $1
@@ -37,59 +33,35 @@ CHANGED_RESOURCES="./resources/changed-resources"
 default_src()
 { 
  
-<<<<<<< HEAD
- echo -n "${color_yellow}---------------------------------------" && echo "${color_reset}"
- echo -n "${color_yellow} >>> SEZ@Done copy default sources <<< " && echo "${color_reset}"
- echo -n "${color_yellow}---------------------------------------" && echo "${color_reset}"
-=======
  echo -n "${color_yellow}----------------------------------------" && echo "${color_reset}"
  echo -n "${color_yellow}>>>     copy default resources       <<<" && echo "${color_reset}"
  echo -n "${color_yellow}----------------------------------------" && echo "${color_reset}"
->>>>>>> origin/main
 
  cp -rv $DEFAULT_RESOURCES/idf-5.2/components/partition_table/Kconfig.projbuild \
  	$ESP_IDF_PATH/$ESP_IDF_VERSION/components/partition_table/Kconfig.projbuild
 
 # cp -rv $DEFAULT_RESOURCES/idf-5.2/ $ESP_IDF_PATH/$ESP_IDF_VERSION/
 
-<<<<<<< HEAD
- echo -n "${color_yellow}---------------------------------------" && echo "${color_reset}"
- echo -n "${color_yellow} >>> SEZ@Done copy successfully    <<< " && echo "${color_reset}"
- echo -n "${color_yellow}---------------------------------------" && echo "${color_reset}"
-=======
  echo -n "${color_success}---------------------------------------" && echo "${color_reset}"
  echo -n "${color_success}>> default res. copied, successfully <<" && echo "${color_reset}"
  echo -n "${color_success}---------------------------------------" && echo "${color_reset}"
->>>>>>> origin/main
 }
 
 humanization()
 {
-<<<<<<< HEAD
- echo -n "${color_yellow}---------------------------------------" && echo "${color_reset}"
- echo -n "${color_yellow} >>> SEZ@Done copy changed sources <<< " && echo "${color_reset}"
- echo -n "${color_yellow}---------------------------------------" && echo "${color_reset}"
-=======
  echo -n "${color_yellow}----------------------------------------" && echo "${color_reset}"
  echo -n "${color_yellow}>>>     copy modified resources      <<<" && echo "${color_reset}"
  echo -n "${color_yellow}----------------------------------------" && echo "${color_reset}"
 
->>>>>>> origin/main
 
  cp -rv $CHANGED_RESOURCES/idf-5.2/components/partition_table/Kconfig.projbuild \
  	$ESP_IDF_PATH/$ESP_IDF_VERSION/components/partition_table/Kconfig.projbuild
 
  # cp -rv $CHANGED_RESOURCES/idf-5.2/ $ESP_IDF_PATH/$ESP_IDF_VERSION/
 
-<<<<<<< HEAD
- echo -n "${color_yellow}---------------------------------------" && echo "${color_reset}"
- echo -n "${color_yellow} >>> SEZ@Done copy successfully    <<< " && echo "${color_reset}"
- echo -n "${color_yellow}---------------------------------------" && echo "${color_reset}"
-=======
  echo -n "${color_success}----------------------------------------" && echo "${color_reset}"
  echo -n "${color_success}>> modified res. copied, successfully <<" && echo "${color_reset}"
  echo -n "${color_success}----------------------------------------" && echo "${color_reset}"
->>>>>>> origin/main
 }
 
 # check pass argument
