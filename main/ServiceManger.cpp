@@ -111,7 +111,7 @@ void ServiceMangerTask(void *pvParameter)
     char pcTaskList[TASK_LIST_BUFFER_SIZE];
     while (true)
     {
-        vTaskList(pcTaskList);
+        // vTaskList(pcTaskList);
 #ifdef MONITORING
         ESP_LOGI(TAG, "Task List:\n%s\n", pcTaskList);
 #endif
