@@ -7,19 +7,18 @@ const char *TAG = "Heap log";
 static Log Log2;
 static Log Log1;
 #endif
-extera
-    /**
-     * @brief Records the status of an event.
-     * This function logs the current RAM usage for a given event and component.
-     * @param Log Pointer to the Log structure.
-     * @param ComponentNumber Index of the component.
-     * @param EventNumber Index of the event.
-     * @param FirstTimeFlag Indicates if this is the first time logging the event (LogStart or LogEnd).
-     * @return void
-     */
-    void
-    Log_RecordStatus(Log *Log, int ComponentNumber, int EventNumber,
-                     int FistTimeFlag)
+
+/**
+ * @brief Records the status of an event.
+ * This function logs the current RAM usage for a given event and component.
+ * @param Log Pointer to the Log structure.
+ * @param ComponentNumber Index of the component.
+ * @param EventNumber Index of the event.
+ * @param FirstTimeFlag Indicates if this is the first time logging the event (LogStart or LogEnd).
+ * @return void
+ */
+void Log_RecordStatus(Log *Log, int ComponentNumber, int EventNumber,
+                      int FistTimeFlag)
 {
 
     if (FistTimeFlag == true)
