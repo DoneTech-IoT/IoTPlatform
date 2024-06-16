@@ -41,7 +41,7 @@ void Log_RecordStatus(Log *Log, int ComponentNumber, int EventNumber,
         Log->Component[ComponentNumber].Event[EventNumber].RAM.Psram = psramSize;
         size_t TimeFromBootUp = pdTICKS_TO_MS(xTaskGetTickCount());
 #ifdef CONFIG_DONE_LOG_PRINT
-        ESP_LOGE(TAG, "Event name :%s SRAM: %u K bytes PSRAM occupy: %u K bytes occupy at %u millis",
+        ESP_LOGI(TAG, "Event name :%s SRAM: %u K bytes PSRAM occupy: %u K bytes occupy at %u millis",
                  Log->Component[ComponentNumber].Event[EventNumber].Name, sramSize,
                  psramSize, TimeFromBootUp);
 #endif
@@ -235,7 +235,7 @@ void Log_RamOccupy(char *Component, char *EventName)
         eventNumber = Log_EmptyPlaceInEventPool(&Log1, componentNumber);
         if (eventNumber == ERROR_CODE)
         {
-            ESP_LOGE(TAG, "  there is not any space in Event pool for creating new event");
+            ESP_LOGI(TAG, "  there is not any space in Event pool for creating new event");
             return;
         }
         strncpy(Log1.Component[componentNumber].Event[eventNumber].Name, EventName, STRING_LEN);
@@ -275,7 +275,7 @@ void Log_RamStatus(char *ComponentName, char *EventName)
         Log2.Component[componentNumber].Event[eventNumber].TimeStamp =
             TimeFromBootUp;
 #ifdef CONFIG_DONE_LOG_PRINT
-        ESP_LOGE(TAG, "component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at %d millis is FREE", ComponentName, EventName, sramSize, psramSize, TimeFromBootUp);
+        ESP_LOGI(TAG, "component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at %d millis is FREE", ComponentName, EventName, sramSize, psramSize, TimeFromBootUp);
 #endif
         return;
     }
@@ -297,7 +297,7 @@ void Log_RamStatus(char *ComponentName, char *EventName)
     Log2.Component[componentNumber].Event[eventNumber].TimeStamp =
         TimeFromBootUp;
 #ifdef CONFIG_DONE_LOG_PRINT
-    ESP_LOGE(TAG, "component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at %d millis is FREE",
+    ESP_LOGI(TAG, "component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at %d millis is FREE",
              ComponentName, EventName, sramSize, psramSize, TimeFromBootUp);
 #endif
 #endif
@@ -324,7 +324,7 @@ void Log_ReportComponentRamStatus(char *ComponentName)
     {
         if (strlen(Log2.Component[componentNumber].Event[i].Name) != 0)
         {
-            ESP_LOGE(TAG, "in the report component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at %d millis is FREE",
+            ESP_LOGI(TAG, "in the report component:%s event:%s , SRAM: %u K bytes , PSRAM: %u K bytes at %d millis is FREE",
                      ComponentName, Log2.Component[componentNumber].Event[i].Name,
                      Log2.Component[componentNumber].Event[i].RAM.Sram,
                      Log2.Component[componentNumber].Event[i].RAM.Psram,
