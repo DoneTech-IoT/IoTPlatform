@@ -27,44 +27,44 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
     case chip::DeviceLayer::DeviceEventType::kInterfaceIpAddressChanged:
     {
         ESP_LOGI(TAG, "Interface IP Address Changed");
-        Log_RamStatus(TAG, "Interface IP Address Changed");
+        Log_RamStatus("Matter", "Interface IP Address Changed");
         break;
     }
 
     case chip::DeviceLayer::DeviceEventType::kCommissioningComplete:
     {
         ESP_LOGI(TAG, "Commissioning complete");
-        Log_RamStatus(TAG, "Commissioning complete");
+        Log_RamStatus("Matter", "Commissioning complete");
         break;
     }
     case chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired:
     {
         ESP_LOGI(TAG, "Commissioning failed, fail safe timer expired");
-        Log_RamStatus(TAG, "Commissioning failed");
+        Log_RamStatus("Matter", "Commissioning failed");
         break;
     }
     case chip::DeviceLayer::DeviceEventType::kCommissioningSessionStarted:
     {
         ESP_LOGI(TAG, "Commissioning session started");
-        Log_RamStatus(TAG, "Commissioning started");
+        Log_RamStatus("Matter", "Commissioning started");
         break;
     }
     case chip::DeviceLayer::DeviceEventType::kCommissioningSessionStopped:
     {
         ESP_LOGI(TAG, "Commissioning session stopped");
-        Log_RamStatus(TAG, "Commissioning stopped");
+        Log_RamStatus("Matter", "Commissioning stopped");
         break;
     }
     case chip::DeviceLayer::DeviceEventType::kCommissioningWindowOpened:
     {
         ESP_LOGI(TAG, "Commissioning window opened");
-        Log_RamStatus(TAG, "Commissioning window opened");
+        Log_RamStatus("Matter", "Commissioning window opened");
         break;
     }
     case chip::DeviceLayer::DeviceEventType::kCommissioningWindowClosed:
     {
         ESP_LOGI(TAG, "Commissioning window closed");
-        Log_RamStatus(TAG, "Commissioning window closed");
+        Log_RamStatus("Matter", "Commissioning window closed");
         break;
     }
     default:
@@ -104,7 +104,7 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         // InterfaceHandler->MatterIdentificationCB != NULL &&
         InterfaceHandler->MatterAttributeUpdateCB != NULL)
     {
-        Log_RamStatus(TAG, "Start Matter");
+        Log_RamStatus("Matter", "Start Matter");
         esp_err_t err = ESP_OK;
         /* Initialize driver */
         app_driver_handle_t switch_handle = app_driver_switch_init();
@@ -113,15 +113,15 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         // app_driver_handle_t coffee_maker_handle = app_driver_coffee_maker_init();
 
         /* Create a Matter node and add the mandatory Root Node device type on endpoint 0 */
-        Log_RamOccupy(TAG, "making node");
+        Log_RamOccupy("Matter", "making node");
         node::config_t node_config;
         node_t *node = node::create(&node_config, app_attribute_update_cb, app_identification_cb);
-        Log_RamOccupy(TAG, "making node");
-        Log_RamOccupy(TAG, "making endpoint");
+        Log_RamOccupy("Matter", "making node");
+        Log_RamOccupy("Matter", "making endpoint");
         on_off_switch::config_t switch_config;
         endpoint_t *endpoint1 = on_off_switch::create(node, &switch_config, ENDPOINT_FLAG_NONE, switch_handle);
 
-        Log_RamOccupy(TAG, "making endpoint");
+        Log_RamOccupy("Matter", "making endpoint");
         done_coffee_maker::config_t coffee_maker_config;
         endpoint_t *endpoint2 = done_coffee_maker::create(node, &coffee_maker_config, ENDPOINT_FLAG_NONE, NULL /*coffee_maker_handle*/);
 
@@ -168,19 +168,19 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
 #endif
 
         /* Matter start */
-        Log_RamOccupy(TAG, "Matter start");
+        Log_RamOccupy("Matter", "Matter start");
         err = esp_matter::start(app_event_cb);
         if (err != ESP_OK)
         {
             ESP_LOGE(TAG, "Matter start failed: %d", err);
         }
-        Log_RamOccupy(TAG, "Matter start");
+        Log_RamOccupy("Matter", "Matter start");
 #if CONFIG_ENABLE_CHIP_SHELL
-        Log_RamOccupy(TAG, "Matter init peripheral");
+        Log_RamOccupy("Matter", "Matter init peripheral");
         esp_matter::console::diagnostics_register_commands();
         esp_matter::console::wifi_register_commands();
         esp_matter::console::init();
-        Log_RamOccupy(TAG, "Matter init peripheral");
+        Log_RamOccupy("Matter", "Matter init peripheral");
 #endif
 
         ESP_LOGI(TAG, "Matter app initiated successfully");
