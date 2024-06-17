@@ -16,10 +16,10 @@ void GUI_mainTask(void *pvParameter);
  * @param Stack Size of the LVGL task stack.
  * @return 1 if memory allocation succeeds, 0 otherwise.
  */
-uint8_t GUI_AllocationMemory(uint32_t Stack)
+uint8_t GUI_MemoryAllocation(uint32_t Stack)
 {
     xTaskLVGLBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
-    xLVGLStack = (StackType_t *)malloc(Stack * MULTIPLIER * sizeof(StackType_t));
+    xLVGLStack = (StackType_t *)malloc(Stack  * sizeof(StackType_t));
     LVGL_BigBuf1 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
     LVGL_BigBuf2 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
     if (xTaskLVGLBuffer == NULL || xLVGLStack == NULL || LVGL_BigBuf1 == NULL || LVGL_BigBuf2 == NULL)
@@ -29,9 +29,9 @@ uint8_t GUI_AllocationMemory(uint32_t Stack)
         free(xLVGLStack);
         free(LVGL_BigBuf2);
         free(LVGL_BigBuf1);
-        return 0;
+        return false;
     }
-    return 1;
+    return true;
 }
 
 /**
@@ -44,8 +44,12 @@ uint8_t GUI_AllocationMemory(uint32_t Stack)
  */
 void GUI_TaskInit(TaskHandle_t *GuiTaskHandler, UBaseType_t TaskPriority, uint32_t TaskStack)
 {
-    if (!GUI_AllocationMemory(TaskStack))
+    uint8_t  GUI_MemoryAllocationStatus=GUI_MemoryAllocation(TaskStack);
+    if (GUI_MemoryAllocationStatus==false)
+    {
+        ESP_LOGE(TAG, "GUI task can not be created ");
         return;
+    }
     *GuiTaskHandler = xTaskCreateStatic(
         GUI_mainTask,           // Task function
         "GUI_mainTask",         // Task name (for debugging)
@@ -57,6 +61,7 @@ void GUI_TaskInit(TaskHandle_t *GuiTaskHandler, UBaseType_t TaskPriority, uint32
     );
     // this delay so important
     vTaskDelay(500);
+    ESP_LOGI(TAG, "GUI task successfully created!");
 }
 
 /**
@@ -82,7 +87,7 @@ void GUI_mainTask(void *pvParameter)
     lv_disp_drv_register(&disp_drv);
     setup_ui(&guider_ui);
     LVGL_Timer();
-    while (1)
+    while (true)
     {
         vTaskDelay(pdMS_TO_TICKS(1));
         lv_task_handler();
@@ -97,12 +102,15 @@ void GUI_mainTask(void *pvParameter)
  */
 void GUI_TaskKill(TaskHandle_t *TaskHandler)
 {
-    lv_deinit();
-    vTaskDelete(TaskHandler);
-    free(xTaskLVGLBuffer);
-    free(xLVGLStack);
-    free(LVGL_BigBuf2);
-    free(LVGL_BigBuf1);
+    if (*TaskHandler == NULL)
+    {
+        lv_deinit();
+        vTaskDelete(TaskHandler);
+        free(xTaskLVGLBuffer);
+        free(xLVGLStack);
+        free(LVGL_BigBuf2);
+        free(LVGL_BigBuf1);
+    }
 }
 
 /**

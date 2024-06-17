@@ -89,11 +89,18 @@ void CallbackTest(char *buffer)
 
 extern "C" void app_main()
 {
+
+    Log_RamOccupy("main", "service manager");
+
     ServiceMangerTaskInit();
+    vTaskDelay(pdMS_TO_TICKS(1 * SEC));
+
     GlobalInit();
     nvsFlashInit();
     SpiffsGlobalConfig();
 
+    Log_RamOccupy("main", "service manager");
+    Log_RamOccupy("main", "Matter usage");
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
@@ -101,12 +108,17 @@ extern "C" void app_main()
     Matter_TaskInit(&MatterInterfaceHandler);
 
     vTaskDelay(pdMS_TO_TICKS(5000));
-
+    Log_RamOccupy("main", "Matter usage");
+    Log_RamOccupy("main", "spotify");
+  
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
     SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
     Spotify_TaskInit(&SpotifyInterfaceHandler);
 
     vTaskDelay(pdMS_TO_TICKS(3000));
+
+    Log_RamOccupy("main", "spotify");
+
     if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
     {
         bool CommandResult = false;

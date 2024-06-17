@@ -113,7 +113,7 @@ void ServiceMangerTask(void *pvParameter)
     {
         // vTaskList(pcTaskList);
 #ifdef MONITORING
-        ESP_LOGI(TAG, "Task List:\n%s\n", pcTaskList);
+        // ESP_LOGI(TAG, "Task List:\n%s\n", pcTaskList);
 #endif
         vTaskDelay(pdMS_TO_TICKS(500));
     }
