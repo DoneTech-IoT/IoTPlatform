@@ -20,11 +20,10 @@ uint8_t GUI_MemoryAllocation(uint32_t Stack)
 {
     Log_RamOccupy("LVGL", "allocate memory");
     xTaskLVGLBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
-    xLVGLStack = (StackType_t *)malloc(Stack  * sizeof(StackType_t));
+    xLVGLStack = (StackType_t *)malloc(Stack * sizeof(StackType_t));
     LVGL_BigBuf1 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
     LVGL_BigBuf2 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
-    if (xTaskLVGLBuffer == NULL || xLVGLStack == NULL || LVGL_BigBuf1 == NULL || LVGL_BigBuf2
-     == NULL)
+    if (xTaskLVGLBuffer == NULL || xLVGLStack == NULL || LVGL_BigBuf1 == NULL || LVGL_BigBuf2 == NULL)
     {
         ESP_LOGE(TAG, "Memory allocation failed!");
         free(xTaskLVGLBuffer);
@@ -50,8 +49,8 @@ uint8_t GUI_MemoryAllocation(uint32_t Stack)
  */
 void GUI_TaskInit(TaskHandle_t *GuiTaskHandler, UBaseType_t TaskPriority, uint32_t TaskStack)
 {
-    uint8_t  GUI_MemoryAllocationStatus=GUI_MemoryAllocation(TaskStack);
-    if (GUI_MemoryAllocationStatus==false)
+    uint8_t GUI_MemoryAllocationStatus = GUI_MemoryAllocation(TaskStack);
+    if (GUI_MemoryAllocationStatus == false)
     {
         ESP_LOGE(TAG, "GUI task can not be created ");
         return;
@@ -98,7 +97,7 @@ void GUI_mainTask(void *pvParameter)
     setup_ui(&guider_ui);
     LVGL_Timer();
     while (true)
-    Log_RamOccupy("LVGL", "starting GUI task");
+        Log_RamOccupy("LVGL", "starting GUI task");
     while (1)
     {
         vTaskDelay(pdMS_TO_TICKS(1));
