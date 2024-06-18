@@ -23,7 +23,8 @@ uint8_t GUI_AllocationMemory(uint32_t Stack)
     xLVGLStack = (StackType_t *)malloc(Stack * MULTIPLIER * sizeof(StackType_t));
     LVGL_BigBuf1 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
     LVGL_BigBuf2 = (lv_color_t *)malloc(LV_HOR_RES_MAX * 100 * MULTIPLIER * sizeof(lv_color_t));
-    if (xTaskLVGLBuffer == NULL || xLVGLStack == NULL || LVGL_BigBuf1 == NULL || LVGL_BigBuf2 == NULL)
+    if (xTaskLVGLBuffer == NULL || xLVGLStack == NULL || LVGL_BigBuf1 == NULL || LVGL_BigBuf2
+     == NULL)
     {
         ESP_LOGE(TAG, "Memory allocation failed!");
         free(xTaskLVGLBuffer);
