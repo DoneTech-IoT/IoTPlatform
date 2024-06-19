@@ -2149,8 +2149,6 @@ CONFIG_DONE_PARTITION_TABLE_CUSTOM_FILENAME="partitions_s3_16m.csv"
 #
 # Done Firmware components
 #
-CONFIG_DONE_COMPONENT_SPOTIFY=y
-CONFIG_DONE_COMPONENT_LVGL=y
 CONFIG_DONE_COMPONENT_MATTER=y
 # end of Done Firmware components
 # end of Done Main Config

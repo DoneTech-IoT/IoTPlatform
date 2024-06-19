@@ -19,10 +19,6 @@
 #define LVGL_STACK 100 * 1000 // in word not byte
 #define SERVICE_MANGER_STACK 5000
 #define NUMBER_OF_COSTUME_TASK 10
-
-#define GUI_ENABLE
-#define SPOTIFY_ENABLE
-
 typedef enum
 {
     GUI_Task = 0,

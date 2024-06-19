@@ -20,7 +20,7 @@ StackType_t *xServiceMangerStack;
 // Global instance of Service Manager
 ServiceManger_t ServiceManger;
 
-#ifdef GUI_ENABLE
+#ifdef CONFIG_DONE_COMPONENT_LVGL
 /**
  * @brief Creates the GUI task.
  * This function configures and creates the GUI task.
@@ -89,11 +89,11 @@ void ServiceMangerTaskInit()
  */
 void ServiceMangerInit()
 {
-#ifdef GUI_ENABLE
+#ifdef CONFIG_DONE_COMPONENT_LVGL
     GUI_TaskCreator();
     ESP_LOGI(TAG, "GUI Created !");
 #endif
-#ifdef SPOTIFY_ENABLE
+#ifdef CONFIG_DONE_COMPONENT_SPOTIFY
     SpotifyTaskCreator();
     ESP_LOGI(TAG, "Spotify Created !");
 #endif

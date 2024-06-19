@@ -9,13 +9,17 @@
 #include "ServiceManger.h"
 #include "Custom_Log.h"
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
+
+#ifdef CONFIG_DONE_COMPONENT_MATTER
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
 MatterInterfaceHandler_t MatterInterfaceHandler;
+#endif
 // ****************************** GLobal Variables ****************************** //
-static const char *TAG = "Main";
-SpotifyInterfaceHandler_t SpotifyInterfaceHandler;
+static const char *TAG = "Main";       
 
+#ifdef CONFIG_DONE_COMPONENT_SPOTIFY
+SpotifyInterfaceHandler_t SpotifyInterfaceHandler;
 // ****************************** GLobal Functions ****************************** //
 /**
  * @brief Function to change colors based on a timer callback
@@ -76,6 +80,7 @@ void IRAM_ATTR AcceptBottomCallBack_(void *arg, void *data)
         }
     }
 }
+#endif
 // ****************************** GLobal Functions ****************************** //
 void MatterAttributeUpdateCBMain(callback_type_t type,
                                  uint16_t endpoint_id, uint32_t cluster_id,
@@ -99,6 +104,7 @@ extern "C" void app_main()
     nvsFlashInit();
     SpiffsGlobalConfig();
 
+#ifdef CONFIG_DONE_COMPONENT_MATTER
     Log_RamOccupy("main", "service manager");
     Log_RamOccupy("main", "Matter usage");
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
@@ -106,7 +112,9 @@ extern "C" void app_main()
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
+#endif
 
+#ifdef CONFIG_DONE_COMPONENT_SPOTIFY
     vTaskDelay(pdMS_TO_TICKS(5000));
     Log_RamOccupy("main", "Matter usage");
     Log_RamOccupy("main", "spotify");
@@ -140,6 +148,7 @@ extern "C" void app_main()
             }
         }
     }
+#endif    
 }
 
 void MatterAttributeUpdateCBMain(

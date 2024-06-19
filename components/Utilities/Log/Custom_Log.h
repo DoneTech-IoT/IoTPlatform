@@ -16,9 +16,6 @@ extern "C"
 #include <sys/param.h>
 #include <stdint.h>
 
-#define CONFIG_DONE_LOG
-#define CONFIG_DONE_LOG_PRINT
-
 #define CONFIG_DONE_LOG_RAM
 #define CONFIG_DONE_OATH_LOG_RAM
 #define CONFIG_DONE_GUI_LOG_RAM

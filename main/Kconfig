@@ -34,5 +34,14 @@ menu "Done Main Config"
         config DONE_COMPONENT_MATTER
             bool "Matter component"        
             default y        
+
+        config DONE_LOG
+            bool "Log Utility"        
+            default y            
+
+        config DONE_LOG_PRINT
+            bool "Print Log"        
+            depends on DONE_LOG
+            default y      
     endmenu                 
 endmenu
