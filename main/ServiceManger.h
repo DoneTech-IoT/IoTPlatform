@@ -19,10 +19,6 @@
 #define LVGL_STACK 100 * 1000 // in word not byte
 #define SERVICE_MANGER_STACK 5000
 #define NUMBER_OF_COSTUME_TASK 10
-
-// #define CONFIG_DONE_COMPONENT_LVGL
-// #define CONFIG_DONE_COMPONENT_SPOTIFY
-
 typedef enum
 {
     GUI_Task = 0,
