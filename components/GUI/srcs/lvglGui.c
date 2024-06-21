@@ -98,7 +98,7 @@ void GUI_mainTask(void *pvParameter)
     LVGL_Timer();
     Log_RamOccupy("LVGL", "starting GUI task");
     
-    while (1)
+    while (true)
     {
         vTaskDelay(pdMS_TO_TICKS(1));
         lv_task_handler();
