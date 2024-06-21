@@ -96,8 +96,8 @@ void GUI_mainTask(void *pvParameter)
     lv_disp_drv_register(&disp_drv);
     setup_ui(&guider_ui);
     LVGL_Timer();
-    while (true)
-        Log_RamOccupy("LVGL", "starting GUI task");
+    Log_RamOccupy("LVGL", "starting GUI task");
+    
     while (1)
     {
         vTaskDelay(pdMS_TO_TICKS(1));
