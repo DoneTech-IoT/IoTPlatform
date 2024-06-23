@@ -28,7 +28,7 @@ menu "Done Main Config"
 
         config DONE_COMPONENT_LVGL
             bool "LVGL component"      
-            depends on DONE_BOARDS_LILYGO_S3
+            #depends on DONE_BOARDS_LILYGO_S3
             default y         
 
         config DONE_COMPONENT_MATTER
