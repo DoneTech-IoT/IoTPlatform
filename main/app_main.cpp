@@ -1,7 +1,7 @@
 #include "lvglGui.h"
 #include "GlobalInit.h"
 #include "nvsFlash.h"
-//#include "SpotifyInterface.h"
+#include "SpotifyInterface.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "Setup_GPIO.h"
