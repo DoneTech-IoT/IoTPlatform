@@ -1,5 +1,5 @@
 #include "ServiceManger.h"
-#include "lvglGui.h"
+//#include "lvglGui.h"
 #include <stdio.h>
 #include"string.h"
 static const char *TAG = "Service_Manger";
