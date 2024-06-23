@@ -1,7 +1,7 @@
-#include "lvglGui.h"
+//#include "lvglGui.h"
 #include "GlobalInit.h"
 #include "nvsFlash.h"
-#include "SpotifyInterface.h"
+//#include "SpotifyInterface.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "Setup_GPIO.h"
@@ -110,7 +110,7 @@ extern "C" void app_main()
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
-    MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
+    //MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
 #endif
 
