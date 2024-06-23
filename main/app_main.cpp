@@ -1,4 +1,4 @@
-//#include "lvglGui.h"
+#include "lvglGui.h"
 #include "GlobalInit.h"
 #include "nvsFlash.h"
 //#include "SpotifyInterface.h"
@@ -110,7 +110,7 @@ extern "C" void app_main()
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
-    //MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
+    MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
 #endif
 
