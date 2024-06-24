@@ -10,4 +10,4 @@ idf_component_register(
 "JsonUtility/include"
 "Log"
 "nvsFlash/include"
-     REQUIRES spiffs  nvs_flash esp_timer GlobalInit driver json Utilities) 
+     REQUIRES spiffs nvs_flash esp_timer GlobalInit driver json) 
