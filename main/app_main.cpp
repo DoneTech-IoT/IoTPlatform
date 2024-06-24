@@ -47,6 +47,7 @@ void SpotifyPeriodicTimer(TimerHandle_t xTimer)
         strcpy(imgLink, SpotifyInterfaceHandler.PlaybackInfo->SongImageURL);
     }
 
+#ifdef CONFIG_DONE_COMPONENT_LVGL
     GUI_UpdateSpotifyScreen(isNewSong,
                             SpotifyInterfaceHandler.PlaybackInfo->ArtistName,
                             SpotifyInterfaceHandler.PlaybackInfo->SongName,
@@ -55,6 +56,7 @@ void SpotifyPeriodicTimer(TimerHandle_t xTimer)
                             SpotifyInterfaceHandler.PlaybackInfo->Progress,
                             SpotifyInterfaceHandler.CoverPhoto);
     ESP_LOGI(TAG, "Playback info updated");
+#endif    
 }
 void IRAM_ATTR BackBottomCallBack_(void *arg, void *data)
 {
