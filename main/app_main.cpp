@@ -47,6 +47,7 @@ void SpotifyPeriodicTimer(TimerHandle_t xTimer)
         strcpy(imgLink, SpotifyInterfaceHandler.PlaybackInfo->SongImageURL);
     }
 
+#ifdef CONFIG_DONE_COMPONENT_LVGL
     GUI_UpdateSpotifyScreen(isNewSong,
                             SpotifyInterfaceHandler.PlaybackInfo->ArtistName,
                             SpotifyInterfaceHandler.PlaybackInfo->SongName,
@@ -55,6 +56,7 @@ void SpotifyPeriodicTimer(TimerHandle_t xTimer)
                             SpotifyInterfaceHandler.PlaybackInfo->Progress,
                             SpotifyInterfaceHandler.CoverPhoto);
     ESP_LOGI(TAG, "Playback info updated");
+#endif    
 }
 void IRAM_ATTR BackBottomCallBack_(void *arg, void *data)
 {
@@ -157,10 +159,10 @@ void MatterAttributeUpdateCBMain(
     uint32_t attribute_id, esp_matter_attr_val_t *val,
     void *priv_data)
 {
-    printf("callback_type_t: %u\n", type);
-    printf("endpoint_id: %u\n", endpoint_id);
-    printf("cluster_id: %lu\n", cluster_id);
-    printf("attribute_id: %lu\n", attribute_id);
-    printf("val: %p\n", val);
-    printf("priv_data: %p\n", priv_data);
+    // printf("callback_type_t: %u\n", type);
+    // printf("endpoint_id: %u\n", endpoint_id);
+    // printf("cluster_id: %lu\n", cluster_id);
+    // printf("attribute_id: %lu\n", attribute_id);
+    // printf("val: %p\n", val);
+    // printf("priv_data: %p\n", priv_data);
 }
