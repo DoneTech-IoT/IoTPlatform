@@ -4,7 +4,6 @@ extern "C" {
 #endif
 #ifndef GLOBAL_INIT_H_
 #define GLOBAL_INIT_H_
-
 #include <esp_event.h>
 #include <esp_log.h>
 #include <esp_system.h>
