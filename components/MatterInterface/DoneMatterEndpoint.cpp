@@ -9,6 +9,57 @@ namespace esp_matter {
 using namespace cluster;
 
 namespace endpoint {
+namespace done_multiFunction_switch {
+uint32_t get_device_type_id(uint32_3 device_id)
+{
+    return device_id;
+}
+
+uint8_t get_device_type_version(uint8_t type_version)
+{
+    return type_version;
+}
+
+endpoint_t *create(node_t *node, config_t *config, uint8_t flags, void *priv_data)
+{
+    endpoint_t *endpoint = endpoint::create(node, flags, priv_data);
+    add(endpoint, config, );
+    return endpoint;
+}
+
+esp_err_t add(endpoint_t *endpoint, config_t *config, done_endpointType_t type)
+{
+    if (!endpoint) {
+        ESP_LOGE(TAG, "Endpoint cannot be NULL");
+        return ESP_ERR_INVALID_ARG;
+    }
+    esp_err_t err = add_device_type(endpoint, get_device_type_id(deviceTypeID_table[type]),         get_device_type_version(deviceTypeVersion_table[type]));
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to add device type id:%" PRIu32 ",err: %d", get_device_type_id(), err);
+        return err;
+    }
+
+    descriptor::create(endpoint, &(config->descriptor), CLUSTER_FLAG_SERVER);
+    cluster_t *identify_cluster = identify::create(endpoint, &(config->identify), CLUSTER_FLAG_SERVER);
+    identify::command::create_trigger_effect(identify_cluster);
+    groups::create(endpoint, &(config->groups), CLUSTER_FLAG_SERVER);
+    scenes::create(endpoint, &(config->scenes), CLUSTER_FLAG_SERVER);
+
+    level_control::create(endpoint, &(config->power), CLUSTER_FLAG_SERVER,
+                          level_control::feature::on_off::get_id());
+
+    //level_control::create(endpoint, &(config->cooking_mode), CLUSTER_FLAG_SERVER,NULL);
+    // level_control::create(endpoint, &(config->grinder), CLUSTER_FLAG_SERVER,NULL);
+    // level_control::create(endpoint, &(config->cup_counter), CLUSTER_FLAG_SERVER,NULL);
+    // level_control::create(endpoint, &(config->cooking_procedure), CLUSTER_FLAG_SERVER,NULL);
+
+    // temperature_measurement::create(endpoint, &(config->temperature_measurement), CLUSTER_FLAG_SERVER);
+    // temperature_control::create(endpoint, &(config->temperature_control), CLUSTER_FLAG_SERVER, ESP_MATTER_NONE_FEATURE_ID);
+
+    return ESP_OK;
+}    
+}//
+
 namespace done_coffee_maker {
 uint32_t get_device_type_id()
 {
@@ -45,14 +96,16 @@ esp_err_t add(endpoint_t *endpoint, config_t *config)
     groups::create(endpoint, &(config->groups), CLUSTER_FLAG_SERVER);
     scenes::create(endpoint, &(config->scenes), CLUSTER_FLAG_SERVER);
 
-    //on_off::create(endpoint, &(config->on_off), CLUSTER_FLAG_SERVER, ESP_MATTER_NONE_FEATURE_ID);
+    level_control::create(endpoint, &(config->power), CLUSTER_FLAG_SERVER,
+                          level_control::feature::on_off::get_id());
 
-    on_off::create(endpoint, &(config->on_off), CLUSTER_FLAG_SERVER, on_off::feature::lighting::get_id());
-    level_control::create(endpoint, &(config->level_control), CLUSTER_FLAG_SERVER,
-                          level_control::feature::on_off::get_id() | level_control::feature::lighting::get_id());
+    //level_control::create(endpoint, &(config->cooking_mode), CLUSTER_FLAG_SERVER,NULL);
+    // level_control::create(endpoint, &(config->grinder), CLUSTER_FLAG_SERVER,NULL);
+    // level_control::create(endpoint, &(config->cup_counter), CLUSTER_FLAG_SERVER,NULL);
+    // level_control::create(endpoint, &(config->cooking_procedure), CLUSTER_FLAG_SERVER,NULL);
 
-    temperature_measurement::create(endpoint, &(config->temperature_measurement), CLUSTER_FLAG_SERVER);
-    temperature_control::create(endpoint, &(config->temperature_control), CLUSTER_FLAG_SERVER, ESP_MATTER_NONE_FEATURE_ID);
+    // temperature_measurement::create(endpoint, &(config->temperature_measurement), CLUSTER_FLAG_SERVER);
+    // temperature_control::create(endpoint, &(config->temperature_control), CLUSTER_FLAG_SERVER, ESP_MATTER_NONE_FEATURE_ID);
 
     return ESP_OK;
 }
