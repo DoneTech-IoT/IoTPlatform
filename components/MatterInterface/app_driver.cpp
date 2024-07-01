@@ -176,6 +176,33 @@ static void app_driver_register_commands()
 }
 #endif // CONFIG_ENABLE_CHIP_SHELL
 
+esp_err_t app_driver_attribute_update(app_driver_handle_t driver_handle, uint16_t endpoint_id, uint32_t cluster_id,
+                                      uint32_t attribute_id, esp_matter_attr_val_t *val)
+{
+    esp_err_t err = ESP_OK;
+    if (endpoint_id == light_endpoint_id) {
+        led_driver_handle_t handle = (led_driver_handle_t)driver_handle;
+        if (cluster_id == OnOff::Id) {
+            if (attribute_id == OnOff::Attributes::OnOff::Id) {
+                err = app_driver_light_set_power(handle, val);
+            }
+        } else if (cluster_id == LevelControl::Id) {
+            if (attribute_id == LevelControl::Attributes::CurrentLevel::Id) {
+                err = app_driver_light_set_brightness(handle, val);
+            }
+        } else if (cluster_id == ColorControl::Id) {
+            if (attribute_id == ColorControl::Attributes::CurrentHue::Id) {
+                err = app_driver_light_set_hue(handle, val);
+            } else if (attribute_id == ColorControl::Attributes::CurrentSaturation::Id) {
+                err = app_driver_light_set_saturation(handle, val);
+            } else if (attribute_id == ColorControl::Attributes::ColorTemperatureMireds::Id) {
+                err = app_driver_light_set_temperature(handle, val);
+            }
+        }
+    }
+    return err;
+}
+
 void app_driver_client_command_callback(client::peer_device_t *peer_device, client::command_handle_t *cmd_handle,
                                         void *priv_data)
 {

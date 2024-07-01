@@ -12,7 +12,7 @@
 static const char *TAG = "MatterInterface";
 uint16_t switch_endpoint_id = 0;
 uint16_t coffee_maker_endpoint_id = 0;
-static uint16_t temp_ctrl_endpoint_id = 0;
+uint16_t multiFunction_switch_id = 0;
 static MatterInterfaceHandler_t *InterfaceHandler;
 // ****************************** Local Functions
 
@@ -84,14 +84,17 @@ static esp_err_t app_identification_cb(identification::callback_type_t type, uin
 static esp_err_t app_attribute_update_cb(callback_type_t type, uint16_t endpoint_id, uint32_t cluster_id,
                                          uint32_t attribute_id, esp_matter_attr_val_t *val, void *priv_data)
 {
-    if (type == PRE_UPDATE)
-    {
-        /* Handle the attribute updates here. */
+     esp_err_t err = ESP_OK;
+
+    if (type == PRE_UPDATE) {
+        /* Driver update */
+        app_driver_handle_t driver_handle = (app_driver_handle_t)priv_data;
+        err = app_driver_attribute_update(driver_handle, endpoint_id, cluster_id, attribute_id, val);
     }
 
     InterfaceHandler->MatterAttributeUpdateCB(type, endpoint_id, cluster_id, attribute_id, val, priv_data);
-
-    return ESP_OK;
+    
+    return err;        
 }
 
 bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
@@ -125,12 +128,11 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         done_coffee_maker::config_t coffee_maker_config;
         endpoint_t *endpoint2 = done_coffee_maker::create(node, &coffee_maker_config, ENDPOINT_FLAG_NONE, NULL /*coffee_maker_handle*/);
 
-        // "Temperature Measurement", "Refrigerator and Temperature Controlled Cabinet Mode Select" are optional cluster for temperature_controlled_cabinet device type so we are not adding them by default.
-        // temperature_controlled_cabinet::config_t temperature_controlled_cabinet_config;
-        // endpoint_t *endpoint3 = temperature_controlled_cabinet::create(node, &temperature_controlled_cabinet_config, ENDPOINT_FLAG_NONE, NULL);
+        done_multiFunction_switch::config_t multiFunction_switch_config;
+        endpoint_t *endpoint3 = done_multiFunction_switch::create(node, &multiFunction_switch_config, ENDPOINT_FLAG_NONE, NULL /*coffee_maker_handle*/);
 
         /* These node and endpoint handles can be used to create/add other endpoints and clusters. */
-        if (!node || !endpoint1 || !endpoint2 /*|| !endpoint3*/)
+        if (!node || !endpoint1 || !endpoint2 || !endpoint3)
         {
             ESP_LOGE(TAG, "Matter node creation failed");
         }
@@ -147,15 +149,9 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
 
         coffee_maker_endpoint_id = endpoint::get_id(endpoint2);
         ESP_LOGI(TAG, "Coffee Maker created with endpoint_id %d", coffee_maker_endpoint_id);
-
-        // esp_matter::cluster_t *cluster = esp_matter::cluster::get(endpoint1, chip::app::Clusters::TemperatureControl::Id);
-
-        // // Atleast one of temperature_number and temperature_level feature is mandatory.
-        // cluster::temperature_control::feature::temperature_number::config_t temperature_number_config;
-        // cluster::temperature_control::feature::temperature_number::add(cluster, &temperature_number_config);
-
-        // temp_ctrl_endpoint_id = endpoint::get_id(endpoint3);
-        // ESP_LOGI(TAG, "Temperature controlled cabinet created with endpoint_id %d", temp_ctrl_endpoint_id);
+       
+        multiFunction_switch_id = endpoint::get_id(endpoint3);
+        ESP_LOGI(TAG, "Multi Function switch created with endpoint_id %d", multiFunction_switch_id);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         /* Set OpenThread platform config */
