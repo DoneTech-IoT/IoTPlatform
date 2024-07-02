@@ -17,6 +17,20 @@
 namespace esp_matter {
 namespace endpoint {
 
+namespace done_lightSwitch_test {
+typedef struct config {
+    cluster::descriptor::config_t descriptor;
+    cluster::identify::config_t identify;        
+    cluster::on_off::config_t on_off;
+    cluster::binding::config_t binding;     
+} config_t;
+
+uint32_t get_device_type_id();
+uint8_t get_device_type_version();
+endpoint_t *create(node_t *node, config_t *config, uint8_t flags, void *priv_data);
+esp_err_t add(endpoint_t *endpoint, config_t *config);
+}//done_multiFunction_switch
+
 namespace done_multiFunction_switch {
 typedef struct config {
     cluster::descriptor::config_t descriptor;

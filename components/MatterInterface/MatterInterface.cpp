@@ -10,15 +10,16 @@
 #include "Custom_Log.h"
 // ****************************** Local Variables
 static const char *TAG = "MatterInterface";
-uint16_t switch_endpoint_id = 0;
-uint16_t coffee_maker_endpoint_id = 0;
-uint16_t multiFunction_switch_id = 0;
 static MatterInterfaceHandler_t *InterfaceHandler;
 // ****************************** Local Functions
-
 using namespace esp_matter;
 using namespace esp_matter::attribute;
 using namespace esp_matter::endpoint;
+using namespace chip::app::Clusters;
+
+uint16_t switch_endpoint_id = 0;
+uint16_t coffee_maker_endpoint_id = 0;
+uint16_t multiFunction_switch_id = 0;
 
 static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
 {
@@ -86,15 +87,85 @@ static esp_err_t app_attribute_update_cb(callback_type_t type, uint16_t endpoint
 {
      esp_err_t err = ESP_OK;
 
-    if (type == PRE_UPDATE) {
-        /* Driver update */
+    if (type == PRE_UPDATE) {//update before save in database(usually drivers)
         app_driver_handle_t driver_handle = (app_driver_handle_t)priv_data;
         err = app_driver_attribute_update(driver_handle, endpoint_id, cluster_id, attribute_id, val);
+    }
+    if (type == POST_UPDATE) {//update after save in database
+        
+    }
+    if (type == READ) {
+        
+    }
+    if (type == WRITE) {
+        
     }
 
     InterfaceHandler->MatterAttributeUpdateCB(type, endpoint_id, cluster_id, attribute_id, val, priv_data);
     
     return err;        
+}
+
+static esp_err_t create_button(struct gpio_button* button, node_t* node)
+{
+    esp_err_t err = ESP_OK;
+
+    /* Initialize driver */
+    app_driver_handle_t button_handle = app_driver_button_init(button);
+
+    /* Create a new endpoint. */
+    generic_switch::config_t switch_config;
+    endpoint_t *endpoint = generic_switch::create(node, &switch_config, ENDPOINT_FLAG_NONE, button_handle);
+
+    /* These node and endpoint handles can be used to create/add other endpoints and clusters. */
+    if (!node || !endpoint)
+    {
+        ESP_LOGE(TAG, "Matter node creation failed");
+        err = ESP_FAIL;
+        return err;
+    }
+
+    for (int i = 0; i < configured_buttons; i++) {
+        if (button_list[i].button == button) {
+            break;
+        }
+    }
+
+    /* Check for maximum physical buttons that can be configured. */
+    if (configured_buttons <CONFIG_MAX_CONFIGURABLE_BUTTONS) {
+        button_list[configured_buttons].button = button;
+        button_list[configured_buttons].endpoint = endpoint::get_id(endpoint);
+        configured_buttons++;
+    }
+    else
+    {
+        ESP_LOGI(TAG, "Cannot configure more buttons");
+        err = ESP_FAIL;
+        return err;
+    }
+
+    static uint16_t generic_switch_endpoint_id = 0;
+    generic_switch_endpoint_id = endpoint::get_id(endpoint);
+    ESP_LOGI(TAG, "Generic Switch created with endpoint_id %d", generic_switch_endpoint_id);
+
+    cluster::fixed_label::config_t fl_config;
+    cluster_t *fl_cluster = cluster::fixed_label::create(endpoint, &fl_config, CLUSTER_FLAG_SERVER);
+
+    cluster::user_label::config_t ul_config;
+    cluster_t *ul_cluster = cluster::user_label::create(endpoint, &ul_config, CLUSTER_FLAG_SERVER);
+
+    /* Add additional features to the node */
+    cluster_t *cluster = cluster::get(endpoint, Switch::Id);
+
+#if CONFIG_GENERIC_SWITCH_TYPE_LATCHING
+    cluster::switch_cluster::feature::latching_switch::add(cluster);
+#endif
+
+#if CONFIG_GENERIC_SWITCH_TYPE_MOMENTARY
+    cluster::switch_cluster::feature::momentary_switch::add(cluster);
+#endif
+
+    return err;
 }
 
 bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
@@ -120,6 +191,7 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         node::config_t node_config;
         node_t *node = node::create(&node_config, app_attribute_update_cb, app_identification_cb);
         Log_RamOccupy("Matter", "making node");
+
         Log_RamOccupy("Matter", "making endpoint");
         on_off_switch::config_t switch_config;
         endpoint_t *endpoint1 = on_off_switch::create(node, &switch_config, ENDPOINT_FLAG_NONE, switch_handle);
@@ -130,6 +202,9 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
 
         done_multiFunction_switch::config_t multiFunction_switch_config;
         endpoint_t *endpoint3 = done_multiFunction_switch::create(node, &multiFunction_switch_config, ENDPOINT_FLAG_NONE, NULL /*coffee_maker_handle*/);
+
+        /* Call for Boot button */
+        err = create_button(NULL, node);
 
         /* These node and endpoint handles can be used to create/add other endpoints and clusters. */
         if (!node || !endpoint1 || !endpoint2 || !endpoint3)
