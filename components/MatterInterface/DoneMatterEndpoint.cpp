@@ -7,8 +7,8 @@ static const char *TAG = "DoneMatterEndpoint";
 
 namespace esp_matter {
 using namespace cluster;
-
 namespace endpoint {
+
 namespace done_multiFunction_switch {
 uint32_t get_device_type_id()
 {
@@ -42,15 +42,9 @@ esp_err_t add(endpoint_t *endpoint, config_t *config)
     descriptor::create(endpoint, &(config->descriptor), CLUSTER_FLAG_SERVER);
     cluster_t *identify_cluster = identify::create(endpoint, &(config->identify), CLUSTER_FLAG_SERVER);
     identify::command::create_trigger_effect(identify_cluster);    
-    binding::create(endpoint, &(config->binding), CLUSTER_FLAG_SERVER);
+    on_off::create(endpoint, &(config->on_off), CLUSTER_FLAG_SERVER,            on_off::feature::lighting::get_id());
     level_control::create(endpoint, &(config->level_control), CLUSTER_FLAG_SERVER,
-                          level_control::feature::on_off::get_id());
-
-    // descriptor::create(endpoint, &(config->descriptor), CLUSTER_FLAG_SERVER);
-    // identify::create(endpoint, &(config->identify), CLUSTER_FLAG_SERVER | CLUSTER_FLAG_CLIENT);
-    // binding::create(endpoint, &(config->binding), CLUSTER_FLAG_SERVER);
-    // on_off::create(endpoint, NULL, CLUSTER_FLAG_CLIENT, ESP_MATTER_NONE_FEATURE_ID);
-    // level_control::create(endpoint, NULL, CLUSTER_FLAG_CLIENT, ESP_MATTER_NONE_FEATURE_ID);
+                          level_control::feature::on_off::get_id() | level_control::feature::lighting::get_id());
 
     return ESP_OK;
 }    

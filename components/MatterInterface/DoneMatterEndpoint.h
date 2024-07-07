@@ -6,37 +6,26 @@
 #include <esp_matter_identify.h>
 
 //SEZ@Done: we define custom ID 
-#define ESP_MATTER_DONE_COFFEE_MAKER_DEVICE_TYPE_ID 0x1000
+#define ESP_MATTER_DONE_TEST_DEVICE_TYPE_ID 0x1000
+#define ESP_MATTER_DONE_TEST_DEVICE_TYPE_VERSION 1
+#define ESP_MATTER_DONE_COFFEE_MAKER_DEVICE_TYPE_ID 0x1001
 #define ESP_MATTER_DONE_COFFEE_MAKER_DEVICE_TYPE_VERSION 1
-#define ESP_MATTER_DONE_MULTI_FUNCTION_SWITCH_DEVICE_TYPE_ID 0x1001
+#define ESP_MATTER_DONE_MULTI_FUNCTION_SWITCH_DEVICE_TYPE_ID 0x1002
 #define ESP_MATTER_DONE_MULTI_FUNCTION_SWITCH_DEVICE_TYPE_VERSION 1
-#define ESP_MATTER_DONE_COOKING_MODE_SWITCH_DEVICE_TYPE_ID 0x1002
-#define ESP_MATTER_DONE_GRINDER_SWITCH_DEVICE_TYPE_ID 0x1003
-#define ESP_MATTER_DONE_CUP_COUNTER_DEVICE_TYPE_ID 0x1004
+#define ESP_MATTER_DONE_COOKING_MODE_SWITCH_DEVICE_TYPE_ID 0x1003
+#define ESP_MATTER_DONE_GRINDER_SWITCH_DEVICE_TYPE_ID 0x1004
+#define ESP_MATTER_DONE_CUP_COUNTER_DEVICE_TYPE_ID 0x1005
 
 namespace esp_matter {
 namespace endpoint {
 
-namespace done_lightSwitch_test {
-typedef struct config {
-    cluster::descriptor::config_t descriptor;
-    cluster::identify::config_t identify;        
-    cluster::on_off::config_t on_off;
-    cluster::binding::config_t binding;     
-} config_t;
-
-uint32_t get_device_type_id();
-uint8_t get_device_type_version();
-endpoint_t *create(node_t *node, config_t *config, uint8_t flags, void *priv_data);
-esp_err_t add(endpoint_t *endpoint, config_t *config);
-}//done_multiFunction_switch
-
 namespace done_multiFunction_switch {
 typedef struct config {
     cluster::descriptor::config_t descriptor;
-    cluster::identify::config_t identify;        
+    cluster::identify::config_t identify;    
+    cluster::on_off::config_t on_off;    
     cluster::level_control::config_t level_control;
-    cluster::binding::config_t binding;     
+    cluster::binding::config_t binding;         
 } config_t;
 
 uint32_t get_device_type_id();
