@@ -27,6 +27,7 @@ using namespace esp_matter::cluster;
 
 static const char *TAG = "app_driver";
 extern uint16_t switch_endpoint_id;
+extern uint16_t multiFunction_switch_id;
 
 #if CONFIG_ENABLE_CHIP_SHELL
 static char console_buffer[101] = {0};
@@ -179,26 +180,33 @@ static void app_driver_register_commands()
 esp_err_t app_driver_attribute_update(app_driver_handle_t driver_handle, uint16_t endpoint_id,      uint32_t cluster_id,uint32_t attribute_id, esp_matter_attr_val_t *val)
 {
     esp_err_t err = ESP_OK;
-    // if (endpoint_id == light_endpoint_id) {
-    //     led_driver_handle_t handle = (led_driver_handle_t)driver_handle;
-    //     if (cluster_id == OnOff::Id) {
-    //         if (attribute_id == OnOff::Attributes::OnOff::Id) {
-    //             err = app_driver_light_set_power(handle, val);
-    //         }
-    //     } else if (cluster_id == LevelControl::Id) {
-    //         if (attribute_id == LevelControl::Attributes::CurrentLevel::Id) {
-    //             err = app_driver_light_set_brightness(handle, val);
-    //         }
-    //     } else if (cluster_id == ColorControl::Id) {
-    //         if (attribute_id == ColorControl::Attributes::CurrentHue::Id) {
-    //             err = app_driver_light_set_hue(handle, val);
-    //         } else if (attribute_id == ColorControl::Attributes::CurrentSaturation::Id) {
-    //             err = app_driver_light_set_saturation(handle, val);
-    //         } else if (attribute_id == ColorControl::Attributes::ColorTemperatureMireds::Id) {
-    //             err = app_driver_light_set_temperature(handle, val);
-    //         }
-    //     }
-    // }
+    if (endpoint_id == multiFunction_switch_id) {
+        //led_driver_handle_t handle = (led_driver_handle_t)driver_handle;
+        if (cluster_id == OnOff::Id) {
+            if (attribute_id == OnOff::Attributes::OnOff::Id) {
+                //err = app_driver_light_set_power(handle, val);
+                ESP_LOGW(TAG, "endpoint_id %d, clusterOnOff_id %ld, attributeOnOff_id %ld", 
+                switch_endpoint_id, cluster_id, attribute_id);
+            }
+        } else if (cluster_id == LevelControl::Id) {
+            if (attribute_id == LevelControl::Attributes::CurrentLevel::Id) {
+                //err = app_driver_light_set_brightness(handle, val);
+                ESP_LOGW(TAG, "endpoint_id %d, clusterLevelControl_id %ld, attributeCurrentLevel_id %ld", switch_endpoint_id, cluster_id, attribute_id);
+            }
+            else if (attribute_id == LevelControl::Attributes::MinLevel::Id) {
+                //err = app_driver_light_set_brightness(handle, val);
+                ESP_LOGW(TAG, "endpoint_id %d, clusterLevelControl_id %ld, attributeMinLevel_id %ld", switch_endpoint_id, cluster_id, attribute_id);
+            }
+            else if (attribute_id == LevelControl::Attributes::MaxLevel::Id) {
+                //err = app_driver_light_set_brightness(handle, val);
+                ESP_LOGW(TAG, "endpoint_id %d, clusterLevelControl_id %ld, attributeMaxLevel_id %ld", switch_endpoint_id, cluster_id, attribute_id);
+            }
+            else if (attribute_id == LevelControl::Attributes::MaxLevel::Id) {
+                //err = app_driver_light_set_brightness(handle, val);
+                ESP_LOGW(TAG, "endpoint_id %d, clusterLevelControl_id %ld, attributeMaxLevel_id %ld", switch_endpoint_id, cluster_id, attribute_id);
+            }
+        }
+    }
     return err;
 }
 
