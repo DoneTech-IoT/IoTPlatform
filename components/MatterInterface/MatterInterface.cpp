@@ -7,7 +7,9 @@
 
 #include "MatterInterface.h"
 #include "DoneMatterEndpoint.h"
+#include "DoneCoffeeMaker.h"
 #include "Custom_Log.h"
+
 // ****************************** Local Variables
 static const char *TAG = "MatterInterface";
 static MatterInterfaceHandler_t *InterfaceHandler;
@@ -205,36 +207,12 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
 
         Log_RamOccupy("Matter", "making endpoint");
         done_coffee_maker::config_t coffee_maker_config;
-        endpoint_t *endpoint2 = done_coffee_maker::create(node, &coffee_maker_config, ENDPOINT_FLAG_NONE, NULL /*coffee_maker_handle*/);
-        
-        create_button();
+        endpoint_t *endpoint2 = done_coffee_maker::create(node, &coffee_maker_config, ENDPOINT_FLAG_NONE, NULL /*coffee_maker_handle*/);                
 
-        done_multiFunction_switch::config_t cookingMode_config;
-        cookingMode_config.on_off.on_off= true;        
-        cookingMode_config.level_control.current_level = 1;
-        cookingMode_config.level_control.lighting.min_level = 1;
-        cookingMode_config.level_control.lighting.max_level = 3;
-        endpoint_t *endpoint3 = done_multiFunction_switch::create(node, &cookingMode_config, ENDPOINT_FLAG_NONE, NULL /*coffee_maker_handle*/);
-
-        done_multiFunction_switch::config_t grinder_config;
-        grinder_config.on_off.on_off= true;        
-        grinder_config.level_control.current_level = 1;
-        grinder_config.level_control.lighting.min_level = 1;
-        grinder_config.level_control.lighting.max_level = 3;
-        endpoint_t *endpoint4 = done_multiFunction_switch::create(node, &grinder_config, ENDPOINT_FLAG_NONE, NULL /*coffee_maker_handle*/);
-
-        done_multiFunction_switch::config_t cup_counter_config;
-        cup_counter_config.on_off.on_off= true;        
-        cup_counter_config.level_control.current_level = 1;
-        cup_counter_config.level_control.lighting.min_level = 1;
-        cup_counter_config.level_control.lighting.max_level = 6;
-        endpoint_t *endpoint5 = done_multiFunction_switch::create(node, &cup_counter_config, ENDPOINT_FLAG_NONE, NULL /*coffee_maker_handle*/);
-
-        /* Call for Boot button */
-        //err = create_button(NULL, node);
+        create_DoneCoffeeMaker(node);
 
         /* These node and endpoint handles can be used to create/add other endpoints and clusters. */
-        if (!node || !endpoint1 || !endpoint2 || !endpoint3)
+        if (!node || !endpoint1)
         {
             ESP_LOGE(TAG, "Matter node creation failed");
         }

@@ -1,14 +1,9 @@
-#ifndef DONE_COFFEE_MAKER_H
-#define DONE_COFFEE_MAKER_H
-
 #include <esp_matter_core.h>
 #include <esp_matter_cluster.h>
 #include <esp_matter_identify.h>
 #include <esp_matter_endpoint.h>
 #include "DoneMatterEndpoint.h"
-
-#define ESP_MATTER_DONE_COFFEE_MAKER_DEVICE_TYPE_ID 0x1001
-#define ESP_MATTER_DONE_COFFEE_MAKER_DEVICE_TYPE_VERSION 1
+#include "DoneCoffeeMaker.h"
 
 static const char *TAG = "DoneCoffeeMaker";
 
@@ -16,10 +11,6 @@ using namespace esp_matter;
 using namespace esp_matter::attribute;
 using namespace esp_matter::endpoint;
 using namespace chip::app::Clusters;
-
-uint16_t cookingMode_endpointID = 0;
-uint16_t grinder_endpointID = 0;
-uint16_t cupCounter_endpointID = 0;
 
 static app_driver_handle_t app_driver_cookingMode_init();
 {
@@ -36,7 +27,7 @@ static app_driver_handle_t app_driver_cupCounter_init();
 
 }
 
-esp_err_t create_coffeeMaker(node_t* node)
+esp_err_t create_DoneCoffeeMaker(node_t* node)
 {
     esp_err_t err = ESP_OK;
 
@@ -94,4 +85,3 @@ esp_err_t create_coffeeMaker(node_t* node)
         ESP_LOGI(TAG, "grinder_endpoint created with endpoint_id %d", cupCounter_endpointID);
     }
 }
-#endif //DONE_COFFEE_MAKER_H
