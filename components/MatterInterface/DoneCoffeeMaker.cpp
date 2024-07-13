@@ -65,7 +65,7 @@ esp_err_t create_DoneCoffeeMaker(node_t* node)
 {
     esp_err_t err = ESP_OK;
 
-    app_driver_handle_t cookingMode_handle = app_driver_cookingMode_init();    
+    app_driver_handle_t cookingMode_handle = app_driver_cookingModeInit();    
     done_multiFunction_switch::config_t cookingMode_config;
     cookingMode_config.on_off.on_off= true;
     cookingMode_config.level_control.current_level = 1;
@@ -83,7 +83,7 @@ esp_err_t create_DoneCoffeeMaker(node_t* node)
         ESP_LOGI(TAG, "cookingMode_endpoint created with endpoint_id %d", cookingMode_endpointID);
     }
 
-    app_driver_handle_t grinder_handle = app_driver_grinder_init();
+    app_driver_handle_t grinder_handle = app_driver_grinderInit();
     done_multiFunction_switch::config_t grinder_config;
     grinder_config.on_off.on_off= true;        
     grinder_config.level_control.current_level = 1;
@@ -101,7 +101,7 @@ esp_err_t create_DoneCoffeeMaker(node_t* node)
         ESP_LOGI(TAG, "grinder_endpoint created with endpoint_id %d", grinder_endpointID);
     }
 
-    app_driver_handle_t cupCounter_handle = app_driver_cupCounter_init();
+    app_driver_handle_t cupCounter_handle = app_driver_cupCounterInit();
     done_multiFunction_switch::config_t cupCounter_config;
     cupCounter_config.on_off.on_off= true;        
     cupCounter_config.level_control.current_level = 1;
