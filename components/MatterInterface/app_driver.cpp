@@ -18,6 +18,8 @@
 #include <app_priv.h>
 #include <app_reset.h>
 
+#include "DoneCoffeeMaker.h"
+
 using chip::kInvalidClusterId;
 static constexpr chip::CommandId kInvalidCommandId = 0xFFFF'FFFF;
 
@@ -27,7 +29,6 @@ using namespace esp_matter::cluster;
 
 static const char *TAG = "app_driver";
 extern uint16_t switch_endpoint_id;
-extern uint16_t multiFunction_switch_id;
 
 #if CONFIG_ENABLE_CHIP_SHELL
 static char console_buffer[101] = {0};
@@ -180,7 +181,7 @@ static void app_driver_register_commands()
 esp_err_t app_driver_attribute_update(app_driver_handle_t driver_handle, uint16_t endpoint_id,      uint32_t cluster_id,uint32_t attribute_id, esp_matter_attr_val_t *val)
 {
     esp_err_t err = ESP_OK;
-    if (endpoint_id == multiFunction_switch_id) {
+    if (endpoint_id == cookingMode_endpointID) {
         //led_driver_handle_t handle = (led_driver_handle_t)driver_handle;
         if (cluster_id == OnOff::Id) {
             if (attribute_id == OnOff::Attributes::OnOff::Id) {

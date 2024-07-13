@@ -20,8 +20,6 @@ using namespace esp_matter::endpoint;
 using namespace chip::app::Clusters;
 
 uint16_t switch_endpoint_id = 0;
-uint16_t coffee_maker_endpoint_id = 0;
-uint16_t multiFunction_switch_id = 0;
 
 static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
 {
@@ -113,7 +111,7 @@ static esp_err_t create_button(node_t* node, struct gpio_button* button, void* b
     esp_err_t err = ESP_OK;
 
     /* Initialize driver */
-    //app_driver_handle_t button_handle = app_driver_button_init(button);
+    app_driver_handle_t button_handle = app_driver_button_init(button);
 
     /* Create a new endpoint. */
     generic_switch::config_t switch_config;
@@ -170,13 +168,6 @@ static esp_err_t create_button(node_t* node, struct gpio_button* button, void* b
     return err;
 }
 
-static esp_err_t create_coffeeMaker(node_t* node)
-{
-    esp_err_t err = ESP_OK;
-
-    return err;
-}
-
 bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
 {
     InterfaceHandler = MatterInterfaceHandler;
@@ -205,11 +196,11 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         on_off_switch::config_t switch_config;
         endpoint_t *endpoint1 = on_off_switch::create(node, &switch_config, ENDPOINT_FLAG_NONE, switch_handle);
 
-        Log_RamOccupy("Matter", "making endpoint");
-        done_coffee_maker::config_t coffee_maker_config;
-        endpoint_t *endpoint2 = done_coffee_maker::create(node, &coffee_maker_config, ENDPOINT_FLAG_NONE, NULL /*coffee_maker_handle*/);                
+        // Log_RamOccupy("Matter", "making endpoint");
+        // done_coffee_maker::config_t coffee_maker_config;
+        // endpoint_t *endpoint2 = done_coffee_maker::create(node, &coffee_maker_config, ENDPOINT_FLAG_NONE, NULL /*coffee_maker_handle*/);                
 
-        create_DoneCoffeeMaker(node);
+        err = create_DoneCoffeeMaker(node);
 
         /* These node and endpoint handles can be used to create/add other endpoints and clusters. */
         if (!node || !endpoint1)
@@ -227,11 +218,9 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         switch_endpoint_id = endpoint::get_id(endpoint1);
         ESP_LOGI(TAG, "Switch created with endpoint_id %d", switch_endpoint_id);
 
-        coffee_maker_endpoint_id = endpoint::get_id(endpoint2);
-        ESP_LOGI(TAG, "Coffee Maker created with endpoint_id %d", coffee_maker_endpoint_id);
-       
-        multiFunction_switch_id = endpoint::get_id(endpoint3);
-        ESP_LOGI(TAG, "Multi Function switch created with endpoint_id %d", multiFunction_switch_id);
+        // coffee_maker_endpoint_id = endpoint::get_id(endpoint2);
+        // ESP_LOGI(TAG, "Coffee Maker created with endpoint_id %d", coffee_maker_endpoint_id);
+               
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         /* Set OpenThread platform config */
