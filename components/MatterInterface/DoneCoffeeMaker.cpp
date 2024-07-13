@@ -4,6 +4,7 @@
 #include <esp_matter_endpoint.h>
 #include "DoneMatterEndpoint.h"
 #include "DoneCoffeeMaker.h"
+#include "app_priv.h"
 
 static const char *TAG = "DoneCoffeeMaker";
 
@@ -12,19 +13,52 @@ using namespace esp_matter::attribute;
 using namespace esp_matter::endpoint;
 using namespace chip::app::Clusters;
 
-static app_driver_handle_t app_driver_cookingMode_init();
+static app_driver_handle_t app_driver_cookingModeInit()
 {
+    app_driver_handle_t handle;
 
+    return (app_driver_handle_t)handle;
 }
 
-static app_driver_handle_t app_driver_grinder_init();
+static app_driver_handle_t app_driver_grinderInit()
 {
+    app_driver_handle_t handle;
 
+    return (app_driver_handle_t)handle;
 }
 
-static app_driver_handle_t app_driver_cupCounter_init();
+static app_driver_handle_t app_driver_cupCounterInit()
 {
+    app_driver_handle_t handle;
 
+    return (app_driver_handle_t)handle;
+}
+
+esp_err_t app_driver_cookingModeSetEnable(
+    app_driver_handle_t driver_handle, 
+    esp_matter_attr_val_t *val)
+{
+    esp_err_t err = ESP_OK;
+
+    return err;
+}
+
+esp_err_t app_driver_grinderSetEnable(
+    app_driver_handle_t driver_handle, 
+    esp_matter_attr_val_t *val)
+{
+    esp_err_t err = ESP_OK;
+
+    return err;
+}
+
+esp_err_t app_driver_cupCounterSetEnable(
+    app_driver_handle_t driver_handle, 
+    esp_matter_attr_val_t *val)
+{
+    esp_err_t err = ESP_OK;
+
+    return err;
 }
 
 esp_err_t create_DoneCoffeeMaker(node_t* node)
@@ -84,4 +118,6 @@ esp_err_t create_DoneCoffeeMaker(node_t* node)
         cupCounter_endpointID = endpoint::get_id(cupCounter_endpoint);
         ESP_LOGI(TAG, "grinder_endpoint created with endpoint_id %d", cupCounter_endpointID);
     }
+
+    return err;
 }

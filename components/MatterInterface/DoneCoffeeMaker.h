@@ -7,10 +7,10 @@
 #define ESP_MATTER_DONE_COFFEE_MAKER_DEVICE_TYPE_ID 0x1001
 #define ESP_MATTER_DONE_COFFEE_MAKER_DEVICE_TYPE_VERSION 1
 
-uint16_t cookingMode_endpointID = 0;
-uint16_t grinder_endpointID = 0;
-uint16_t cupCounter_endpointID = 0;
+static uint16_t cookingMode_endpointID = 0;
+static uint16_t grinder_endpointID = 0;
+static uint16_t cupCounter_endpointID = 0;
 
-esp_err_t create_DoneCoffeeMaker(node_t* node);
+esp_err_t create_DoneCoffeeMaker(esp_matter::node_t* node);
 
 #endif //DONE_COFFEE_MAKER_H
