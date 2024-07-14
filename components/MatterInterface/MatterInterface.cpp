@@ -200,7 +200,7 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         // done_coffee_maker::config_t coffee_maker_config;
         // endpoint_t *endpoint2 = done_coffee_maker::create(node, &coffee_maker_config, ENDPOINT_FLAG_NONE, NULL /*coffee_maker_handle*/);                
 
-        err = create_DoneCoffeeMaker(node);
+        err = create_DoneCoffeeMaker(node);        
 
         /* These node and endpoint handles can be used to create/add other endpoints and clusters. */
         if (!node || !endpoint1)
