@@ -7,6 +7,9 @@
 #include "app_priv.h"
 
 static const char *TAG = "DoneCoffeeMaker";
+uint16_t cookingMode_endpointID;
+uint16_t grinder_endpointID;
+uint16_t cupCounter_endpointID;
 
 using namespace esp_matter;
 using namespace esp_matter::attribute;
