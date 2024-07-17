@@ -33,6 +33,7 @@ static button_endpoint button_list[CONFIG_MAX_CONFIGURABLE_BUTTONS];
 
 int get_endpoint(gpio_button* button);
 typedef void *app_driver_handle_t;
+typedef void *button_handle_t;
 
 /** Initialize the switch driver
  *

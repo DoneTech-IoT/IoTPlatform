@@ -29,6 +29,7 @@ using namespace esp_matter::cluster;
 
 static const char *TAG = "app_driver";
 extern uint16_t switch_endpoint_id;
+extern uint16_t powerKey_endpointID;
 extern uint16_t cookingMode_endpointID;
 extern uint16_t grinder_endpointID;
 extern uint16_t cupCounter_endpointID;
