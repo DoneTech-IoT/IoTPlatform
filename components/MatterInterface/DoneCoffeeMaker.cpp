@@ -18,6 +18,36 @@ using namespace esp_matter::attribute;
 using namespace esp_matter::endpoint;
 using namespace chip::app::Clusters;
 
+static void app_driver_LevelControlUpdateCurrentValue(
+    const uint16_t &endpoint_id)    
+{    
+    uint32_t cluster_id = LevelControl::Id;
+    uint32_t attribute_id = LevelControl::Attributes::CurrentLevel::Id;
+    uint32_t attMaxLevel_id = LevelControl::Attributes::MaxLevel::Id;
+    uint32_t attMinLevel_id = LevelControl::Attributes::MinLevel::Id;
+
+    node_t *node = node::get();
+    endpoint_t *endpoint = endpoint::get(node, endpoint_id);
+    cluster_t *cluster = cluster::get(endpoint, cluster_id);
+    attribute_t *attribute = attribute::get(cluster, attribute_id);
+    attribute_t *attMaxLevel = attribute::get(cluster, attMaxLevel_id);
+    attribute_t *attMinLevel = attribute::get(cluster, attMinLevel_id);
+
+    esp_matter_attr_val_t val_currentLevel = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t val_MaxLevel = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t val_MinLevel = esp_matter_invalid(NULL);
+
+    attribute::get_val(attribute, &val_currentLevel);
+    attribute::get_val(attMaxLevel, &val_MaxLevel);
+    attribute::get_val(attMinLevel, &val_MinLevel);
+
+    val_currentLevel.val.u8 = val_currentLevel.val.u8++;
+    if(val_currentLevel.val.u8 > val_MaxLevel.val.u8)
+        val_currentLevel.val.u8 = val_MinLevel.val.u8;
+
+    attribute::update(endpoint_id, cluster_id, attribute_id, &val_currentLevel);    
+}
+
 static void app_driver_InitKeyWithPressCallback(
     button_handle_t handle,
     int32_t gpioPin,
@@ -89,33 +119,8 @@ static app_driver_handle_t app_driver_PowerKeyInit()
 
 static void app_driver_cookingModeGrindCB(void *arg, void *data)
 {
-    ESP_LOGI(TAG, "app_driver_PowerKeyCB");
-    uint16_t endpoint_id = grinder_endpointID;
-    uint32_t cluster_id = LevelControl::Id;
-    uint32_t attribute_id = LevelControl::Attributes::CurrentLevel::Id;
-    uint32_t attMaxLevel_id = LevelControl::Attributes::MaxLevel::Id;
-    uint32_t attMinLevel_id = LevelControl::Attributes::MinLevel::Id;
-
-    node_t *node = node::get();
-    endpoint_t *endpoint = endpoint::get(node, endpoint_id);
-    cluster_t *cluster = cluster::get(endpoint, cluster_id);
-    attribute_t *attribute = attribute::get(cluster, attribute_id);
-    attribute_t *attMaxLevel = attribute::get(cluster, attMaxLevel_id);
-    attribute_t *attMinLevel = attribute::get(cluster, attMinLevel_id);
-
-    esp_matter_attr_val_t val_currentLevel = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t val_MaxLevel = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t val_MinLevel = esp_matter_invalid(NULL);
-
-    attribute::get_val(attribute, &val_currentLevel);
-    attribute::get_val(attMaxLevel, &val_MaxLevel);
-    attribute::get_val(attMinLevel, &val_MinLevel);
-
-    val_currentLevel.val.u8 = val_currentLevel.val.u8++;
-    if(val_currentLevel.val.u8 > val_MaxLevel.val.u8)
-        val_currentLevel.val.u8 = val_MinLevel.val.u8;
-
-    attribute::update(endpoint_id, cluster_id, attribute_id, &val_currentLevel);    
+    ESP_LOGI(TAG, "app_driver_cookingModeGrindCB");
+    app_driver_LevelControlUpdateCurrentValue(grinder_endpointID);    
 }
 
 static void app_driver_CookingModeCoffeeCB(void *arg, void *data)
@@ -151,32 +156,7 @@ static app_driver_handle_t app_driver_cookingModeInit()
 static void app_driver_CupCounterKeyCB(void *arg, void *data)
 {
     ESP_LOGI(TAG, "app_driver_CupCounterKeyCB");
-    uint16_t endpoint_id = cupCounter_endpointID;
-    uint32_t cluster_id = LevelControl::Id;
-    uint32_t attribute_id = LevelControl::Attributes::CurrentLevel::Id;
-    uint32_t attMaxLevel_id = LevelControl::Attributes::MaxLevel::Id;
-    uint32_t attMinLevel_id = LevelControl::Attributes::MinLevel::Id;
-
-    node_t *node = node::get();
-    endpoint_t *endpoint = endpoint::get(node, endpoint_id);
-    cluster_t *cluster = cluster::get(endpoint, cluster_id);
-    attribute_t *attribute = attribute::get(cluster, attribute_id);
-    attribute_t *attMaxLevel = attribute::get(cluster, attMaxLevel_id);
-    attribute_t *attMinLevel = attribute::get(cluster, attMinLevel_id);
-
-    esp_matter_attr_val_t val_currentLevel = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t val_MaxLevel = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t val_MinLevel = esp_matter_invalid(NULL);
-
-    attribute::get_val(attribute, &val_currentLevel);
-    attribute::get_val(attMaxLevel, &val_MaxLevel);
-    attribute::get_val(attMinLevel, &val_MinLevel);
-
-    val_currentLevel.val.u8 = val_currentLevel.val.u8++;
-    if(val_currentLevel.val.u8 > val_MaxLevel.val.u8)
-        val_currentLevel.val.u8 = val_MinLevel.val.u8;
-
-    attribute::update(endpoint_id, cluster_id, attribute_id, &val_currentLevel);
+    app_driver_LevelControlUpdateCurrentValue(cupCounter_endpointID);
 }
 
 static app_driver_handle_t app_driver_cupCounterInit()
