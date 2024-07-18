@@ -10,12 +10,16 @@ menu "Done Matter Config"
 
         config DONE_MATTER_DEVICE_REFRIGERATOR
             bool "Smart Refrigerator"          
-    endchoice     
-        
+    endchoice             
+    
+    
+
     menu " Device Pin Assignments" 
-        config DONE_INPUT_ACTIVE_LEVEL
-            int "Input key activation level" 
-            default 1        
+    depends on DONE_MATTER_DEVICE_COFFEE_MAKER
+
+        config DONE_KEY_ACTIVE_LEVEL
+            int "Key activation level" 
+            default 1       
 
         config DONE_COFFEE_MAKER_POWER_KEY
             int "Master Power Key"
