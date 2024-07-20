@@ -20,6 +20,13 @@ typedef enum {
     TEA_MODE = 3    
 }CookingMode_t;
 
+typedef enum {
+    DONT_CARE = 0,
+    GRINDER_MODE = 1,
+    COFFEE_MODE = 2,
+    TEA_MODE = 3    
+}CookingMode_t;
+
 esp_err_t create_DoneCoffeeMaker(esp_matter::node_t* node);
 
 #endif //DONE_COFFEE_MAKER_H
