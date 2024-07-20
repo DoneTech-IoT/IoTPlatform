@@ -19,6 +19,8 @@ using namespace esp_matter::endpoint;
 using namespace chip::app::Clusters;
 
 static void app_driver_LevelControlUpdateCurrentValue(
+    LevelControlCurrentValueMode_t mode,
+    const uint8_t &explicitCurrentValue,
     const uint16_t &endpoint_id)    
 {    
     uint32_t cluster_id = LevelControl::Id;
@@ -41,9 +43,19 @@ static void app_driver_LevelControlUpdateCurrentValue(
     attribute::get_val(attMaxLevel, &val_MaxLevel);
     attribute::get_val(attMinLevel, &val_MinLevel);
 
-    val_currentLevel.val.u8 = val_currentLevel.val.u8++;
-    if(val_currentLevel.val.u8 > val_MaxLevel.val.u8)
-        val_currentLevel.val.u8 = val_MinLevel.val.u8;
+    if(mode == INCREMENT_MODE) {
+        val_currentLevel.val.u8 = val_currentLevel.val.u8++;
+        if(val_currentLevel.val.u8 > val_MaxLevel.val.u8)
+            val_currentLevel.val.u8 = val_MinLevel.val.u8;
+    }
+    else if(mode == DECREMENT_MODE) {
+        val_currentLevel.val.u8 = val_currentLevel.val.u8--;
+        if(val_currentLevel.val.u8 < val_MinLevel.val.u8)
+            val_currentLevel.val.u8 = val_MaxLevel.val.u8;
+    }
+    else if(mode == EXPLICIT_MODE) {
+        val_currentLevel.val.u8 = explicitCurrentValue;        
+    }
 
     attribute::update(endpoint_id, cluster_id, attribute_id, &val_currentLevel);    
 }
@@ -120,17 +132,25 @@ static app_driver_handle_t app_driver_PowerKeyInit()
 static void app_driver_cookingModeGrindCB(void *arg, void *data)
 {
     ESP_LOGI(TAG, "app_driver_cookingModeGrindCB");
-    app_driver_LevelControlUpdateCurrentValue(grinder_endpointID);    
+    app_driver_LevelControlUpdateCurrentValue(
+        INCREMENT_MODE, DONT_CARE, grinder_endpointID);    
+    app_driver_LevelControlUpdateCurrentValue(
+        EXPLICIT_MODE, GRINDER_MODE, cookingMode_endpointID);    
+
 }
 
 static void app_driver_CookingModeCoffeeCB(void *arg, void *data)
 {
-    
+    ESP_LOGI(TAG, "app_driver_CookingModeCoffeeCB");
+    app_driver_LevelControlUpdateCurrentValue(
+        EXPLICIT_MODE, COFFEE_MODE, cookingMode_endpointID);        
 }
 
 static void app_driver_CookingModeTeaCB(void *arg, void *data)
 {
-    
+    ESP_LOGI(TAG, "app_driver_CookingModeTeaCB");
+    app_driver_LevelControlUpdateCurrentValue(
+        EXPLICIT_MODE, TEA_MODE, cookingMode_endpointID);        
 }
 
 static app_driver_handle_t app_driver_cookingModeInit()
@@ -156,7 +176,8 @@ static app_driver_handle_t app_driver_cookingModeInit()
 static void app_driver_CupCounterKeyCB(void *arg, void *data)
 {
     ESP_LOGI(TAG, "app_driver_CupCounterKeyCB");
-    app_driver_LevelControlUpdateCurrentValue(cupCounter_endpointID);
+    app_driver_LevelControlUpdateCurrentValue(
+        INCREMENT_MODE, DONT_CARE, cupCounter_endpointID);        
 }
 
 static app_driver_handle_t app_driver_cupCounterInit()
@@ -203,10 +224,12 @@ esp_err_t create_DoneCoffeeMaker(node_t* node)
     esp_err_t err = ESP_OK;
 
     app_driver_handle_t powerKey_handle = app_driver_PowerKeyInit();    
-    generic_switch::config_t powerKey_config;
-    powerKey_config.number_of_positions = 4;
-    powerKey_config.current_position = 1 ;    
-    endpoint_t *powerKey_endpoint = generic_switch::create(node, &powerKey_config, ENDPOINT_FLAG_NONE, powerKey_handle);        
+    done_MasterPower_key::config_t powerKey_config;
+    cookingMode_config.on_off.on_off= true;    
+    powerKey_config.switch.current_position = 1;  
+    powerKey_config.switch.number_of_positions = 2;
+    powerKey_config.  
+    endpoint_t *powerKey_endpoint = done_MasterPower_key::create(node, &powerKey_config, ENDPOINT_FLAG_NONE, powerKey_handle);        
     if (!powerKey_endpoint)
     {
         ESP_LOGE(TAG, "powerKey_endpoint creation failed");
@@ -222,7 +245,7 @@ esp_err_t create_DoneCoffeeMaker(node_t* node)
     cookingMode_config.on_off.on_off= true;
     cookingMode_config.level_control.current_level = 1;
     cookingMode_config.level_control.lighting.min_level = 1;
-    cookingMode_config.level_control.lighting.max_level = 5;
+    cookingMode_config.level_control.lighting.max_level = 3;
     endpoint_t *cookingMode_endpoint = done_multiFunction_switch::create(node, &cookingMode_config, ENDPOINT_FLAG_NONE, cookingMode_handle);
     if (!cookingMode_endpoint)
     {
