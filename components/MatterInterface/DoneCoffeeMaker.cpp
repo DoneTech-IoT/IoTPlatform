@@ -116,7 +116,7 @@ static void app_driver_PowerKeyLongPressCB(void *arg, void *data)
 static app_driver_handle_t app_driver_PowerKeyInit()
 {
     app_driver_handle_t handle;
-    button_handle_t btn_handle;    
+    button_handle_t btn_handle, btn1_handle;    
 
     app_driver_InitKeyWithPressCallback(btn_handle, 
         CONFIG_DONE_COFFEE_MAKER_POWER_KEY,
@@ -126,6 +126,10 @@ static app_driver_handle_t app_driver_PowerKeyInit()
         BUTTON_LONG_PRESS_START, 
         app_driver_PowerKeyLongPressCB, NULL);
     
+    app_driver_InitKeyWithPressCallback(btn_handle, 
+        CONFIG_DONE_COFFEE_MAKER_MICRO_SWITCH,
+        app_driver_PowerKeyCB);
+
     return (app_driver_handle_t)handle;
 }
 
