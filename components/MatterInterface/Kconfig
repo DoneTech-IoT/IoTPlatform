@@ -25,6 +25,10 @@ menu "Done Matter Config"
             int "Master Power Key"
             default 1
 
+            config DONE_COFFEE_MAKER_MICRO_SWITCH
+                int "Door Micro Switch"
+                default 1
+
         config DONE_COFFEE_MAKER_COOKING_MODE_GRINDER
             int "Cooking-Mode Grinder Key"
             default 2    
