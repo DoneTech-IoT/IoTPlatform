@@ -11,9 +11,7 @@ menu "Done Matter Config"
         config DONE_MATTER_DEVICE_REFRIGERATOR
             bool "Smart Refrigerator"          
     endchoice             
-    
-    
-
+        
     menu " Device Pin Assignments" 
     depends on DONE_MATTER_DEVICE_COFFEE_MAKER
 
@@ -25,9 +23,9 @@ menu "Done Matter Config"
             int "Master Power Key"
             default 1
 
-            config DONE_COFFEE_MAKER_MICRO_SWITCH
-                int "Door Micro Switch"
-                default 1
+        config DONE_COFFEE_MAKER_MICRO_SWITCH
+            int "Door Micro Switch"
+            default 1
 
         config DONE_COFFEE_MAKER_COOKING_MODE_GRINDER
             int "Cooking-Mode Grinder Key"
