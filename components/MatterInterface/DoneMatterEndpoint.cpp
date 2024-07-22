@@ -42,9 +42,9 @@ esp_err_t add(endpoint_t *endpoint, config_t *config)
     descriptor::create(endpoint, &(config->descriptor), CLUSTER_FLAG_SERVER);
     cluster_t *identify_cluster = identify::create(endpoint, &(config->identify), CLUSTER_FLAG_SERVER);
     identify::command::create_trigger_effect(identify_cluster);    
-    switch_cluster::create(endpoint, &(config->switch_cluster), CLUSTER_FLAG_SERVER);
+    boolean_state::create(endpoint, &(config->boolean), CLUSTER_FLAG_SERVER);
     operational_state::create(endpoint, &(config->operational_state), CLUSTER_FLAG_SERVER);
-    on_off::create(endpoint, &(config->on_off), CLUSTER_FLAG_SERVER,            on_off::feature::lighting::get_id());
+    on_off::create(endpoint, &(config->on_off), CLUSTER_FLAG_SERVER,                on_off::feature::lighting::get_id());
     
     return ESP_OK;
 }    

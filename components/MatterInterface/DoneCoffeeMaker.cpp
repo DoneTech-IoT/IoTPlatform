@@ -6,6 +6,7 @@
 #include "DoneCoffeeMaker.h"
 #include "app_priv.h"
 #include "iot_button.h"
+#include "Buzzer.h"
 
 static const char *TAG = "DoneCoffeeMaker";
 uint16_t powerKey_endpointID;
@@ -18,31 +19,61 @@ using namespace esp_matter::attribute;
 using namespace esp_matter::endpoint;
 using namespace chip::app::Clusters;
 
+static void app_driver_GetAttributeValue(
+    const uint16_t &endpoint_id,
+    const uint32_t &cluster_id,
+    const uint32_t &attribute_id,
+    esp_matter_attr_val_t *attr_val)
+{
+    node_t *node = node::get();
+    endpoint_t *endpoint = endpoint::get(node, endpoint_id);
+    cluster_t *cluster = cluster::get(endpoint, cluster_id);
+    attribute_t *attribute = attribute::get(cluster, attribute_id);
+
+    attribute::get_val(attribute, val);
+}
+
+static esp_err_t app_driver_SetAttributeValue(
+    const uint16_t &endpoint_id,
+    const uint32_t &cluster_id,
+    const uint32_t &attribute_id, 
+    const esp_matter_attr_val_t &val)
+{
+    node_t *node = node::get();
+    endpoint_t *endpoint = endpoint::get(node, endpoint_id);
+    cluster_t *cluster = cluster::get(endpoint, cluster_id);
+    attribute_t *attribute = attribute::get(cluster, attribute_id);
+
+    return attribute::set_val(attribute, &val);
+}
+
 static void app_driver_LevelControlUpdateCurrentValue(
     LevelControlCurrentValueMode_t mode,
     const uint8_t &explicitCurrentValue,
     const uint16_t &endpoint_id)    
 {    
-    uint32_t cluster_id = LevelControl::Id;
-    uint32_t attribute_id = LevelControl::Attributes::CurrentLevel::Id;
-    uint32_t attMaxLevel_id = LevelControl::Attributes::MaxLevel::Id;
-    uint32_t attMinLevel_id = LevelControl::Attributes::MinLevel::Id;
-
-    node_t *node = node::get();
-    endpoint_t *endpoint = endpoint::get(node, endpoint_id);
-    cluster_t *cluster = cluster::get(endpoint, cluster_id);
-    attribute_t *attribute = attribute::get(cluster, attribute_id);
-    attribute_t *attMaxLevel = attribute::get(cluster, attMaxLevel_id);
-    attribute_t *attMinLevel = attribute::get(cluster, attMinLevel_id);
-
     esp_matter_attr_val_t val_currentLevel = esp_matter_invalid(NULL);
     esp_matter_attr_val_t val_MaxLevel = esp_matter_invalid(NULL);
     esp_matter_attr_val_t val_MinLevel = esp_matter_invalid(NULL);
 
-    attribute::get_val(attribute, &val_currentLevel);
-    attribute::get_val(attMaxLevel, &val_MaxLevel);
-    attribute::get_val(attMinLevel, &val_MinLevel);
+    app_driver_GetAttributeValue(
+        endpoint_id,
+        LevelControl::Id,
+        LevelControl::Attributes::CurrentLevel::Id,
+        &val_currentLevel);
 
+    app_driver_GetAttributeValue(
+        endpoint_id,
+        LevelControl::Id,
+        LevelControl::Attributes::MaxLevel::Id,
+        &val_MaxLevel);
+
+    app_driver_GetAttributeValue(
+        endpoint_id,
+        LevelControl::Id,
+        LevelControl::Attributes::MinLevel::Id,
+        &val_MinLevel);     
+    
     if(mode == INCREMENT_MODE) {
         val_currentLevel.val.u8 = val_currentLevel.val.u8++;
         if(val_currentLevel.val.u8 > val_MaxLevel.val.u8)
@@ -77,35 +108,33 @@ static void app_driver_InitKeyWithPressCallback(
     iot_button_register_cb(handle, BUTTON_PRESS_DOWN, callbackFunc, NULL);
 }
 
+static void app_driver_MicroSwitchCB(void *arg, void *data)
+{
+    ESP_LOGI(TAG, "app_driver_MicroSwitchCB");    
+
+    esp_matter_attr_val_t attr_val = esp_matter_invalid(NULL);
+    app_driver_GetAttributeValue(
+        powerKey_endpointID,
+        BooleanState::Id,
+        BooleanState::Attributes::StateValue::Id,
+        &attr_val);                     
+    attr_val.val.b = !attr_val.val.b;
+    attribute::update(endpoint_id, cluster_id, attribute_id, &attr_val);    
+}
+
 static void app_driver_PowerKeyCB(void *arg, void *data)
 {
     ESP_LOGI(TAG, "app_driver_PowerKeyCB");
-    uint16_t endpoint_id = powerKey_endpointID;
-    uint32_t cluster_id = Switch::Id;
-    uint32_t attribute_id = Switch::Attributes::CurrentLevel::Id;
-    uint32_t attMaxLevel_id = Switch::Attributes::MaxLevel::Id;
-    uint32_t attMinLevel_id = Switch::Attributes::MinLevel::Id;
 
-    node_t *node = node::get();
-    endpoint_t *endpoint = endpoint::get(node, endpoint_id);
-    cluster_t *cluster = cluster::get(endpoint, cluster_id);
-    attribute_t *attribute = attribute::get(cluster, attribute_id);
-    attribute_t *attMaxLevel = attribute::get(cluster, attMaxLevel_id);
-    attribute_t *attMinLevel = attribute::get(cluster, attMinLevel_id);
+    esp_matter_attr_val_t attr_val = esp_matter_invalid(NULL);
+    app_driver_GetAttributeValue(
+        powerKey_endpointID,
+        OperationalState::Id,
+        OperationalState::Attributes::StateValue::Id,
+        &attr_val);                     
+    attr_val.val.b = !attr_val.val.b;
+    attribute::update(endpoint_id, cluster_id, attribute_id, &attr_val);    
 
-    esp_matter_attr_val_t val_currentLevel = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t val_MaxLevel = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t val_MinLevel = esp_matter_invalid(NULL);
-
-    attribute::get_val(attribute, &val_currentLevel);
-    attribute::get_val(attMaxLevel, &val_MaxLevel);
-    attribute::get_val(attMinLevel, &val_MinLevel);
-
-    val_currentLevel.val.u8 = val_currentLevel.val.u8++;
-    if(val_currentLevel.val.u8 > val_MaxLevel.val.u8)
-        val_currentLevel.val.u8 = val_MinLevel.val.u8;
-
-    attribute::update(endpoint_id, cluster_id, attribute_id, &val_currentLevel);    
 }
 
 static void app_driver_PowerKeyLongPressCB(void *arg, void *data)
@@ -128,7 +157,7 @@ static app_driver_handle_t app_driver_PowerKeyInit()
     
     app_driver_InitKeyWithPressCallback(btn_handle, 
         CONFIG_DONE_COFFEE_MAKER_MICRO_SWITCH,
-        app_driver_PowerKeyCB);
+        app_driver_MicroSwitchCB);
 
     return (app_driver_handle_t)handle;
 }
@@ -229,10 +258,9 @@ esp_err_t create_DoneCoffeeMaker(node_t* node)
 
     app_driver_handle_t powerKey_handle = app_driver_PowerKeyInit();    
     done_MasterPower_key::config_t powerKey_config;
-    cookingMode_config.on_off.on_off= true;    
-    powerKey_config.switch.current_position = 1;  
-    powerKey_config.switch.number_of_positions = 2;
-    powerKey_config.  
+    powerKey_config.on_off.on_off = true;    
+    powerKey_config.boolean.state_value = false;    
+    powerKey_config.operational_state.  
     endpoint_t *powerKey_endpoint = done_MasterPower_key::create(node, &powerKey_config, ENDPOINT_FLAG_NONE, powerKey_handle);        
     if (!powerKey_endpoint)
     {
