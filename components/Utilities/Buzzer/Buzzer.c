@@ -16,10 +16,10 @@
 
 const char *TAG = "BUZZER";
 
-void BuzzerInit(void)
-{
+static void BuzzerMakeSound(int gpio_num, uint32_t freq,uint32_t duration)
+{	
     ledc_timer_config_t timer_conf;
-	timer_conf.speed_mode = GPIO_OUTPUT_SPEED;
+	timer_conf.speed_mode = LEDC_HIGH_SPEED_MODE;
 	timer_conf.duty_resolution = LEDC_TIMER_10_BIT;
 	timer_conf.timer_num  = LEDC_TIMER_0;
 	timer_conf.freq_hz    = freq;
@@ -27,7 +27,7 @@ void BuzzerInit(void)
 
 	ledc_channel_config_t ledc_conf;
 	ledc_conf.gpio_num   = gpio_num;
-	ledc_conf.speed_mode = GPIO_OUTPUT_SPEED;
+	ledc_conf.speed_mode = LEDC_HIGH_SPEED_MODE;
 	ledc_conf.channel    = LEDC_CHANNEL_0;
 	ledc_conf.intr_type  = LEDC_INTR_DISABLE;
 	ledc_conf.timer_sel  = LEDC_TIMER_0;
@@ -44,7 +44,33 @@ void BuzzerInit(void)
     ledc_update_duty(GPIO_OUTPUT_SPEED, LEDC_CHANNEL_0);    
 }
 
+static void BuzzerBiz(uin8_t count)
+{
+	for (size_t i = 0; i < count; i++)
+	{
+		BuzzerMakeSound(
+		CONFIG_DONE_GPIO_BUZZER, 
+		CONFIG_DONE_BUZZER_DEFAULT_FREQUENCY, 		
+		CONFIG_DONE_BUZZER_DEFAULT_PWM_DURATION);
+		vTaskDelay(CONFIG_DONE_BUZZER_DEFAULT_DELAY_MS / portTICK_PERIOD_MS);
+	}		
+}
+
 void BuzzerPlay(BuzzerEffect_t effectNo)
 {
-
+	switch (effectNo)
+	{
+		case ON_BIZ:
+			BuzzerBiz(ON_BIZ);
+			break;	
+		case DOUBLE_BIZ:
+			BuzzerBiz(DOUBLE_BIZ);
+			break;
+		case TRIPLE_BIZ:
+			BuzzerBiz(TRIPLE_BIZ);	
+			break;
+		case NO_EFFECT:	
+		default:
+			break;
+	}
 }

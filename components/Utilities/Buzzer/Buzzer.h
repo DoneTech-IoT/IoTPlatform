@@ -11,7 +11,6 @@ typedef enum {
     TRIPLE_BIZ = 3,
 }BuzzerEffect_t;
 
-void BuzzerInit(void);
 void BuzzerPlay(BuzzerEffect_t effectNo);
 
 #ifdef __cplusplus
