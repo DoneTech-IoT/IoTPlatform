@@ -22,7 +22,7 @@ namespace done_MasterPower_key {
 typedef struct config {
     cluster::descriptor::config_t descriptor;
     cluster::identify::config_t identify;   
-    cluster::switch_cluster::config_t switch;
+    cluster::boolean_state::config_t boolean;
     cluster::on_off::config_t on_off;    
     cluster::operational_state::config_t operational_state;
     cluster::binding::config_t binding;         
