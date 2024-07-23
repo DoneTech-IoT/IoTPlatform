@@ -24,7 +24,7 @@ typedef struct config {
     cluster::identify::config_t identify;   
     cluster::boolean_state::config_t boolean;
     cluster::on_off::config_t on_off;    
-    cluster::operational_state::config_t operational_state;
+    cluster::level_control::config_t level_control;
     cluster::binding::config_t binding;         
 } config_t;
 

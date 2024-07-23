@@ -43,8 +43,9 @@ esp_err_t add(endpoint_t *endpoint, config_t *config)
     cluster_t *identify_cluster = identify::create(endpoint, &(config->identify), CLUSTER_FLAG_SERVER);
     identify::command::create_trigger_effect(identify_cluster);    
     boolean_state::create(endpoint, &(config->boolean), CLUSTER_FLAG_SERVER);
-    operational_state::create(endpoint, &(config->operational_state), CLUSTER_FLAG_SERVER);
     on_off::create(endpoint, &(config->on_off), CLUSTER_FLAG_SERVER,                on_off::feature::lighting::get_id());
+    level_control::create(endpoint, &(config->level_control), CLUSTER_FLAG_SERVER,
+                          level_control::feature::on_off::get_id() | level_control::feature::lighting::get_id());
     
     return ESP_OK;
 }    
