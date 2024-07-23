@@ -111,7 +111,6 @@ static void app_driver_InitKeyWithPressCallback(
 static void app_driver_MicroSwitchCB(void *arg, void *data)
 {
     ESP_LOGI(TAG, "app_driver_MicroSwitchCB");    
-
     esp_matter_attr_val_t attr_val = esp_matter_invalid(NULL);
     app_driver_GetAttributeValue(
         powerKey_endpointID,
@@ -124,16 +123,83 @@ static void app_driver_MicroSwitchCB(void *arg, void *data)
 
 static void app_driver_PowerKeyCB(void *arg, void *data)
 {
-    ESP_LOGI(TAG, "app_driver_PowerKeyCB");
+    ESP_LOGI(TAG, "app_driver_PowerKeyCB");    
 
-    esp_matter_attr_val_t attr_val = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t val_currentLevel = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t val_boolean = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t val_onOff = esp_matter_invalid(NULL);
+
     app_driver_GetAttributeValue(
         powerKey_endpointID,
-        OperationalState::Id,
-        OperationalState::Attributes::StateValue::Id,
-        &attr_val);                     
-    attr_val.val.b = !attr_val.val.b;
-    attribute::update(endpoint_id, cluster_id, attribute_id, &attr_val);    
+        LevelControl::Id,
+        LevelControl::Attributes::CurrentLevel::Id,
+        &val_currentLevel);
+
+    app_driver_GetAttributeValue(
+        powerKey_endpointID,
+        BooleanState::Id,
+        BooleanState::Attributes::StateValue::Id,
+        &val_boolean);              
+
+    app_driver_GetAttributeValue(
+        powerKey_endpointID,
+        OnOff::Id,
+        OnOff::Attributes::OnOff::Id,
+        &val_onOff);              
+
+    if(!val_onOff.val.b) //when powerOff
+    {
+
+    }
+    else  
+    {  
+        app_driver_GetAttributeValue(
+        powerKey_endpointID,
+        LevelControl::Id,
+        LevelControl::Attributes::CurrentLevel::Id,
+        &val_currentLevel);
+
+        app_driver_LevelControlUpdateCurrentValue(
+            EXPLICIT_MODE, GRINDER_MODE, cookingMode_endpointID);    
+        app_driver_LevelControlUpdateCurrentValue(
+            EXPLICIT_MODE, GRINDER_MODE, cupCounter_endpointID);    
+        app_driver_LevelControlUpdateCurrentValue(
+            EXPLICIT_MODE, GRINDER_MODE, grinder_endpointID);        
+
+        val_onOff.val.b = true;
+        app_driver_SetAttributeValue(
+            powerKey_endpointID,
+            OnOff::Id,
+            OnOff::Attributes::OnOff::Id, 
+            const esp_matter_attr_val_t &val)  
+              
+    }
+
+    if(attr_val.val.b == ERROR_MODE)
+        BuzzerPlay(BuzzerEffect_t::TRIPLE_BIZ);
+    else 
+        {}
+    if(val_currentLevel.val.u8 == OFF_MODE) 
+    {        
+        
+    }
+    
+        
+
+    else if(val_currentLevel.val.u8 == ON_MODE)        
+    {   
+        
+            
+
+    }
+        app_driver_GetAttributeValue(
+        endpoint_id,
+        LevelControl::Id,
+        LevelControl::Attributes::CurrentLevel::Id,
+        &val_currentLevel);    
+    }
+        attribute::update(endpoint_id, cluster_id, attribute_id, &attr_val);    
+    
 
 }
 
@@ -169,7 +235,6 @@ static void app_driver_cookingModeGrindCB(void *arg, void *data)
         INCREMENT_MODE, DONT_CARE, grinder_endpointID);    
     app_driver_LevelControlUpdateCurrentValue(
         EXPLICIT_MODE, GRINDER_MODE, cookingMode_endpointID);    
-
 }
 
 static void app_driver_CookingModeCoffeeCB(void *arg, void *data)
@@ -258,9 +323,11 @@ esp_err_t create_DoneCoffeeMaker(node_t* node)
 
     app_driver_handle_t powerKey_handle = app_driver_PowerKeyInit();    
     done_MasterPower_key::config_t powerKey_config;
-    powerKey_config.on_off.on_off = true;    
-    powerKey_config.boolean.state_value = false;    
-    powerKey_config.operational_state.  
+    powerKey_config.on_off.on_off = false;    
+    powerKey_config.boolean.state_value = True;//MicroSwitchMode_t::NORMAL_MODE  
+    cookingMode_config.level_control.current_level = 1;
+    cookingMode_config.level_control.lighting.min_level = 1;
+    cookingMode_config.level_control.lighting.max_level = 4;      
     endpoint_t *powerKey_endpoint = done_MasterPower_key::create(node, &powerKey_config, ENDPOINT_FLAG_NONE, powerKey_handle);        
     if (!powerKey_endpoint)
     {
