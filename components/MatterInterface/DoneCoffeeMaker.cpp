@@ -128,6 +128,7 @@ static void app_driver_PowerKeyCB(void *arg, void *data)
     esp_matter_attr_val_t val_currentLevel = esp_matter_invalid(NULL);
     esp_matter_attr_val_t val_boolean = esp_matter_invalid(NULL);
     esp_matter_attr_val_t val_onOff = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t val_cookingMode = esp_matter_invalid(NULL);
 
     app_driver_GetAttributeValue(
         powerKey_endpointID,
@@ -147,65 +148,103 @@ static void app_driver_PowerKeyCB(void *arg, void *data)
         OnOff::Attributes::OnOff::Id,
         &val_onOff);              
 
-    if(!val_onOff.val.b) //when powerOff
-    {
+    app_driver_GetAttributeValue(
+        cookingMode_endpointID,
+        LevelControl::Id,
+        LevelControl::Attributes::CurrentLevel::Id,
+        &val_cookingMode);
 
+    if(val_onOff.val.b) //when powerON
+    {        
+        if (val_boolean.val.b == ERROR_MODE)
+        {
+            ESP_LOGI(TAG, "MicroSwitch Error");           
+            BuzzerPlay(BuzzerEffect_t::TRIPLE_BIZ);
+        }
+        else 
+        {
+            app_driver_LevelControlUpdateCurrentValue(
+                EXPLICIT_MODE, ON_MODE, powerKey_endpointID);    
+            //To Do: //exept for grinder
+                ESP_LOGI(TAG, "TurnOn Water Actuator");
+                ESP_LOGI(TAG, "TurnOn Heater");
+            //To Do : //register powerKeyHold callback
+
+            switch (val_cookingMode.val.u8)
+            {                
+                case GRINDER_MODE:
+                {
+                    ESP_LOGI(TAG, "GRINDER_MODE");
+                    break;
+                }
+                case COFFEE_MODE:
+                {
+                    ESP_LOGI(TAG, "COFFEE_MODE");           
+                    break;
+                }
+                case TEA_MODE:
+                {
+                    ESP_LOGI(TAG, "TEA_MODE");           
+                    break;
+                }                        
+                default:
+                    break;
+            }
+        }        
     }
-    else  
-    {  
-        app_driver_GetAttributeValue(
+    else //when powerOFF  
+    {   
+        ESP_LOGI(TAG, "Power On");       
+        val_onOff.val.b = true;
+        attribute::update(endpoint_id, cluster_id, attribute_id, &attr_val);    
+
+        //to Do
+        //turn On LCD                                     
+    } 
+}
+
+static void app_driver_PowerKeyLongPressCB(void *arg, void *data)
+{
+    ESP_LOGI(TAG, "app_driver_PowerKeyLongPressCB");    
+
+    esp_matter_attr_val_t val_currentLevel = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t val_boolean = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t val_onOff = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t val_cookingMode = esp_matter_invalid(NULL);
+
+    app_driver_GetAttributeValue(
         powerKey_endpointID,
         LevelControl::Id,
         LevelControl::Attributes::CurrentLevel::Id,
         &val_currentLevel);
 
-        app_driver_LevelControlUpdateCurrentValue(
-            EXPLICIT_MODE, GRINDER_MODE, cookingMode_endpointID);    
-        app_driver_LevelControlUpdateCurrentValue(
-            EXPLICIT_MODE, GRINDER_MODE, cupCounter_endpointID);    
-        app_driver_LevelControlUpdateCurrentValue(
-            EXPLICIT_MODE, GRINDER_MODE, grinder_endpointID);        
+    app_driver_GetAttributeValue(
+        powerKey_endpointID,
+        BooleanState::Id,
+        BooleanState::Attributes::StateValue::Id,
+        &val_boolean);              
 
-        val_onOff.val.b = true;
-        app_driver_SetAttributeValue(
-            powerKey_endpointID,
-            OnOff::Id,
-            OnOff::Attributes::OnOff::Id, 
-            const esp_matter_attr_val_t &val)  
-              
-    }
+    app_driver_GetAttributeValue(
+        powerKey_endpointID,
+        OnOff::Id,
+        OnOff::Attributes::OnOff::Id,
+        &val_onOff);              
 
-    if(attr_val.val.b == ERROR_MODE)
-        BuzzerPlay(BuzzerEffect_t::TRIPLE_BIZ);
-    else 
-        {}
-    if(val_currentLevel.val.u8 == OFF_MODE) 
-    {        
-        
-    }
-    
-        
-
-    else if(val_currentLevel.val.u8 == ON_MODE)        
-    {   
-        
-            
-
-    }
-        app_driver_GetAttributeValue(
-        endpoint_id,
+    app_driver_GetAttributeValue(
+        cookingMode_endpointID,
         LevelControl::Id,
         LevelControl::Attributes::CurrentLevel::Id,
-        &val_currentLevel);    
+        &val_cookingMode);
+
+    if (val_boolean.val.b == ERROR_MODE)
+    {
+        ESP_LOGI(TAG, "MicroSwitch Error");           
+        BuzzerPlay(BuzzerEffect_t::TRIPLE_BIZ);
+    }    
+    else 
+    {
+        if(val_currentLevel.val.u8 == ON_MODE)
     }
-        attribute::update(endpoint_id, cluster_id, attribute_id, &attr_val);    
-    
-
-}
-
-static void app_driver_PowerKeyLongPressCB(void *arg, void *data)
-{
-    
 }
 
 static app_driver_handle_t app_driver_PowerKeyInit()
@@ -328,7 +367,9 @@ esp_err_t create_DoneCoffeeMaker(node_t* node)
     cookingMode_config.level_control.current_level = 1;
     cookingMode_config.level_control.lighting.min_level = 1;
     cookingMode_config.level_control.lighting.max_level = 4;      
-    endpoint_t *powerKey_endpoint = done_MasterPower_key::create(node, &powerKey_config, ENDPOINT_FLAG_NONE, powerKey_handle);        
+    endpoint_t *powerKey_endpoint = done_MasterPower_key::create(
+        node, &powerKey_config,    
+        ENDPOINT_FLAG_NONE, powerKey_handle);                
     if (!powerKey_endpoint)
     {
         ESP_LOGE(TAG, "powerKey_endpoint creation failed");
