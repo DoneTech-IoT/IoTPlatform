@@ -18,7 +18,7 @@
 namespace esp_matter {
 namespace endpoint {
 
-namespace done_MasterPower_key {
+namespace done_MasterPowerKey {
 typedef struct config {
     cluster::descriptor::config_t descriptor;
     cluster::identify::config_t identify;   
@@ -28,7 +28,13 @@ typedef struct config {
     cluster::binding::config_t binding;         
 } config_t;
 
-namespace done_multiFunction_switch {
+uint32_t get_device_type_id();
+uint8_t get_device_type_version();
+endpoint_t *create(node_t *node, config_t *config, uint8_t flags, void *priv_data);
+esp_err_t add(endpoint_t *endpoint, config_t *config);
+}
+
+namespace done_MultiFunctionSwitch {
 typedef struct config {
     cluster::descriptor::config_t descriptor;
     cluster::identify::config_t identify;    
@@ -42,7 +48,6 @@ uint8_t get_device_type_version();
 endpoint_t *create(node_t *node, config_t *config, uint8_t flags, void *priv_data);
 esp_err_t add(endpoint_t *endpoint, config_t *config);
 }//done_multiFunction_switch
-
 
 } /* endpoint */
 } /* esp_matter */
