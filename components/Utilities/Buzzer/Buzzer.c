@@ -14,12 +14,14 @@
 #include "driver/ledc.h"
 #include "Buzzer.h"
 
-const char *TAG = "BUZZER";
+#define GPIO_OUTPUT_SPEED LEDC_LOW_SPEED_MODE
+//#define GPIO_OUTPUT_SPEED LEDC_HIGH_SPEED_MODE
+static const char *TAG = "BUZZER";
 
 static void BuzzerMakeSound(int gpio_num, uint32_t freq,uint32_t duration)
 {	
     ledc_timer_config_t timer_conf;
-	timer_conf.speed_mode = LEDC_HIGH_SPEED_MODE;
+	timer_conf.speed_mode = GPIO_OUTPUT_SPEED;
 	timer_conf.duty_resolution = LEDC_TIMER_10_BIT;
 	timer_conf.timer_num  = LEDC_TIMER_0;
 	timer_conf.freq_hz    = freq;
@@ -27,7 +29,7 @@ static void BuzzerMakeSound(int gpio_num, uint32_t freq,uint32_t duration)
 
 	ledc_channel_config_t ledc_conf;
 	ledc_conf.gpio_num   = gpio_num;
-	ledc_conf.speed_mode = LEDC_HIGH_SPEED_MODE;
+	ledc_conf.speed_mode = GPIO_OUTPUT_SPEED;
 	ledc_conf.channel    = LEDC_CHANNEL_0;
 	ledc_conf.intr_type  = LEDC_INTR_DISABLE;
 	ledc_conf.timer_sel  = LEDC_TIMER_0;
@@ -44,7 +46,7 @@ static void BuzzerMakeSound(int gpio_num, uint32_t freq,uint32_t duration)
     ledc_update_duty(GPIO_OUTPUT_SPEED, LEDC_CHANNEL_0);    
 }
 
-static void BuzzerBiz(uin8_t count)
+static void BuzzerBiz(uint8_t count)
 {
 	for (size_t i = 0; i < count; i++)
 	{

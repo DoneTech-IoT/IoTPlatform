@@ -4,6 +4,8 @@
 #ifdef __cplusplus
 extern "C"
 {    
+#endif
+
 typedef enum {
     NO_EFFECT = 0,
     ON_BIZ = 1,
