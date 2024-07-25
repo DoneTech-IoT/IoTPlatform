@@ -121,9 +121,7 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         /* Initialize driver */
         app_driver_handle_t switch_handle = app_driver_switch_init();
         app_reset_button_register(switch_handle);
-
-        // app_driver_handle_t coffee_maker_handle = app_driver_coffee_maker_init();
-
+        
         /* Create a Matter node and add the mandatory Root Node device type on endpoint 0 */
         Log_RamOccupy("Matter", "making node");
         node::config_t node_config;
@@ -134,10 +132,7 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         on_off_switch::config_t switch_config;
         endpoint_t *endpoint1 = on_off_switch::create(node, &switch_config, ENDPOINT_FLAG_NONE, switch_handle);
 
-        // Log_RamOccupy("Matter", "making endpoint");
-        // done_coffee_maker::config_t coffee_maker_config;
-        // endpoint_t *endpoint2 = done_coffee_maker::create(node, &coffee_maker_config, ENDPOINT_FLAG_NONE, NULL /*coffee_maker_handle*/);                
-
+        Log_RamOccupy("Matter", "making endpoint");        
         err = create_DoneCoffeeMaker(node);        
 
         /* These node and endpoint handles can be used to create/add other endpoints and clusters. */
@@ -154,12 +149,8 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         cluster::groups::create(endpoint1, &groups_config, CLUSTER_FLAG_SERVER | CLUSTER_FLAG_CLIENT);
 
         switch_endpoint_id = endpoint::get_id(endpoint1);
-        ESP_LOGI(TAG, "Switch created with endpoint_id %d", switch_endpoint_id);
-
-        // coffee_maker_endpoint_id = endpoint::get_id(endpoint2);
-        // ESP_LOGI(TAG, "Coffee Maker created with endpoint_id %d", coffee_maker_endpoint_id);
+        ESP_LOGI(TAG, "Switch created with endpoint_id %d", switch_endpoint_id);        
                
-
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         /* Set OpenThread platform config */
         esp_openthread_platform_config_t config = {
