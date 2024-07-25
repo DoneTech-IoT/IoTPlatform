@@ -106,68 +106,6 @@ static esp_err_t app_attribute_update_cb(callback_type_t type, uint16_t endpoint
     return err;        
 }
 
-static esp_err_t create_button(node_t* node, struct gpio_button* button, void* button_handler)
-{
-    esp_err_t err = ESP_OK;
-
-    /* Initialize driver */
-    app_driver_handle_t button_handle = app_driver_button_init(button);
-
-    /* Create a new endpoint. */
-    generic_switch::config_t switch_config;
-    endpoint_t *endpoint = generic_switch::create(node, &switch_config, ENDPOINT_FLAG_NONE, button_handle);
-
-    /* These node and endpoint handles can be used to create/add other endpoints and clusters. */
-    if (!node || !endpoint)
-    {
-        ESP_LOGE(TAG, "Matter node creation failed");
-        err = ESP_FAIL;
-        return err;
-    }
-
-    for (int i = 0; i < configured_buttons; i++) {
-        if (button_list[i].button == button) {
-            break;
-        }
-    }
-
-    /* Check for maximum physical buttons that can be configured. */
-    if (configured_buttons <CONFIG_MAX_CONFIGURABLE_BUTTONS) {
-        button_list[configured_buttons].button = button;
-        button_list[configured_buttons].endpoint = endpoint::get_id(endpoint);
-        configured_buttons++;
-    }
-    else
-    {
-        ESP_LOGI(TAG, "Cannot configure more buttons");
-        err = ESP_FAIL;
-        return err;
-    }
-
-    static uint16_t generic_switch_endpoint_id = 0;
-    generic_switch_endpoint_id = endpoint::get_id(endpoint);
-    ESP_LOGI(TAG, "Generic Switch created with endpoint_id %d", generic_switch_endpoint_id);
-
-    cluster::fixed_label::config_t fl_config;
-    cluster_t *fl_cluster = cluster::fixed_label::create(endpoint, &fl_config, CLUSTER_FLAG_SERVER);
-
-    cluster::user_label::config_t ul_config;
-    cluster_t *ul_cluster = cluster::user_label::create(endpoint, &ul_config, CLUSTER_FLAG_SERVER);
-
-    /* Add additional features to the node */
-    cluster_t *cluster = cluster::get(endpoint, Switch::Id);
-
-#if CONFIG_GENERIC_SWITCH_TYPE_LATCHING
-    cluster::switch_cluster::feature::latching_switch::add(cluster);
-#endif
-
-#if CONFIG_GENERIC_SWITCH_TYPE_MOMENTARY
-    cluster::switch_cluster::feature::momentary_switch::add(cluster);
-#endif
-
-    return err;
-}
-
 bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
 {
     InterfaceHandler = MatterInterfaceHandler;
