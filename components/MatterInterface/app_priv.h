@@ -16,22 +16,6 @@
 #include "esp_openthread_types.h"
 #endif
 
-struct gpio_button
-{
-      gpio_num_t GPIO_PIN_VALUE;
-};
-
-struct button_endpoint
-{
-    gpio_button* button;
-    uint16_t endpoint;
-};
-
-#define CONFIG_MAX_CONFIGURABLE_BUTTONS 3
-static uint16_t configured_buttons = 0;
-static button_endpoint button_list[CONFIG_MAX_CONFIGURABLE_BUTTONS];
-
-int get_endpoint(gpio_button* button);
 typedef void *app_driver_handle_t;
 typedef void *button_handle_t;
 
@@ -44,17 +28,6 @@ typedef void *button_handle_t;
  */
 app_driver_handle_t app_driver_switch_init();
 app_driver_handle_t app_driver_coffee_maker_init();
-
-/** Initialize the button driver
- *
- * This initializes the button driver associated with the selected board.
- *
- * @param[in] button Pointer to `gpio_button`.For boot button value is NULL.
- *
- * @return Handle on success.
- * @return NULL in case of failure.
- */
-app_driver_handle_t app_driver_button_init(gpio_button *button = NULL);
 
 /** Driver Update
  *
