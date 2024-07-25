@@ -30,21 +30,7 @@ static void app_driver_GetAttributeValue(
     cluster_t *cluster = cluster::get(endpoint, cluster_id);
     attribute_t *attribute = attribute::get(cluster, attribute_id);
 
-    attribute::get_val(attribute, val);
-}
-
-static esp_err_t app_driver_SetAttributeValue(
-    const uint16_t &endpoint_id,
-    const uint32_t &cluster_id,
-    const uint32_t &attribute_id, 
-    const esp_matter_attr_val_t &val)
-{
-    node_t *node = node::get();
-    endpoint_t *endpoint = endpoint::get(node, endpoint_id);
-    cluster_t *cluster = cluster::get(endpoint, cluster_id);
-    attribute_t *attribute = attribute::get(cluster, attribute_id);
-
-    return attribute::set_val(attribute, &val);
+    attribute::get_val(attribute, attr_val);
 }
 
 static void app_driver_LevelControlUpdateCurrentValue(
@@ -75,12 +61,12 @@ static void app_driver_LevelControlUpdateCurrentValue(
         &val_MinLevel);     
     
     if(mode == INCREMENT_MODE) {
-        val_currentLevel.val.u8 = val_currentLevel.val.u8++;
+        val_currentLevel.val.u8 += 1;
         if(val_currentLevel.val.u8 > val_MaxLevel.val.u8)
             val_currentLevel.val.u8 = val_MinLevel.val.u8;
     }
     else if(mode == DECREMENT_MODE) {
-        val_currentLevel.val.u8 = val_currentLevel.val.u8--;
+        val_currentLevel.val.u8 -= 1;
         if(val_currentLevel.val.u8 < val_MinLevel.val.u8)
             val_currentLevel.val.u8 = val_MaxLevel.val.u8;
     }
@@ -88,7 +74,10 @@ static void app_driver_LevelControlUpdateCurrentValue(
         val_currentLevel.val.u8 = explicitCurrentValue;        
     }
 
-    attribute::update(endpoint_id, cluster_id, attribute_id, &val_currentLevel);    
+    attribute::update(endpoint_id, 
+        LevelControl::Id, 
+        LevelControl::Attributes::CurrentLevel::Id, 
+        &val_currentLevel);    
 }
 
 static void app_driver_InitKeyWithPressCallback(
@@ -118,7 +107,8 @@ static void app_driver_MicroSwitchCB(void *arg, void *data)
         BooleanState::Attributes::StateValue::Id,
         &attr_val);                     
     attr_val.val.b = !attr_val.val.b;
-    attribute::update(endpoint_id, cluster_id, attribute_id, &attr_val);    
+    attribute::update(powerKey_endpointID, BooleanState::Id, 
+        BooleanState::Attributes::StateValue::Id, &attr_val);
 }
 
 static void app_driver_PowerKeyCB(void *arg, void *data)
@@ -196,7 +186,7 @@ static void app_driver_PowerKeyCB(void *arg, void *data)
     {   
         ESP_LOGI(TAG, "Power On");       
         val_onOff.val.b = true;
-        attribute::update(endpoint_id, cluster_id, attribute_id, &attr_val);    
+        //attribute::update(endpoint_id, cluster_id, attribute_id, &attr_val);    
 
         //to Do
         //turn On LCD                                     
@@ -244,13 +234,16 @@ static void app_driver_PowerKeyLongPressCB(void *arg, void *data)
     else 
     {
         if(val_currentLevel.val.u8 == ON_MODE)
+        {
+
+        }
     }
 }
 
 static app_driver_handle_t app_driver_PowerKeyInit()
 {
     app_driver_handle_t handle;
-    button_handle_t btn_handle, btn1_handle;    
+    button_handle_t btn_handle;    
 
     app_driver_InitKeyWithPressCallback(btn_handle, 
         CONFIG_DONE_COFFEE_MAKER_POWER_KEY,
@@ -363,10 +356,10 @@ esp_err_t create_DoneCoffeeMaker(node_t* node)
     app_driver_handle_t powerKey_handle = app_driver_PowerKeyInit();    
     done_MasterPower_key::config_t powerKey_config;
     powerKey_config.on_off.on_off = false;    
-    powerKey_config.boolean.state_value = True;//MicroSwitchMode_t::NORMAL_MODE  
-    cookingMode_config.level_control.current_level = 1;
-    cookingMode_config.level_control.lighting.min_level = 1;
-    cookingMode_config.level_control.lighting.max_level = 4;      
+    powerKey_config.boolean.state_value = true;//MicroSwitchMode_t::NORMAL_MODE  
+    powerKey_config.level_control.current_level = 1;
+    powerKey_config.level_control.lighting.min_level = 1;
+    powerKey_config.level_control.lighting.max_level = 4;      
     endpoint_t *powerKey_endpoint = done_MasterPower_key::create(
         node, &powerKey_config,    
         ENDPOINT_FLAG_NONE, powerKey_handle);                
@@ -397,13 +390,12 @@ esp_err_t create_DoneCoffeeMaker(node_t* node)
         ESP_LOGI(TAG, "cookingMode_endpoint created with endpoint_id %d", cookingMode_endpointID);
     }
 
-    app_driver_handle_t grinder_handle = app_driver_grinderInit();
     done_multiFunction_switch::config_t grinder_config;
     grinder_config.on_off.on_off= true;        
     grinder_config.level_control.current_level = 1;
     grinder_config.level_control.lighting.min_level = 1;
     grinder_config.level_control.lighting.max_level = 3;
-    endpoint_t *grinder_endpoint = done_multiFunction_switch::create(node, &grinder_config, ENDPOINT_FLAG_NONE, grinder_handle);
+    endpoint_t *grinder_endpoint = done_multiFunction_switch::create(node, &grinder_config,         ENDPOINT_FLAG_NONE, NULL);
     if (!grinder_endpoint)
     {
         ESP_LOGE(TAG, "grinder_endpoint creation failed");
