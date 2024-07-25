@@ -27,47 +27,71 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
     {
     case chip::DeviceLayer::DeviceEventType::kInterfaceIpAddressChanged:
     {
-        ESP_LOGI(TAG, "Interface IP Address Changed");
+        chip::CommissioningWindowManager &commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
+        if (!commissionMgr.IsCommissioningWindowOpen())
+        {
+            if (InterfaceHandler->ConnectToMatterNetwork != NULL)
+                InterfaceHandler->ConnectToMatterNetwork();
+        }
         Log_RamStatus("Matter", "Interface IP Address Changed");
+        ESP_LOGW(TAG, "Interface IP Address changed");
         break;
     }
-
     case chip::DeviceLayer::DeviceEventType::kCommissioningComplete:
-    {
-        ESP_LOGI(TAG, "Commissioning complete");
+        ESP_LOGW(TAG, "Commissioning complete");
         Log_RamStatus("Matter", "Commissioning complete");
         break;
-    }
+
     case chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired:
-    {
-        ESP_LOGI(TAG, "Commissioning failed, fail safe timer expired");
+        ESP_LOGW(TAG, "Commissioning failed, fail safe timer expired");
         Log_RamStatus("Matter", "Commissioning failed");
         break;
-    }
+
     case chip::DeviceLayer::DeviceEventType::kCommissioningSessionStarted:
-    {
-        ESP_LOGI(TAG, "Commissioning session started");
+        Log_RamStatus("Matter", "Commissioning started");
+        ESP_LOGW(TAG, "Commissioning session started");
+        break;
+
+    case chip::DeviceLayer::DeviceEventType::kCommissioningSessionStopped:
+        ESP_LOGW(TAG, "Commissioning session stopped");
         Log_RamStatus("Matter", "Commissioning started");
         break;
-    }
-    case chip::DeviceLayer::DeviceEventType::kCommissioningSessionStopped:
-    {
-        ESP_LOGI(TAG, "Commissioning session stopped");
-        Log_RamStatus("Matter", "Commissioning stopped");
-        break;
-    }
+
     case chip::DeviceLayer::DeviceEventType::kCommissioningWindowOpened:
-    {
-        ESP_LOGI(TAG, "Commissioning window opened");
         Log_RamStatus("Matter", "Commissioning window opened");
+        ESP_LOGW(TAG, "Commissioning window opened");
         break;
-    }
+
     case chip::DeviceLayer::DeviceEventType::kCommissioningWindowClosed:
-    {
-        ESP_LOGI(TAG, "Commissioning window closed");
         Log_RamStatus("Matter", "Commissioning window closed");
+        ESP_LOGW(TAG, "Commissioning window closed");
         break;
-    }
+
+    case chip::DeviceLayer::DeviceEventType::kFabricRemoved:
+        Log_RamStatus("Matter", "Fabric removed successfully");
+        ESP_LOGW(TAG, "Fabric removed successfully");
+        break;
+
+    case chip::DeviceLayer::DeviceEventType::kFabricWillBeRemoved:
+        Log_RamStatus("Matter", "Fabric will be removed");
+        ESP_LOGW(TAG, "Fabric will be removed");
+        break;
+
+    case chip::DeviceLayer::DeviceEventType::kFabricUpdated:
+        Log_RamStatus("Matter", "Fabric is updated");
+        ESP_LOGW(TAG, "Fabric is updated");
+        break;
+
+    case chip::DeviceLayer::DeviceEventType::kFabricCommitted:
+        Log_RamStatus("Matter", "Fabric is committed");
+        ESP_LOGW(TAG, "Fabric is committed");
+        InterfaceHandler->ConnectToMatterNetwork();
+        break;
+
+    case chip::DeviceLayer::DeviceEventType::kBLEDeinitialized:
+        Log_RamStatus("Matter", "BLE deinitialized");
+        ESP_LOGW(TAG, "BLE deinitialized and memory reclaimed");
+        break;
     default:
         break;
     }
