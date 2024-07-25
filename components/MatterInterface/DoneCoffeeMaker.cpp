@@ -354,13 +354,13 @@ esp_err_t create_DoneCoffeeMaker(node_t* node)
     esp_err_t err = ESP_OK;
 
     app_driver_handle_t powerKey_handle = app_driver_PowerKeyInit();    
-    done_MasterPower_key::config_t powerKey_config;
+    done_MasterPowerKey::config_t powerKey_config;
     powerKey_config.on_off.on_off = false;    
     powerKey_config.boolean.state_value = true;//MicroSwitchMode_t::NORMAL_MODE  
     powerKey_config.level_control.current_level = 1;
     powerKey_config.level_control.lighting.min_level = 1;
     powerKey_config.level_control.lighting.max_level = 4;      
-    endpoint_t *powerKey_endpoint = done_MasterPower_key::create(
+    endpoint_t *powerKey_endpoint = done_MasterPowerKey::create(
         node, &powerKey_config,    
         ENDPOINT_FLAG_NONE, powerKey_handle);                
     if (!powerKey_endpoint)
@@ -374,12 +374,12 @@ esp_err_t create_DoneCoffeeMaker(node_t* node)
     }
 
     app_driver_handle_t cookingMode_handle = app_driver_cookingModeInit();    
-    done_multiFunction_switch::config_t cookingMode_config;
+    done_MultiFunctionSwitch::config_t cookingMode_config;
     cookingMode_config.on_off.on_off= true;
     cookingMode_config.level_control.current_level = 1;
     cookingMode_config.level_control.lighting.min_level = 1;
     cookingMode_config.level_control.lighting.max_level = 3;
-    endpoint_t *cookingMode_endpoint = done_multiFunction_switch::create(node, &cookingMode_config, ENDPOINT_FLAG_NONE, cookingMode_handle);
+    endpoint_t *cookingMode_endpoint = done_MultiFunctionSwitch::create(node, &cookingMode_config, ENDPOINT_FLAG_NONE, cookingMode_handle);
     if (!cookingMode_endpoint)
     {
         ESP_LOGE(TAG, "cookingMode_endpoint creation failed");
@@ -390,12 +390,12 @@ esp_err_t create_DoneCoffeeMaker(node_t* node)
         ESP_LOGI(TAG, "cookingMode_endpoint created with endpoint_id %d", cookingMode_endpointID);
     }
 
-    done_multiFunction_switch::config_t grinder_config;
+    done_MultiFunctionSwitch::config_t grinder_config;
     grinder_config.on_off.on_off= true;        
     grinder_config.level_control.current_level = 1;
     grinder_config.level_control.lighting.min_level = 1;
     grinder_config.level_control.lighting.max_level = 3;
-    endpoint_t *grinder_endpoint = done_multiFunction_switch::create(node, &grinder_config,         ENDPOINT_FLAG_NONE, NULL);
+    endpoint_t *grinder_endpoint = done_MultiFunctionSwitch::create(node, &grinder_config,         ENDPOINT_FLAG_NONE, NULL);
     if (!grinder_endpoint)
     {
         ESP_LOGE(TAG, "grinder_endpoint creation failed");
@@ -407,12 +407,12 @@ esp_err_t create_DoneCoffeeMaker(node_t* node)
     }
 
     app_driver_handle_t cupCounter_handle = app_driver_cupCounterInit();
-    done_multiFunction_switch::config_t cupCounter_config;
+    done_MultiFunctionSwitch::config_t cupCounter_config;
     cupCounter_config.on_off.on_off= true;        
     cupCounter_config.level_control.current_level = 2;
     cupCounter_config.level_control.lighting.min_level = 2;
     cupCounter_config.level_control.lighting.max_level = 6;
-    endpoint_t *cupCounter_endpoint = done_multiFunction_switch::create(node, &cupCounter_config, ENDPOINT_FLAG_NONE, cupCounter_handle);
+    endpoint_t *cupCounter_endpoint = done_MultiFunctionSwitch::create(node, &cupCounter_config, ENDPOINT_FLAG_NONE, cupCounter_handle);
     if (!cupCounter_endpoint)
     {
         ESP_LOGE(TAG, "cupCounter_endpoint creation failed");
