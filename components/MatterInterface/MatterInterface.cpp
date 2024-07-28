@@ -19,8 +19,10 @@ using namespace esp_matter::attribute;
 using namespace esp_matter::endpoint;
 using namespace chip::app::Clusters;
 
-uint16_t switch_endpoint_id = 0;
-
+/** 
+ * @brief Matter App. event callback
+ * @param[in] event Matter stack internal event.
+ */
 static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
 {
     switch (event->Type)
@@ -96,8 +98,20 @@ static void app_event_cb(const ChipDeviceEvent *event, intptr_t arg)
         break;
     }
 }
-static esp_err_t app_identification_cb(identification::callback_type_t type, uint16_t endpoint_id, uint8_t effect_id,
-                                       uint8_t effect_variant, void *priv_data)
+
+/** 
+ * @brief Matter identification callback
+ * @param[in] type identification callback type
+ * @param[in] endpoint_id endpoint id
+ * @param[in] effect_id 
+ * @param[in] effect_variant 
+ * @param[in] priv_data 
+ * @return ESP_OK on success.
+ * @return error in case of failure.
+ */
+static esp_err_t app_identification_cb(
+    identification::callback_type_t type, uint16_t endpoint_id, 
+    uint8_t effect_id,uint8_t effect_variant, void *priv_data)
 {
     ESP_LOGI(TAG, "Identification callback: type: %u, effect: %u, variant: %u", type, effect_id, effect_variant);
 
@@ -106,30 +120,47 @@ static esp_err_t app_identification_cb(identification::callback_type_t type, uin
     return ESP_OK;
 }
 
-static esp_err_t app_attribute_update_cb(callback_type_t type, uint16_t endpoint_id, uint32_t cluster_id,
-                                         uint32_t attribute_id, esp_matter_attr_val_t *val, void *priv_data)
+/**
+ * @brief This API should be called to update the driver for the attribute being updated.
+ * This is usually called from the common `app_attribute_update_cb()`.
+ * @param[in] endpoint_id Endpoint ID of the attribute.
+ * @param[in] cluster_id Cluster ID of the attribute.
+ * @param[in] attribute_id Attribute ID of the attribute.
+ * @param[in] val Pointer to `esp_matter_attr_val_t`. Use appropriate elements as per the value type.
+ * @return ESP_OK on success.
+ * @return error in case of failure.
+ */
+static esp_err_t app_attribute_update_cb(callback_type_t type, 
+    uint16_t endpoint_id, uint32_t cluster_id,                                         
+    uint32_t attribute_id, esp_matter_attr_val_t *val, void *priv_data)
 {
      esp_err_t err = ESP_OK;
 
-    if (type == PRE_UPDATE) {//update before save in database(usually drivers)
+    if (type == PRE_UPDATE)//update before save in database(usually drivers)
+    {
         app_driver_handle_t driver_handle = (app_driver_handle_t)priv_data;
-        err = app_driver_attribute_update(driver_handle, endpoint_id, cluster_id, attribute_id, val);
+#ifdef CONFIG_DONE_MATTER_DEVICE_COFFEE_MAKER            
+        err = DoneCoffeeMakerAttributeUpdate(
+                driver_handle, endpoint_id, 
+                cluster_id, attribute_id, val);
+#endif                
     }
-    if (type == POST_UPDATE) {//update after save in database
-        
-    }
-    if (type == READ) {
-        
-    }
-    if (type == WRITE) {
-        
-    }
+    if (type == POST_UPDATE) 
+    {
+        //TODO: update after save in database
+    }    
 
     InterfaceHandler->MatterAttributeUpdateCB(type, endpoint_id, cluster_id, attribute_id, val, priv_data);
     
     return err;        
 }
 
+/** 
+ * @brief this API call from app_main to create main task of Matter
+ * @param[in] MatterInterfaceHandler Matter task handler
+ * @return ESP_OK on success.
+ * @return error in case of failure.
+ */
 bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
 {
     InterfaceHandler = MatterInterfaceHandler;
@@ -141,39 +172,22 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
         InterfaceHandler->MatterAttributeUpdateCB != NULL)
     {
         Log_RamStatus("Matter", "Start Matter");
-        esp_err_t err = ESP_OK;
-        /* Initialize driver */
-        app_driver_handle_t switch_handle = app_driver_switch_init();
-        app_reset_button_register(switch_handle);
+        esp_err_t err = ESP_OK;        
         
         /* Create a Matter node and add the mandatory Root Node device type on endpoint 0 */
         Log_RamOccupy("Matter", "making node");
         node::config_t node_config;
         node_t *node = node::create(&node_config, app_attribute_update_cb, app_identification_cb);
-        Log_RamOccupy("Matter", "making node");
-
-        Log_RamOccupy("Matter", "making endpoint");
-        on_off_switch::config_t switch_config;
-        endpoint_t *endpoint1 = on_off_switch::create(node, &switch_config, ENDPOINT_FLAG_NONE, switch_handle);
-
-        Log_RamOccupy("Matter", "making endpoint");        
-        err = create_DoneCoffeeMaker(node);        
-
-        /* These node and endpoint handles can be used to create/add other endpoints and clusters. */
-        if (!node || !endpoint1)
+        Log_RamOccupy("Matter", "making node");        
+        if (!node)
         {
             ESP_LOGE(TAG, "Matter node creation failed");
-        }
+        }         
 
-        // SEZ@Done on_off_switch doesn't have group user by default.
-        // so add it manually.
-
-        /* Add group cluster to the switch endpoint */
-        cluster::groups::config_t groups_config;
-        cluster::groups::create(endpoint1, &groups_config, CLUSTER_FLAG_SERVER | CLUSTER_FLAG_CLIENT);
-
-        switch_endpoint_id = endpoint::get_id(endpoint1);
-        ESP_LOGI(TAG, "Switch created with endpoint_id %d", switch_endpoint_id);        
+#ifdef CONFIG_DONE_MATTER_DEVICE_COFFEE_MAKER            
+        Log_RamOccupy("Matter", "making endpoint");        
+        err = DoneCoffeeMakerCreate(node);        
+#endif                   
                
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         /* Set OpenThread platform config */
@@ -203,7 +217,6 @@ bool Matter_TaskInit(MatterInterfaceHandler_t *MatterInterfaceHandler)
 
         ESP_LOGI(TAG, "Matter app initiated successfully");
     }
-
     else
     {
         ESP_LOGW(TAG, "Matter is already initiated");
