@@ -152,7 +152,7 @@ static esp_err_t app_attribute_update_cb(callback_type_t type,
 
     InterfaceHandler->MatterAttributeUpdateCB(type, endpoint_id, cluster_id, attribute_id, val, priv_data);
     
-    return err;        
+    return err;  
 }
 
 /** 
