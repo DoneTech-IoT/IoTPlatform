@@ -32,7 +32,7 @@ uint32_t get_device_type_id();
 uint8_t get_device_type_version();
 endpoint_t *create(node_t *node, config_t *config, uint8_t flags, void *priv_data);
 esp_err_t add(endpoint_t *endpoint, config_t *config);
-}
+}//done_MasterPowerKey
 
 namespace done_MultiFunctionSwitch {
 typedef struct config {
@@ -47,7 +47,7 @@ uint32_t get_device_type_id();
 uint8_t get_device_type_version();
 endpoint_t *create(node_t *node, config_t *config, uint8_t flags, void *priv_data);
 esp_err_t add(endpoint_t *endpoint, config_t *config);
-}//done_multiFunction_switch
+}//done_MultiFunctionSwitch
 
 } /* endpoint */
 } /* esp_matter */
