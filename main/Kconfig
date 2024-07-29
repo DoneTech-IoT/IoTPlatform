@@ -33,7 +33,11 @@ menu "Done Main Config"
 
         config DONE_COMPONENT_MATTER
             bool "Matter component"        
-            default y        
+            default y   
+            
+            config DONE_COMPONENT_MQTT
+                bool "MQTT component"        
+                default y            
 
         config DONE_LOG
             bool "Log Utility"        

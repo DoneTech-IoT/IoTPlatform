@@ -8,7 +8,16 @@
 #include "MatterInterface.h"
 #include "ServiceManger.h"
 #include "Custom_Log.h"
+#ifdef CONFIG_DONE_COMPONENT_MQTT
+#include "MQTT_Interface.h"
+#endif
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
+
+#ifdef CONFIG_DONE_COMPONENT_MQTT
+QueueHandle_t MQTTDataFromBrokerQueue;
+SemaphoreHandle_t MQTTConnectedSemaphore;
+SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
+#endif
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
 QueueHandle_t MatterBufQueue;
@@ -16,7 +25,7 @@ SemaphoreHandle_t MatterSemaphore = NULL;
 MatterInterfaceHandler_t MatterInterfaceHandler;
 #endif
 // ****************************** GLobal Variables ****************************** //
-static const char *TAG = "Main";       
+static const char *TAG = "Main";
 
 #ifdef CONFIG_DONE_COMPONENT_SPOTIFY
 SpotifyInterfaceHandler_t SpotifyInterfaceHandler;
@@ -56,7 +65,7 @@ void SpotifyPeriodicTimer(TimerHandle_t xTimer)
                             SpotifyInterfaceHandler.PlaybackInfo->Progress,
                             SpotifyInterfaceHandler.CoverPhoto);
     ESP_LOGI(TAG, "Playback info updated");
-#endif    
+#endif
 }
 void IRAM_ATTR BackBottomCallBack_(void *arg, void *data)
 {
@@ -120,7 +129,7 @@ extern "C" void app_main()
     vTaskDelay(pdMS_TO_TICKS(5000));
     Log_RamOccupy("main", "Matter usage");
     Log_RamOccupy("main", "spotify");
-  
+
     SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
     SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
     Spotify_TaskInit(&SpotifyInterfaceHandler);
@@ -128,7 +137,38 @@ extern "C" void app_main()
     vTaskDelay(pdMS_TO_TICKS(3000));
 
     Log_RamOccupy("main", "spotify");
+#ifdef CONFIG_DONE_COMPONENT_MQTT
+    static PublishConfig_str PublishConfig;
+    static SubscriptionConfig_str SubscriptionConfig;
+    static MQTT_Configuration_str Interface;
 
+    SubscriptionConfig.Qos = 1;
+    SubscriptionConfig.Retain = 0;
+    strcpy(SubscriptionConfig.Topic, "test/azmon/bib");
+
+    PublishConfig.Qos = 1;
+    PublishConfig.Retain = 0;
+    strcpy(PublishConfig.Topic, "test/azmon/bib");
+
+    Interface.ClientID = 2225;
+    Interface.PublishConfig = &PublishConfig;
+    Interface.SubscriptionConfig = &SubscriptionConfig;
+
+    Interface.ConnectedSemaphore = &MQTTConnectedSemaphore;
+    Interface.DataFromBrokerQueue = &MQTTDataFromBrokerQueue;
+    Interface.ErrorOrDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
+#endif
+    esp_err_t error;
+
+    error = MQTT_Init(&Interface);
+    if (error == ESP_OK)
+    {
+        ESP_LOGI(TAG, "MQTT Inited!");
+    }
+    else if (error == ESP_FAIL)
+    {
+        ESP_LOGE(TAG, "MQTT iit fail!");
+    }
     if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
     {
         bool CommandResult = false;
@@ -150,7 +190,7 @@ extern "C" void app_main()
             }
         }
     }
-#endif    
+#endif
 }
 
 void MatterAttributeUpdateCBMain(
