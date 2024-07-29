@@ -9,7 +9,7 @@ namespace esp_matter {
 using namespace cluster;
 namespace endpoint {
 
-namespace done_MasterPowerKey {
+namespace DoneMasterPowerKey {
 uint32_t get_device_type_id()
 {
     return ESP_MATTER_DONE_MASTER_POWER_KEY_DEVICE_TYPE_ID;
@@ -49,9 +49,9 @@ esp_err_t add(endpoint_t *endpoint, config_t *config)
     
     return ESP_OK;
 }    
-}//done_MasterPowerKey
+}//DoneMasterPowerKey
 
-namespace done_MultiFunctionSwitch {
+namespace DoneMultiFunctionSwitch {
 uint32_t get_device_type_id()
 {
     return ESP_MATTER_DONE_MULTI_FUNCTION_SWITCH_DEVICE_TYPE_ID;
@@ -90,6 +90,6 @@ esp_err_t add(endpoint_t *endpoint, config_t *config)
 
     return ESP_OK;
 }    
-}//done_multiFunction_switch
+}//DoneMultiFunctionSwitch
 } /* endpoint */
 } /* esp_matter */

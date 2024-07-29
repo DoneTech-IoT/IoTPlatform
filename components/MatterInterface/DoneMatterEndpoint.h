@@ -18,7 +18,7 @@
 namespace esp_matter {
 namespace endpoint {
 
-namespace done_MasterPowerKey {
+namespace DoneMasterPowerKey {
 typedef struct config {
     cluster::descriptor::config_t descriptor;
     cluster::identify::config_t identify;   
@@ -34,7 +34,7 @@ endpoint_t *create(node_t *node, config_t *config, uint8_t flags, void *priv_dat
 esp_err_t add(endpoint_t *endpoint, config_t *config);
 }//done_MasterPowerKey
 
-namespace done_MultiFunctionSwitch {
+namespace DoneMultiFunctionSwitch {
 typedef struct config {
     cluster::descriptor::config_t descriptor;
     cluster::identify::config_t identify;    

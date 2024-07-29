@@ -466,13 +466,13 @@ esp_err_t DoneCoffeeMakerCreate(node_t* Node)
     esp_err_t err = ESP_OK;
 
     app_driver_handle_t powerKeyHandle = PowerKeyInit();    
-    done_MasterPowerKey::config_t powerKeyConfig;
+    DoneMasterPowerKey::config_t powerKeyConfig;
     powerKeyConfig.on_off.on_off = true;//for powerOn when Plug in Powerline.  
     powerKeyConfig.boolean.state_value = true;//MicroSwitchMode_t::NORMAL_MODE  
     powerKeyConfig.level_control.current_level = STANDBY_MODE;
     powerKeyConfig.level_control.lighting.min_level = 1;
     powerKeyConfig.level_control.lighting.max_level = 3;      
-    endpoint_t *powerKeyEndpoint = done_MasterPowerKey::create(
+    endpoint_t *powerKeyEndpoint = DoneMasterPowerKey::create(
         Node, &powerKeyConfig,    
         ENDPOINT_FLAG_NONE, powerKeyHandle);                
     if (!powerKeyEndpoint)
@@ -486,12 +486,12 @@ esp_err_t DoneCoffeeMakerCreate(node_t* Node)
     }
 
     app_driver_handle_t cookingModeHandle = CookingModeInit();    
-    done_MultiFunctionSwitch::config_t CookingModeConfig;
+    DoneMultiFunctionSwitch::config_t CookingModeConfig;
     CookingModeConfig.on_off.on_off= true;
     CookingModeConfig.level_control.current_level = GRINDER_MODE;
     CookingModeConfig.level_control.lighting.min_level = 1;
     CookingModeConfig.level_control.lighting.max_level = 3;
-    endpoint_t *cookingModeEndpoint = done_MultiFunctionSwitch::create(Node, &CookingModeConfig, ENDPOINT_FLAG_NONE, cookingModeHandle);
+    endpoint_t *cookingModeEndpoint = DoneMultiFunctionSwitch::create(Node, &CookingModeConfig, ENDPOINT_FLAG_NONE, cookingModeHandle);
     if (!cookingModeEndpoint)
     {
         ESP_LOGE(TAG, "cookingModeEndpoint creation failed");
