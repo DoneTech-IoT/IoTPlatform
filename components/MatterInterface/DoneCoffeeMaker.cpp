@@ -42,7 +42,7 @@ static void GetAttributeValue(
 }
 
 /**
- * @brief change level contron current value attr.
+ * @brief change levelControl current value attr.
  * @param[in] mode mode of changing current value attr.
  * @param[in] explicitCurrentValue get direct value to currentValue Attr.
  * @param[in] endpoint_id Attribute ID of the attribute.
@@ -97,7 +97,7 @@ static void LevelControlUpdateCurrentValue(
 /**
  * @brief init a key and register Press callback
  * @param[in] handle handler
- * @param[in] gpioPin button gpio num
+ * @param[in] gpioPin gpio pin for button 
  * @param[in] callbackFunc callback for Press event 
  */
 static void InitKeyWithPressCallback(
