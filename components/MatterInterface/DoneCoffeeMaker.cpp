@@ -14,6 +14,8 @@ uint16_t CookingModeEndpointID;
 uint16_t GrinderEndpointID;
 uint16_t CupCounterEndpointID;
 
+static TimerHandle_t MicroSwitchTimerHandle;
+
 using namespace esp_matter;
 using namespace esp_matter::attribute;
 using namespace esp_matter::endpoint;
@@ -117,24 +119,64 @@ static void InitKeyWithPressCallback(
     iot_button_register_cb(Handle, BUTTON_PRESS_DOWN, CallbackFunc, NULL);
 }
 
+void MicroSwitchTimerCallback(TimerHandle_t xTimer)
+{
+    ESP_LOGI(TAG, "MicroSwitchTimerCallback");
+    BuzzerPlay(BuzzerEffect_t::TRIPLE_BIZ);   
+}
+
 static void MicroSwitchCB(void *Arg, void *Data)
 {
     ESP_LOGI(TAG, "MicroSwitchCB");    
     esp_matter_attr_val_t MicroSwitchState = esp_matter_invalid(NULL);        
+    esp_matter_attr_val_t valCurrentLevel = esp_matter_invalid(NULL);
         
     GetAttributeValue(
         PowerKeyEndpointID,
         BooleanState::Id,
         BooleanState::Attributes::StateValue::Id,
-        &MicroSwitchState);                     
+        &MicroSwitchState);     
+
+    GetAttributeValue(
+        PowerKeyEndpointID,
+        LevelControl::Id,
+        LevelControl::Attributes::CurrentLevel::Id,
+        &valCurrentLevel);
+
     MicroSwitchState.val.b = !MicroSwitchState.val.b;
     if(MicroSwitchState.val.b == ERROR_MODE)
     {
-        ESP_LOGI(TAG, "MicroSwitch Error Intrrupt");           
-        BuzzerPlay(BuzzerEffect_t::TRIPLE_BIZ);   
+        if(valCurrentLevel.val.u8 == ON_MODE)
+        {
+            ESP_LOGI(TAG, "MicroSwitch Error Interrupt");           
+            BuzzerPlay(BuzzerEffect_t::TRIPLE_BIZ);   
 
-        LevelControlUpdateCurrentValue(
-            EXPLICIT_MODE, PAUSE_MODE, PowerKeyEndpointID);     
+            LevelControlUpdateCurrentValue(
+                EXPLICIT_MODE, PAUSE_MODE, PowerKeyEndpointID);  
+
+            if (xTimerStart(MicroSwitchTimerHandle, 0) == pdPASS)
+            {
+                    ESP_LOGI(TAG, "MicroSwitch Buzzer Timer Start");
+            }
+            //TODO: LCD blink effect  
+        }              
+    }
+    if(MicroSwitchState.val.b == NORMAL_MODE)
+    {
+        if(valCurrentLevel.val.u8 == PAUSE_MODE)
+        {
+            ESP_LOGI(TAG, "MicroSwitch Normal Interrupt");           
+            BuzzerPlay(BuzzerEffect_t::TRIPLE_BIZ);   
+
+            LevelControlUpdateCurrentValue(
+                EXPLICIT_MODE, PAUSE_MODE, PowerKeyEndpointID);  
+
+            if (xTimerStart(MicroSwitchTimerHandle, 0) == pdPASS)
+            {
+                    ESP_LOGI(TAG, "MicroSwitch Buzzer Timer Start");
+            }
+            //TODO: LCD blink effect  
+        }   
     }
 
     attribute::update(PowerKeyEndpointID, 
@@ -182,6 +224,9 @@ static void PowerKeyCB(void *Arg, void *Data)
         {
             ESP_LOGI(TAG, "MicroSwitch Error");           
             BuzzerPlay(BuzzerEffect_t::TRIPLE_BIZ);
+
+            LevelControlUpdateCurrentValue(
+                EXPLICIT_MODE, PAUSE_MODE, PowerKeyEndpointID);    
         }
         else 
         {
@@ -534,6 +579,12 @@ esp_err_t DoneCoffeeMakerCreate(node_t* Node)
         CupCounterEndpointID = endpoint::get_id(cupCounterEndpoint);
         ESP_LOGI(TAG, "cupCounterEndpoint created with EndpointID %d", CupCounterEndpointID);
     }
+
+    MicroSwitchTimerHandle = xTimerCreate("MicroSwitchTimer", 
+        pdMS_TO_TICKS(3000),
+        pdTRUE,//periodic 
+        NULL, 
+        MicroSwitchTimerCallback);
 
     return err;
 }
