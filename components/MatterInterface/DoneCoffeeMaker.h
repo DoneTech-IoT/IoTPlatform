@@ -35,24 +35,25 @@ typedef enum {
 /**
  * @brief This API should be called to update the driver for the attribute being updated.
  * This is usually called from the common `app_attribute_update_cb()`.
- * @param[in] endpoint_id Endpoint ID of the attribute.
- * @param[in] cluster_id Cluster ID of the attribute.
- * @param[in] attribute_id Attribute ID of the attribute.
- * @param[in] val Pointer to `esp_matter_attr_val_t`. Use appropriate elements as per the value type.
+ * @param[in] DriverHandle pointer to user data.
+ * @param[in] EndpointID Endpoint ID of the attribute.
+ * @param[in] ClusterID Cluster ID of the attribute.
+ * @param[in] AttributeID Attribute ID of the attribute.
+ * @param[in] Val Pointer to `esp_matter_attr_val_t`. Use appropriate elements as per the value type.
  * @return ESP_OK on success.
  * @return error in case of failure.
  */
 esp_err_t DoneCoffeeMakerAttributeUpdate(
-    app_driver_handle_t driver_handle,
-    const uint16_t &endpoint_id, const uint32_t &cluster_id,
-    const uint32_t &attribute_id, esp_matter_attr_val_t *val);
+    app_driver_handle_t DriverHandle,
+    const uint16_t &EndpointID, const uint32_t &ClusterID,
+    const uint32_t &AttributeID, esp_matter_attr_val_t *Val);
 
 /** 
  * @brief create coffee maker device with its related endpoints
- * @param[in] node Endpoint0 or root Node.
+ * @param[in] Node Endpoint0 or root Node.
  * @return ESP_OK on success.
  * @return error in case of failure.
  */
-esp_err_t DoneCoffeeMakerCreate(esp_matter::node_t* node);
+esp_err_t DoneCoffeeMakerCreate(esp_matter::node_t* Node);
 
 #endif //DONE_COFFEE_MAKER_H

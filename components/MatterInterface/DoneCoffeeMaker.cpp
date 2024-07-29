@@ -9,10 +9,10 @@
 #include "Buzzer.h"
 
 static const char *TAG = "DoneCoffeeMaker";
-uint16_t powerKey_endpointID;
-uint16_t cookingMode_endpointID;
-uint16_t grinder_endpointID;
-uint16_t cupCounter_endpointID;
+uint16_t PowerKeyEndpointID;
+uint16_t CookingModeEndpointID;
+uint16_t GrinderEndpointID;
+uint16_t CupCounterEndpointID;
 
 using namespace esp_matter;
 using namespace esp_matter::attribute;
@@ -21,153 +21,164 @@ using namespace chip::app::Clusters;
 
 /**
  * @brief read value of an attribute 
- * @param[in] endpoint_id Endpoint ID of the attribute.
- * @param[in] cluster_id Cluster ID of the attribute.
- * @param[in] attribute_id Attribute ID of the attribute.
- * @param[in] attr_val Pointer to `esp_matter_attr_val_t`. 
+ * @param[in] EndpointID Endpoint ID of the attribute.
+ * @param[in] ClusterID Cluster ID of the attribute.
+ * @param[in] AttributeID Attribute ID of the attribute.
+ * @param[in] AttrVal Pointer to `esp_matter_attr_val_t`. 
  * Use appropriate elements as per the value type.
  */
 static void GetAttributeValue(
-    const uint16_t &endpoint_id,
-    const uint32_t &cluster_id,
-    const uint32_t &attribute_id,
-    esp_matter_attr_val_t *attr_val)
+    const uint16_t &EndpointID,
+    const uint32_t &ClusterID,
+    const uint32_t &AttributeID,
+    esp_matter_attr_val_t *AttrVal)
 {
     node_t *node = node::get();
-    endpoint_t *endpoint = endpoint::get(node, endpoint_id);
-    cluster_t *cluster = cluster::get(endpoint, cluster_id);
-    attribute_t *attribute = attribute::get(cluster, attribute_id);
+    endpoint_t *endpoint = endpoint::get(node, EndpointID);
+    cluster_t *cluster = cluster::get(endpoint, ClusterID);
+    attribute_t *attribute = attribute::get(cluster, AttributeID);
 
-    attribute::get_val(attribute, attr_val);
+    attribute::get_val(attribute, AttrVal);
 }
 
 /**
  * @brief change levelControl current value attr.
- * @param[in] mode mode of changing current value attr.
- * @param[in] explicitCurrentValue get direct value to currentValue Attr.
- * @param[in] endpoint_id Attribute ID of the attribute.
+ * @param[in] Mode mode of changing current value attr.
+ * @param[in] ExplicitCurrentValue get direct value to currentValue Attr.
+ * @param[in] EndpointID Attribute ID of the attribute.
  */
 static void LevelControlUpdateCurrentValue(
-    const LevelControlCurrentValueMode_t &mode,
-    const uint8_t &explicitCurrentValue,
-    const uint16_t &endpoint_id)    
+    const LevelControlCurrentValueMode_t &Mode,
+    const uint8_t &ExplicitCurrentValue,
+    const uint16_t &EndpointID)    
 {    
-    esp_matter_attr_val_t val_currentLevel = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t val_MaxLevel = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t val_MinLevel = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t valCurrentLevel = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t valMaxLevel = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t valMinLevel = esp_matter_invalid(NULL);
 
     GetAttributeValue(
-        endpoint_id,
+        EndpointID,
         LevelControl::Id,
         LevelControl::Attributes::CurrentLevel::Id,
-        &val_currentLevel);
+        &valCurrentLevel);
 
     GetAttributeValue(
-        endpoint_id,
+        EndpointID,
         LevelControl::Id,
         LevelControl::Attributes::MaxLevel::Id,
-        &val_MaxLevel);
+        &valMaxLevel);
 
     GetAttributeValue(
-        endpoint_id,
+        EndpointID,
         LevelControl::Id,
         LevelControl::Attributes::MinLevel::Id,
-        &val_MinLevel);     
+        &valMinLevel);     
     
-    if(mode == INCREMENT_MODE) {
-        val_currentLevel.val.u8 += 1;
-        if(val_currentLevel.val.u8 > val_MaxLevel.val.u8)
-            val_currentLevel.val.u8 = val_MinLevel.val.u8;
+    if(Mode == INCREMENT_MODE) {
+        valCurrentLevel.val.u8 += 1;
+        if(valCurrentLevel.val.u8 > valMaxLevel.val.u8)
+            valCurrentLevel.val.u8 = valMinLevel.val.u8;
     }
-    else if(mode == DECREMENT_MODE) {
-        val_currentLevel.val.u8 -= 1;
-        if(val_currentLevel.val.u8 < val_MinLevel.val.u8)
-            val_currentLevel.val.u8 = val_MaxLevel.val.u8;
+    else if(Mode == DECREMENT_MODE) {
+        valCurrentLevel.val.u8 -= 1;
+        if(valCurrentLevel.val.u8 < valMinLevel.val.u8)
+            valCurrentLevel.val.u8 = valMaxLevel.val.u8;
     }
-    else if(mode == EXPLICIT_MODE) {
-        val_currentLevel.val.u8 = explicitCurrentValue;        
+    else if(Mode == EXPLICIT_MODE) {
+        valCurrentLevel.val.u8 = ExplicitCurrentValue;        
     }
 
-    attribute::update(endpoint_id, 
+    attribute::update(EndpointID, 
         LevelControl::Id, 
         LevelControl::Attributes::CurrentLevel::Id, 
-        &val_currentLevel);    
+        &valCurrentLevel);    
 }
 
 /**
  * @brief init a key and register Press callback
- * @param[in] handle handler
- * @param[in] gpioPin gpio pin for button 
+ * @param[in] Handle handler
+ * @param[in] GpioPin gpio pin for button 
  * @param[in] callbackFunc callback for Press event 
  */
 static void InitKeyWithPressCallback(
-    button_handle_t handle,
-    int32_t gpioPin,
-    void(*callbackFunc)(void *button_handle, void *usr_data))
+    button_handle_t Handle,
+    int32_t GpioPin,
+    void(*CallbackFunc)(void *button_handle, void *usr_data))
 {
     button_config_t config = {
         .type = BUTTON_TYPE_GPIO,
         .gpio_button_config = {
-            .gpio_num = gpioPin,
+            .gpio_num = GpioPin,
             .active_level = CONFIG_DONE_KEY_ACTIVE_LEVEL,
         }
     };
 
-    handle = iot_button_create(&config);
-    iot_button_register_cb(handle, BUTTON_PRESS_DOWN, callbackFunc, NULL);
+    Handle = iot_button_create(&config);
+    iot_button_register_cb(Handle, BUTTON_PRESS_DOWN, CallbackFunc, NULL);
 }
 
-static void MicroSwitchCB(void *arg, void *data)
+static void MicroSwitchCB(void *Arg, void *Data)
 {
     ESP_LOGI(TAG, "MicroSwitchCB");    
-    esp_matter_attr_val_t attr_val = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t MicroSwitchState = esp_matter_invalid(NULL);        
+        
     GetAttributeValue(
-        powerKey_endpointID,
+        PowerKeyEndpointID,
         BooleanState::Id,
         BooleanState::Attributes::StateValue::Id,
-        &attr_val);                     
-    attr_val.val.b = !attr_val.val.b;
+        &MicroSwitchState);                     
+    MicroSwitchState.val.b = !MicroSwitchState.val.b;
+    if(MicroSwitchState.val.b == ERROR_MODE)
+    {
+        ESP_LOGI(TAG, "MicroSwitch Error Intrrupt");           
+        BuzzerPlay(BuzzerEffect_t::TRIPLE_BIZ);   
 
-    attribute::update(powerKey_endpointID, BooleanState::Id, 
-        BooleanState::Attributes::StateValue::Id, &attr_val);
+        LevelControlUpdateCurrentValue(
+            EXPLICIT_MODE, PAUSE_MODE, PowerKeyEndpointID);     
+    }
+
+    attribute::update(PowerKeyEndpointID, 
+        BooleanState::Id, 
+        BooleanState::Attributes::StateValue::Id, 
+        &MicroSwitchState);
 }
 
-static void PowerKeyCB(void *arg, void *data)
+static void PowerKeyCB(void *Arg, void *Data)
 {
     ESP_LOGI(TAG, "PowerKeyCB");    
 
-    esp_matter_attr_val_t val_currentLevel = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t val_boolean = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t val_onOff = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t val_cookingMode = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t valCurrentLevel = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t valBoolean = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t valOnOff = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t valCookingMode = esp_matter_invalid(NULL);
 
     GetAttributeValue(
-        powerKey_endpointID,
+        PowerKeyEndpointID,
         LevelControl::Id,
         LevelControl::Attributes::CurrentLevel::Id,
-        &val_currentLevel);
+        &valCurrentLevel);
 
     GetAttributeValue(
-        powerKey_endpointID,
+        PowerKeyEndpointID,
         BooleanState::Id,
         BooleanState::Attributes::StateValue::Id,
-        &val_boolean);              
+        &valBoolean);              
 
     GetAttributeValue(
-        powerKey_endpointID,
+        PowerKeyEndpointID,
         OnOff::Id,
         OnOff::Attributes::OnOff::Id,
-        &val_onOff);              
+        &valOnOff);              
 
     GetAttributeValue(
-        cookingMode_endpointID,
+        CookingModeEndpointID,
         LevelControl::Id,
         LevelControl::Attributes::CurrentLevel::Id,
-        &val_cookingMode);
+        &valCookingMode);
 
-    if(val_onOff.val.b) //when powerON
+    if(valOnOff.val.b) //when powerON
     {        
-        if (val_boolean.val.b == ERROR_MODE)
+        if (valBoolean.val.b == ERROR_MODE)
         {
             ESP_LOGI(TAG, "MicroSwitch Error");           
             BuzzerPlay(BuzzerEffect_t::TRIPLE_BIZ);
@@ -175,11 +186,11 @@ static void PowerKeyCB(void *arg, void *data)
         else 
         {
             LevelControlUpdateCurrentValue(
-                EXPLICIT_MODE, ON_MODE, powerKey_endpointID);    
+                EXPLICIT_MODE, ON_MODE, PowerKeyEndpointID);    
             
             //To Do : //register powerKeyHold callback
 
-            switch (val_cookingMode.val.u8)
+            switch (valCookingMode.val.u8)
             {                
                 case GRINDER_MODE:
                 {
@@ -211,11 +222,11 @@ static void PowerKeyCB(void *arg, void *data)
     else //when powerOFF  
     {   
         ESP_LOGI(TAG, "Power On");       
-        val_onOff.val.b = true;
-        attribute::update(powerKey_endpointID, 
+        valOnOff.val.b = true;
+        attribute::update(PowerKeyEndpointID, 
             OnOff::Id,
             OnOff::Attributes::OnOff::Id,
-            &val_onOff);    
+            &valOnOff);    
 
         BuzzerPlay(BuzzerEffect_t::ON_BIZ);
         //to Do
@@ -223,47 +234,47 @@ static void PowerKeyCB(void *arg, void *data)
     } 
 }
 
-static void PowerKeyLongPressCB(void *arg, void *data)
+static void PowerKeyLongPressCB(void *Arg, void *Data)
 {
     ESP_LOGI(TAG, "PowerKeyLongPressCB");    
 
-    esp_matter_attr_val_t val_currentLevel = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t val_boolean = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t val_onOff = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t val_cookingMode = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t valCurrentLevel = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t valBoolean = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t valOnOff = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t valCookingMode = esp_matter_invalid(NULL);
 
     GetAttributeValue(
-        powerKey_endpointID,
+        PowerKeyEndpointID,
         LevelControl::Id,
         LevelControl::Attributes::CurrentLevel::Id,
-        &val_currentLevel);
+        &valCurrentLevel);
 
     GetAttributeValue(
-        powerKey_endpointID,
+        PowerKeyEndpointID,
         BooleanState::Id,
         BooleanState::Attributes::StateValue::Id,
-        &val_boolean);              
+        &valBoolean);              
 
     GetAttributeValue(
-        powerKey_endpointID,
+        PowerKeyEndpointID,
         OnOff::Id,
         OnOff::Attributes::OnOff::Id,
-        &val_onOff);              
+        &valOnOff);              
 
     GetAttributeValue(
-        cookingMode_endpointID,
+        CookingModeEndpointID,
         LevelControl::Id,
         LevelControl::Attributes::CurrentLevel::Id,
-        &val_cookingMode);
+        &valCookingMode);
 
-    if (val_boolean.val.b == ERROR_MODE)
+    if (valBoolean.val.b == ERROR_MODE)
     {
         ESP_LOGI(TAG, "MicroSwitch Error");           
         BuzzerPlay(BuzzerEffect_t::TRIPLE_BIZ);
     }    
     else 
     {
-        if(val_currentLevel.val.u8 == ON_MODE)
+        if(valCurrentLevel.val.u8 == ON_MODE)
         {
 
         }
@@ -273,79 +284,79 @@ static void PowerKeyLongPressCB(void *arg, void *data)
 static app_driver_handle_t PowerKeyInit()
 {
     app_driver_handle_t handle;
-    button_handle_t btn_handle;    
+    button_handle_t btnHandle;    
 
-    InitKeyWithPressCallback(btn_handle, 
+    InitKeyWithPressCallback(btnHandle, 
         CONFIG_DONE_COFFEE_MAKER_POWER_KEY,
         PowerKeyCB);
 
-    iot_button_register_cb(btn_handle, 
+    iot_button_register_cb(btnHandle, 
         BUTTON_LONG_PRESS_START, 
         PowerKeyLongPressCB, NULL);
     
-    InitKeyWithPressCallback(btn_handle, 
+    InitKeyWithPressCallback(btnHandle, 
         CONFIG_DONE_COFFEE_MAKER_MICRO_SWITCH,
         MicroSwitchCB);
 
     return (app_driver_handle_t)handle;
 }
 
-static void CookingModeGrindCB(void *arg, void *data)
+static void CookingModeGrindCB(void *Arg, void *Data)
 {
     ESP_LOGI(TAG, "CookingModeGrindCB");
     LevelControlUpdateCurrentValue(
-        INCREMENT_MODE, DONT_CARE, grinder_endpointID);    
+        INCREMENT_MODE, DONT_CARE, GrinderEndpointID);    
     LevelControlUpdateCurrentValue(
-        EXPLICIT_MODE, GRINDER_MODE, cookingMode_endpointID);    
+        EXPLICIT_MODE, GRINDER_MODE, CookingModeEndpointID);    
 }
 
-static void CookingModeCoffeeCB(void *arg, void *data)
+static void CookingModeCoffeeCB(void *Arg, void *Data)
 {
     ESP_LOGI(TAG, "CookingModeCoffeeCB");
     LevelControlUpdateCurrentValue(
-        EXPLICIT_MODE, COFFEE_MODE, cookingMode_endpointID);        
+        EXPLICIT_MODE, COFFEE_MODE, CookingModeEndpointID);        
 }
 
-static void CookingModeTeaCB(void *arg, void *data)
+static void CookingModeTeaCB(void *Arg, void *Data)
 {
     ESP_LOGI(TAG, "CookingModeTeaCB");
     LevelControlUpdateCurrentValue(
-        EXPLICIT_MODE, TEA_MODE, cookingMode_endpointID);        
+        EXPLICIT_MODE, TEA_MODE, CookingModeEndpointID);        
 }
 
 static app_driver_handle_t CookingModeInit()
 {
     app_driver_handle_t handle;
-    button_handle_t btn1_handle, btn2_handle, btn3_handle;    
+    button_handle_t btn1Handle, btn2Handle, btn3Handle;    
 
-    InitKeyWithPressCallback(btn1_handle, 
+    InitKeyWithPressCallback(btn1Handle, 
         CONFIG_DONE_COFFEE_MAKER_COOKING_MODE_GRINDER,
         CookingModeGrindCB);
 
-    InitKeyWithPressCallback(btn2_handle, 
+    InitKeyWithPressCallback(btn2Handle, 
         CONFIG_DONE_COFFEE_MAKER_COOKING_MODE_COFFEE,
         CookingModeCoffeeCB);    
 
-    InitKeyWithPressCallback(btn3_handle, 
+    InitKeyWithPressCallback(btn3Handle, 
         CONFIG_DONE_COFFEE_MAKER_COOKING_MODE_TEA,
         CookingModeTeaCB);        
 
     return (app_driver_handle_t)handle;
 }
 
-static void CupCounterKeyCB(void *arg, void *data)
+static void CupCounterKeyCB(void *Arg, void *Data)
 {
     ESP_LOGI(TAG, "CupCounterKeyCB");
     LevelControlUpdateCurrentValue(
-        INCREMENT_MODE, DONT_CARE, cupCounter_endpointID);        
+        INCREMENT_MODE, DONT_CARE, CupCounterEndpointID);        
 }
 
 static app_driver_handle_t CupCounterInit()
 {
     app_driver_handle_t handle;
-    button_handle_t btn_handle;    
+    button_handle_t btnHandle;    
 
-    InitKeyWithPressCallback(btn_handle, 
+    InitKeyWithPressCallback(btnHandle, 
         CONFIG_DONE_COFFEE_MAKER_CUP_COUNTER_KEY,
         CupCounterKeyCB);
 
@@ -353,8 +364,8 @@ static app_driver_handle_t CupCounterInit()
 }
 
 esp_err_t CookingModeSetEnable(
-    app_driver_handle_t driver_handle, 
-    esp_matter_attr_val_t *val)
+    app_driver_handle_t DriverHandle, 
+    esp_matter_attr_val_t *Val)
 {
     esp_err_t err = ESP_OK;
 
@@ -362,8 +373,8 @@ esp_err_t CookingModeSetEnable(
 }
 
 esp_err_t GrinderSetEnable(
-    app_driver_handle_t driver_handle, 
-    esp_matter_attr_val_t *val)
+    app_driver_handle_t DriverHandle, 
+    esp_matter_attr_val_t *Val)
 {
     esp_err_t err = ESP_OK;
 
@@ -371,8 +382,8 @@ esp_err_t GrinderSetEnable(
 }
 
 esp_err_t CupCounterSetEnable(
-    app_driver_handle_t driver_handle, 
-    esp_matter_attr_val_t *val)
+    app_driver_handle_t DriverHandle, 
+    esp_matter_attr_val_t *Val)
 {
     esp_err_t err = ESP_OK;
 
@@ -382,58 +393,61 @@ esp_err_t CupCounterSetEnable(
 /**
  * @brief This API should be called to update the driver for the attribute being updated.
  * This is usually called from the common `app_attribute_update_cb()`.
- * @param[in] endpoint_id Endpoint ID of the attribute.
- * @param[in] cluster_id Cluster ID of the attribute.
- * @param[in] attribute_id Attribute ID of the attribute.
+ * @param[in] EndpointID Endpoint ID of the attribute.
+ * @param[in] ClusterID Cluster ID of the attribute.
+ * @param[in] AttributeID Attribute ID of the attribute.
  * @param[in] val Pointer to `esp_matter_attr_val_t`. Use appropriate elements as per the value type.
  * @return ESP_OK on success.
  * @return error in case of failure.
  */
 esp_err_t DoneCoffeeMakerAttributeUpdate(
-    app_driver_handle_t driver_handle, 
-    const uint16_t &endpoint_id, const uint32_t &cluster_id,
-    const uint32_t &attribute_id, esp_matter_attr_val_t *val)
+    app_driver_handle_t DriverHandle, 
+    const uint16_t &EndpointID, const uint32_t &ClusterID,
+    const uint32_t &AttributeID, esp_matter_attr_val_t *Val)
 {
     esp_err_t err = ESP_OK;
 
-    if (endpoint_id == powerKey_endpointID) {
-        if (cluster_id == OnOff::Id) {            
-            if (attribute_id == OnOff::Attributes::OnOff::Id) {
+    if (EndpointID == PowerKeyEndpointID) 
+    {
+        if (ClusterID == OnOff::Id) 
+        {            
+            if (AttributeID == OnOff::Attributes::OnOff::Id) 
+            {
                 //err = app_driver_light_set_power(handle, val);
-                ESP_LOGW(TAG, "endpoint_id %d, clusterOnOff_id %ld, attributeOnOff_id %ld", 
-                powerKey_endpointID, cluster_id, attribute_id);
+                ESP_LOGW(TAG, "EndpointID %d, clusterOnOff_id %ld, attributeOnOff_id %ld", 
+                PowerKeyEndpointID, ClusterID, AttributeID);
             }        
         }
     }
-    else if (endpoint_id == cookingMode_endpointID) {        
+    else if (EndpointID == CookingModeEndpointID) {        
     }
-    else if (endpoint_id == grinder_endpointID) {        
+    else if (EndpointID == GrinderEndpointID) {        
     }
-    else if (endpoint_id == cupCounter_endpointID) {        
-        //led_driver_handle_t handle = (led_driver_handle_t)driver_handle;
-        if (cluster_id == OnOff::Id) {            
-            if (attribute_id == OnOff::Attributes::OnOff::Id) {
+    else if (EndpointID == CupCounterEndpointID) {        
+        //led_driver_handle_t handle = (led_driver_handle_t)DriverHandle;
+        if (ClusterID == OnOff::Id) {            
+            if (AttributeID == OnOff::Attributes::OnOff::Id) {
                 //err = app_driver_light_set_power(handle, val);
-                ESP_LOGW(TAG, "endpoint_id %d, clusterOnOff_id %ld, attributeOnOff_id %ld", 
-                powerKey_endpointID, cluster_id, attribute_id);
+                ESP_LOGW(TAG, "EndpointID %d, clusterOnOff_id %ld, attributeOnOff_id %ld", 
+                PowerKeyEndpointID, ClusterID, AttributeID);
             }
             
-        } else if (cluster_id == LevelControl::Id) {
-            if (attribute_id == LevelControl::Attributes::CurrentLevel::Id) {
+        } else if (ClusterID == LevelControl::Id) {
+            if (AttributeID == LevelControl::Attributes::CurrentLevel::Id) {
                 //err = app_driver_light_set_brightness(handle, val);
-                ESP_LOGW(TAG, "endpoint_id %d, clusterLevelControl_id %ld, attributeCurrentLevel_id %ld", powerKey_endpointID, cluster_id, attribute_id);
+                ESP_LOGW(TAG, "EndpointID %d, clusterLevelControl_id %ld, attributeCurrentLevel_id %ld", PowerKeyEndpointID, ClusterID, AttributeID);
             }
-            else if (attribute_id == LevelControl::Attributes::MinLevel::Id) {
+            else if (AttributeID == LevelControl::Attributes::MinLevel::Id) {
                 //err = app_driver_light_set_brightness(handle, val);
-                ESP_LOGW(TAG, "endpoint_id %d, clusterLevelControl_id %ld, attributeMinLevel_id %ld", powerKey_endpointID, cluster_id, attribute_id);
+                ESP_LOGW(TAG, "EndpointID %d, clusterLevelControl_id %ld, attributeMinLevel_id %ld", PowerKeyEndpointID, ClusterID, AttributeID);
             }
-            else if (attribute_id == LevelControl::Attributes::MaxLevel::Id) {
+            else if (AttributeID == LevelControl::Attributes::MaxLevel::Id) {
                 //err = app_driver_light_set_brightness(handle, val);
-                ESP_LOGW(TAG, "endpoint_id %d, clusterLevelControl_id %ld, attributeMaxLevel_id %ld", powerKey_endpointID, cluster_id, attribute_id);
+                ESP_LOGW(TAG, "EndpointID %d, clusterLevelControl_id %ld, attributeMaxLevel_id %ld", PowerKeyEndpointID, ClusterID, AttributeID);
             }
-            else if (attribute_id == LevelControl::Attributes::MaxLevel::Id) {
+            else if (AttributeID == LevelControl::Attributes::MaxLevel::Id) {
                 //err = app_driver_light_set_brightness(handle, val);
-                ESP_LOGW(TAG, "endpoint_id %d, clusterLevelControl_id %ld, attributeMaxLevel_id %ld", powerKey_endpointID, cluster_id, attribute_id);
+                ESP_LOGW(TAG, "EndpointID %d, clusterLevelControl_id %ld, attributeMaxLevel_id %ld", PowerKeyEndpointID, ClusterID, AttributeID);
             }
         }
     }
@@ -443,82 +457,82 @@ esp_err_t DoneCoffeeMakerAttributeUpdate(
 
 /** 
  * @brief create coffee maker device with its related endpoints
- * @param[in] node Endpoint0 or root Node.
+ * @param[in] Node Endpoint0 or root Node.
  * @return ESP_OK on success.
  * @return error in case of failure.
  */
-esp_err_t DoneCoffeeMakerCreate(node_t* node)
+esp_err_t DoneCoffeeMakerCreate(node_t* Node)
 {
     esp_err_t err = ESP_OK;
 
-    app_driver_handle_t powerKey_handle = PowerKeyInit();    
-    done_MasterPowerKey::config_t powerKey_config;
-    powerKey_config.on_off.on_off = false;    
-    powerKey_config.boolean.state_value = true;//MicroSwitchMode_t::NORMAL_MODE  
-    powerKey_config.level_control.current_level = 1;
-    powerKey_config.level_control.lighting.min_level = 1;
-    powerKey_config.level_control.lighting.max_level = 3;      
-    endpoint_t *powerKey_endpoint = done_MasterPowerKey::create(
-        node, &powerKey_config,    
-        ENDPOINT_FLAG_NONE, powerKey_handle);                
-    if (!powerKey_endpoint)
+    app_driver_handle_t powerKeyHandle = PowerKeyInit();    
+    done_MasterPowerKey::config_t powerKeyConfig;
+    powerKeyConfig.on_off.on_off = true;//for powerOn when Plug in Powerline.  
+    powerKeyConfig.boolean.state_value = true;//MicroSwitchMode_t::NORMAL_MODE  
+    powerKeyConfig.level_control.current_level = STANDBY_MODE;
+    powerKeyConfig.level_control.lighting.min_level = 1;
+    powerKeyConfig.level_control.lighting.max_level = 3;      
+    endpoint_t *powerKeyEndpoint = done_MasterPowerKey::create(
+        Node, &powerKeyConfig,    
+        ENDPOINT_FLAG_NONE, powerKeyHandle);                
+    if (!powerKeyEndpoint)
     {
-        ESP_LOGE(TAG, "powerKey_endpoint creation failed");
+        ESP_LOGE(TAG, "powerKeyEndpoint creation failed");
     }
     else 
     {
-        powerKey_endpointID = endpoint::get_id(powerKey_endpoint);
-        ESP_LOGI(TAG, "powerKey_endpoint created with endpoint_id %d", powerKey_endpointID);
+        PowerKeyEndpointID = endpoint::get_id(powerKeyEndpoint);
+        ESP_LOGI(TAG, "powerKeyEndpoint created with EndpointID %d", PowerKeyEndpointID);
     }
 
-    app_driver_handle_t cookingMode_handle = CookingModeInit();    
-    done_MultiFunctionSwitch::config_t cookingMode_config;
-    cookingMode_config.on_off.on_off= true;
-    cookingMode_config.level_control.current_level = 1;
-    cookingMode_config.level_control.lighting.min_level = 1;
-    cookingMode_config.level_control.lighting.max_level = 3;
-    endpoint_t *cookingMode_endpoint = done_MultiFunctionSwitch::create(node, &cookingMode_config, ENDPOINT_FLAG_NONE, cookingMode_handle);
-    if (!cookingMode_endpoint)
+    app_driver_handle_t cookingModeHandle = CookingModeInit();    
+    done_MultiFunctionSwitch::config_t CookingModeConfig;
+    CookingModeConfig.on_off.on_off= true;
+    CookingModeConfig.level_control.current_level = GRINDER_MODE;
+    CookingModeConfig.level_control.lighting.min_level = 1;
+    CookingModeConfig.level_control.lighting.max_level = 3;
+    endpoint_t *cookingModeEndpoint = done_MultiFunctionSwitch::create(Node, &CookingModeConfig, ENDPOINT_FLAG_NONE, cookingModeHandle);
+    if (!cookingModeEndpoint)
     {
-        ESP_LOGE(TAG, "cookingMode_endpoint creation failed");
+        ESP_LOGE(TAG, "cookingModeEndpoint creation failed");
     }
     else 
     {
-        cookingMode_endpointID = endpoint::get_id(cookingMode_endpoint);
-        ESP_LOGI(TAG, "cookingMode_endpoint created with endpoint_id %d", cookingMode_endpointID);
+        CookingModeEndpointID = endpoint::get_id(cookingModeEndpoint);
+        ESP_LOGI(TAG, "cookingModeEndpoint created with EndpointID %d", CookingModeEndpointID);
     }
 
-    done_MultiFunctionSwitch::config_t grinder_config;
-    grinder_config.on_off.on_off= true;        
-    grinder_config.level_control.current_level = 1;
-    grinder_config.level_control.lighting.min_level = 1;
-    grinder_config.level_control.lighting.max_level = 3;
-    endpoint_t *grinder_endpoint = done_MultiFunctionSwitch::create(node, &grinder_config,         ENDPOINT_FLAG_NONE, NULL);
-    if (!grinder_endpoint)
+    done_MultiFunctionSwitch::config_t grinderConfig;
+    grinderConfig.on_off.on_off= true;        
+    grinderConfig.level_control.current_level = 1;
+    grinderConfig.level_control.lighting.min_level = 1;
+    grinderConfig.level_control.lighting.max_level = 3;
+    endpoint_t *grinderEndpoint = done_MultiFunctionSwitch::create(Node, &grinderConfig,         ENDPOINT_FLAG_NONE, NULL);
+    if (!grinderEndpoint)
     {
-        ESP_LOGE(TAG, "grinder_endpoint creation failed");
+        ESP_LOGE(TAG, "grinderEndpoint creation failed");
     }
     else 
     {
-        grinder_endpointID = endpoint::get_id(grinder_endpoint);
-        ESP_LOGI(TAG, "grinder_endpoint created with endpoint_id %d", grinder_endpointID);
+        GrinderEndpointID = endpoint::get_id(grinderEndpoint);
+        ESP_LOGI(TAG, "grinderEndpoint created with EndpointID %d", GrinderEndpointID);
     }
 
-    app_driver_handle_t cupCounter_handle = CupCounterInit();
-    done_MultiFunctionSwitch::config_t cupCounter_config;
-    cupCounter_config.on_off.on_off= true;        
-    cupCounter_config.level_control.current_level = 2;
-    cupCounter_config.level_control.lighting.min_level = 2;
-    cupCounter_config.level_control.lighting.max_level = 7;
-    endpoint_t *cupCounter_endpoint = done_MultiFunctionSwitch::create(node, &cupCounter_config, ENDPOINT_FLAG_NONE, cupCounter_handle);
-    if (!cupCounter_endpoint)
+    app_driver_handle_t cupCounterHandle = CupCounterInit();
+    done_MultiFunctionSwitch::config_t cupCounterConfig;
+    cupCounterConfig.on_off.on_off= true;        
+    cupCounterConfig.level_control.current_level = 2;
+    cupCounterConfig.level_control.lighting.min_level = 2;
+    cupCounterConfig.level_control.lighting.max_level = 7;
+    endpoint_t *cupCounterEndpoint = done_MultiFunctionSwitch::create(Node, &cupCounterConfig, ENDPOINT_FLAG_NONE, cupCounterHandle);
+    if (!cupCounterEndpoint)
     {
         ESP_LOGE(TAG, "cupCounter_endpoint creation failed");
     }
     else 
     {
-        cupCounter_endpointID = endpoint::get_id(cupCounter_endpoint);
-        ESP_LOGI(TAG, "grinder_endpoint created with endpoint_id %d", cupCounter_endpointID);
+        CupCounterEndpointID = endpoint::get_id(cupCounterEndpoint);
+        ESP_LOGI(TAG, "cupCounterEndpoint created with EndpointID %d", CupCounterEndpointID);
     }
 
     return err;
