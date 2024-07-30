@@ -24,13 +24,19 @@ typedef enum {
 typedef enum {
     STANDBY_MODE = 1,
     ON_MODE = 2,
-    PAUSE_MODE = 3,    
+    PAUSE_MODE = 3    
 } PowerKeyMode_t;
 
 typedef enum {
     ERROR_MODE = 0,        
     NORMAL_MODE = 1    
 } MicroSwitchMode_t;
+
+typedef enum {
+    MICRO_SWITCH = 0,        
+    AUTO_TURN_OFF = 1,
+    TIMER_COUNT
+} TimerID_t;
 
 /**
  * @brief This API should be called to update the driver for the attribute being updated.

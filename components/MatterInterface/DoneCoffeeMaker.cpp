@@ -7,6 +7,7 @@
 #include "app_priv.h"
 #include "iot_button.h"
 #include "Buzzer.h"
+#include <map>
 
 static const char *TAG = "DoneCoffeeMaker";
 uint16_t PowerKeyEndpointID;
@@ -14,12 +15,22 @@ uint16_t CookingModeEndpointID;
 uint16_t GrinderEndpointID;
 uint16_t CupCounterEndpointID;
 
-static TimerHandle_t MicroSwitchTimerHandle;
-
 using namespace esp_matter;
 using namespace esp_matter::attribute;
 using namespace esp_matter::endpoint;
 using namespace chip::app::Clusters;
+
+constexpr std::map<uint8_t, uint16_t> TimerValue =
+{
+    {TimerID_t::MICRO_SWITCH, 5000},
+    {TimerID_t::AUTO_TURN_OFF, 30000}
+}
+
+static std::map<uint8_t, TimerHandle_t> TimerHandle =
+{
+    {TimerID_t::MICRO_SWITCH, NULL},
+    {TimerID_t::AUTO_TURN_OFF, NULL}
+}
 
 /**
  * @brief init a key and register Press callback
@@ -119,6 +130,36 @@ static void LevelControlUpdateCurrentValue(
         &valCurrentLevel);    
 }
 
+/**
+ * @brief get PowerKey endpoint state
+ * @param[in] OnOffVal get OnOff sate
+ * @param[in] MicroSwitchVal get micro switch state
+ * @param[in] OperationVal get operational mode
+ */
+static void GetPowerKeyState(
+    esp_matter_attr_val_t *OnOffVal,
+    esp_matter_attr_val_t *MicroSwitchVal,
+    esp_matter_attr_val_t *OperationVal)
+{
+    GetAttributeValue(
+        PowerKeyEndpointID,
+        OnOff::Id,
+        OnOff::Attributes::OnOff::Id,
+        OnOffVal);   
+
+    GetAttributeValue(
+        PowerKeyEndpointID,
+        BooleanState::Id,
+        BooleanState::Attributes::StateValue::Id,
+        MicroSwitchVal); 
+
+    GetAttributeValue(
+        PowerKeyEndpointID,
+        LevelControl::Id,
+        LevelControl::Attributes::CurrentLevel::Id,
+        OperationVal);                                                      
+}
+
 void MicroSwitchTimerCallback(TimerHandle_t xTimer)
 {
     ESP_LOGI(TAG, "MicroSwitchTimerCallback");
@@ -127,26 +168,20 @@ void MicroSwitchTimerCallback(TimerHandle_t xTimer)
 
 static void MicroSwitchCB(void *Arg, void *Data)
 {
-    ESP_LOGI(TAG, "MicroSwitchCB");    
-    esp_matter_attr_val_t MicroSwitchState = esp_matter_invalid(NULL);        
-    esp_matter_attr_val_t valCurrentLevel = esp_matter_invalid(NULL);
-        
-    GetAttributeValue(
-        PowerKeyEndpointID,
-        BooleanState::Id,
-        BooleanState::Attributes::StateValue::Id,
-        &MicroSwitchState);     
+    ESP_LOGI(TAG, "MicroSwitchCB");                
+    esp_matter_attr_val_t onOffVal = esp_matter_invalid(NULL);    
+    esp_matter_attr_val_t microSwitchVal = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t operationVal = esp_matter_invalid(NULL);
 
-    GetAttributeValue(
-        PowerKeyEndpointID,
-        LevelControl::Id,
-        LevelControl::Attributes::CurrentLevel::Id,
-        &valCurrentLevel);
+    GetPowerKeyState(
+        &onOffVal,
+        &microSwitchVal,
+        &operationVal); 
 
-    MicroSwitchState.val.b = !MicroSwitchState.val.b;
-    if(MicroSwitchState.val.b == ERROR_MODE)
+    microSwitchVal.val.b = !microSwitchVal.val.b;
+    if(microSwitchVal.val.b == ERROR_MODE)
     {
-        if(valCurrentLevel.val.u8 == ON_MODE)
+        if(operationVal.val.u8 == ON_MODE)
         {
             ESP_LOGI(TAG, "MicroSwitch Error Interrupt");           
             BuzzerPlay(BuzzerEffect_t::TRIPLE_BIZ);   
@@ -159,18 +194,18 @@ static void MicroSwitchCB(void *Arg, void *Data)
                 ESP_LOGI(TAG, "MicroSwitch Buzzer Timer Start");
             }
             //TODO: LCD start blink effect  
+            //TODO: cooking mode stop
         }              
     }
-    if(MicroSwitchState.val.b == NORMAL_MODE)
+    if(microSwitchVal.val.b == NORMAL_MODE)
     {
-        if(valCurrentLevel.val.u8 == PAUSE_MODE)
+        if(operationVal.val.u8 == PAUSE_MODE)
         {            
             LevelControlUpdateCurrentValue(
                 EXPLICIT_MODE, ON_MODE, PowerKeyEndpointID);  
 
-            xTimerStop(MicroSwitchTimerHandle, 0)
-
-            //TODO: resume cooking mode
+            xTimerStop(MicroSwitchTimerHandle, 0);
+            
             //TODO: LCD stop blink effect  
             //TODO: cooking mode resume correctly
         }   
@@ -179,45 +214,31 @@ static void MicroSwitchCB(void *Arg, void *Data)
     attribute::update(PowerKeyEndpointID, 
         BooleanState::Id, 
         BooleanState::Attributes::StateValue::Id, 
-        &MicroSwitchState);
+        &microSwitchVal);
 }
 
 static void PowerKeyCB(void *Arg, void *Data)
 {
     ESP_LOGI(TAG, "PowerKeyCB");    
+    esp_matter_attr_val_t onOffVal = esp_matter_invalid(NULL);    
+    esp_matter_attr_val_t microSwitchVal = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t operationVal = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t cookingModeVal = esp_matter_invalid(NULL);
 
-    esp_matter_attr_val_t valCurrentLevel = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t valBoolean = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t valOnOff = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t valCookingMode = esp_matter_invalid(NULL);
-
-    GetAttributeValue(
-        PowerKeyEndpointID,
-        LevelControl::Id,
-        LevelControl::Attributes::CurrentLevel::Id,
-        &valCurrentLevel);
-
-    GetAttributeValue(
-        PowerKeyEndpointID,
-        BooleanState::Id,
-        BooleanState::Attributes::StateValue::Id,
-        &valBoolean);              
-
-    GetAttributeValue(
-        PowerKeyEndpointID,
-        OnOff::Id,
-        OnOff::Attributes::OnOff::Id,
-        &valOnOff);              
+    GetPowerKeyState(
+        &onOffVal,
+        &microSwitchVal,
+        &operationVal);           
 
     GetAttributeValue(
         CookingModeEndpointID,
         LevelControl::Id,
         LevelControl::Attributes::CurrentLevel::Id,
-        &valCookingMode);
+        &cookingModeVal);
 
-    if(valOnOff.val.b) //when powerON
+    if(onOffVal.val.b) //when powerON
     {        
-        if (valBoolean.val.b == ERROR_MODE)
+        if (microSwitchVal.val.b == ERROR_MODE)
         {
             ESP_LOGI(TAG, "MicroSwitch Error");           
             BuzzerPlay(BuzzerEffect_t::TRIPLE_BIZ);
@@ -232,7 +253,7 @@ static void PowerKeyCB(void *Arg, void *Data)
             
             //To Do : //register powerKeyHold callback
 
-            switch (valCookingMode.val.u8)
+            switch (cookingModeVal.val.u8)
             {                
                 case GRINDER_MODE:
                 {
@@ -264,11 +285,14 @@ static void PowerKeyCB(void *Arg, void *Data)
     else //when powerOFF  
     {   
         ESP_LOGI(TAG, "Power On");       
-        valOnOff.val.b = true;
+        onOffVal.val.b = true;
         attribute::update(PowerKeyEndpointID, 
             OnOff::Id,
             OnOff::Attributes::OnOff::Id,
-            &valOnOff);    
+            &onOffVal);    
+
+        LevelControlUpdateCurrentValue(
+            EXPLICIT_MODE, STANDBY_MODE, PowerKeyEndpointID);  
 
         BuzzerPlay(BuzzerEffect_t::ON_BIZ);
         //to Do
@@ -279,35 +303,21 @@ static void PowerKeyCB(void *Arg, void *Data)
 static void PowerKeyLongPressCB(void *Arg, void *Data)
 {
     ESP_LOGI(TAG, "PowerKeyLongPressCB");    
+    esp_matter_attr_val_t onOffVal = esp_matter_invalid(NULL);    
+    esp_matter_attr_val_t microSwitchVal = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t operationVal = esp_matter_invalid(NULL);
+    esp_matter_attr_val_t cookingModeVal = esp_matter_invalid(NULL);
 
-    esp_matter_attr_val_t valCurrentLevel = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t valBoolean = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t valOnOff = esp_matter_invalid(NULL);
-    esp_matter_attr_val_t valCookingMode = esp_matter_invalid(NULL);
-
-    GetAttributeValue(
-        PowerKeyEndpointID,
-        LevelControl::Id,
-        LevelControl::Attributes::CurrentLevel::Id,
-        &valCurrentLevel);
-
-    GetAttributeValue(
-        PowerKeyEndpointID,
-        BooleanState::Id,
-        BooleanState::Attributes::StateValue::Id,
-        &valBoolean);              
-
-    GetAttributeValue(
-        PowerKeyEndpointID,
-        OnOff::Id,
-        OnOff::Attributes::OnOff::Id,
-        &valOnOff);              
+    GetPowerKeyState(
+        &onOffVal,
+        &microSwitchVal,
+        &operationVal);           
 
     GetAttributeValue(
         CookingModeEndpointID,
         LevelControl::Id,
         LevelControl::Attributes::CurrentLevel::Id,
-        &valCookingMode);
+        &cookingModeVal);
 
     if (valBoolean.val.b == ERROR_MODE)
     {
@@ -577,11 +587,14 @@ esp_err_t DoneCoffeeMakerCreate(node_t* Node)
         ESP_LOGI(TAG, "cupCounterEndpoint created with EndpointID %d", CupCounterEndpointID);
     }
 
-    MicroSwitchTimerHandle = xTimerCreate("MicroSwitchTimer", 
-        pdMS_TO_TICKS(5000),
-        pdTRUE,//periodic 
-        NULL, 
-        MicroSwitchTimerCallback);
+    for (const auto &&i : TimerHandle)
+    {
+        Timers[i, 2] = xTimerCreate("CoffeeMakerTimers", 
+            pdMS_TO_TICKS(5000),
+            pdTRUE,//periodic 
+            NULL, 
+            MicroSwitchTimerCallback);    
+    }            
 
     return err;
 }
