@@ -156,26 +156,23 @@ static void MicroSwitchCB(void *Arg, void *Data)
 
             if (xTimerStart(MicroSwitchTimerHandle, 0) == pdPASS)
             {
-                    ESP_LOGI(TAG, "MicroSwitch Buzzer Timer Start");
+                ESP_LOGI(TAG, "MicroSwitch Buzzer Timer Start");
             }
-            //TODO: LCD blink effect  
+            //TODO: LCD start blink effect  
         }              
     }
     if(MicroSwitchState.val.b == NORMAL_MODE)
     {
         if(valCurrentLevel.val.u8 == PAUSE_MODE)
-        {
-            ESP_LOGI(TAG, "MicroSwitch Normal Interrupt");           
-            BuzzerPlay(BuzzerEffect_t::TRIPLE_BIZ);   
-
+        {            
             LevelControlUpdateCurrentValue(
-                EXPLICIT_MODE, PAUSE_MODE, PowerKeyEndpointID);  
+                EXPLICIT_MODE, ON_MODE, PowerKeyEndpointID);  
 
-            if (xTimerStart(MicroSwitchTimerHandle, 0) == pdPASS)
-            {
-                    ESP_LOGI(TAG, "MicroSwitch Buzzer Timer Start");
-            }
-            //TODO: LCD blink effect  
+            xTimerStop(MicroSwitchTimerHandle, 0)
+
+            //TODO: resume cooking mode
+            //TODO: LCD stop blink effect  
+            //TODO: cooking mode resume correctly
         }   
     }
 
@@ -581,7 +578,7 @@ esp_err_t DoneCoffeeMakerCreate(node_t* Node)
     }
 
     MicroSwitchTimerHandle = xTimerCreate("MicroSwitchTimer", 
-        pdMS_TO_TICKS(3000),
+        pdMS_TO_TICKS(5000),
         pdTRUE,//periodic 
         NULL, 
         MicroSwitchTimerCallback);
