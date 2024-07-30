@@ -22,6 +22,29 @@ using namespace esp_matter::endpoint;
 using namespace chip::app::Clusters;
 
 /**
+ * @brief init a key and register Press callback
+ * @param[in] Handle handler
+ * @param[in] GpioPin gpio pin for button 
+ * @param[in] callbackFunc callback for Press event 
+ */
+static void InitKeyWithPressCallback(
+    ButtonHandle_t Handle,
+    const int32_t &GpioPin,
+    void(*CallbackFunc)(void *button_handle, void *usr_data))
+{
+    button_config_t config = {
+        .type = BUTTON_TYPE_GPIO,
+        .gpio_button_config = {
+            .gpio_num = GpioPin,
+            .active_level = CONFIG_DONE_KEY_ACTIVE_LEVEL,
+        }
+    };
+
+    Handle = iot_button_create(&config);
+    iot_button_register_cb(Handle, BUTTON_PRESS_DOWN, CallbackFunc, NULL);
+}
+
+/**
  * @brief read value of an attribute 
  * @param[in] EndpointID Endpoint ID of the attribute.
  * @param[in] ClusterID Cluster ID of the attribute.
@@ -94,29 +117,6 @@ static void LevelControlUpdateCurrentValue(
         LevelControl::Id, 
         LevelControl::Attributes::CurrentLevel::Id, 
         &valCurrentLevel);    
-}
-
-/**
- * @brief init a key and register Press callback
- * @param[in] Handle handler
- * @param[in] GpioPin gpio pin for button 
- * @param[in] callbackFunc callback for Press event 
- */
-static void InitKeyWithPressCallback(
-    ButtonHandle_t Handle,
-    int32_t GpioPin,
-    void(*CallbackFunc)(void *button_handle, void *usr_data))
-{
-    button_config_t config = {
-        .type = BUTTON_TYPE_GPIO,
-        .gpio_button_config = {
-            .gpio_num = GpioPin,
-            .active_level = CONFIG_DONE_KEY_ACTIVE_LEVEL,
-        }
-    };
-
-    Handle = iot_button_create(&config);
-    iot_button_register_cb(Handle, BUTTON_PRESS_DOWN, CallbackFunc, NULL);
 }
 
 void MicroSwitchTimerCallback(TimerHandle_t xTimer)
