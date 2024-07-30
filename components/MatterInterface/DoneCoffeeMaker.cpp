@@ -103,7 +103,7 @@ static void LevelControlUpdateCurrentValue(
  * @param[in] callbackFunc callback for Press event 
  */
 static void InitKeyWithPressCallback(
-    button_handle_t Handle,
+    ButtonHandle_t Handle,
     int32_t GpioPin,
     void(*CallbackFunc)(void *button_handle, void *usr_data))
 {
@@ -323,10 +323,10 @@ static void PowerKeyLongPressCB(void *Arg, void *Data)
     }
 }
 
-static app_driver_handle_t PowerKeyInit()
+static AppDriverHandle_t PowerKeyInit()
 {
-    app_driver_handle_t handle;
-    button_handle_t btnHandle;    
+    AppDriverHandle_t handle;
+    ButtonHandle_t btnHandle;    
 
     InitKeyWithPressCallback(btnHandle, 
         CONFIG_DONE_COFFEE_MAKER_POWER_KEY,
@@ -340,7 +340,7 @@ static app_driver_handle_t PowerKeyInit()
         CONFIG_DONE_COFFEE_MAKER_MICRO_SWITCH,
         MicroSwitchCB);
 
-    return (app_driver_handle_t)handle;
+    return (AppDriverHandle_t)handle;
 }
 
 static void CookingModeGrindCB(void *Arg, void *Data)
@@ -366,10 +366,10 @@ static void CookingModeTeaCB(void *Arg, void *Data)
         EXPLICIT_MODE, TEA_MODE, CookingModeEndpointID);        
 }
 
-static app_driver_handle_t CookingModeInit()
+static AppDriverHandle_t CookingModeInit()
 {
-    app_driver_handle_t handle;
-    button_handle_t btn1Handle, btn2Handle, btn3Handle;    
+    AppDriverHandle_t handle;
+    ButtonHandle_t btn1Handle, btn2Handle, btn3Handle;    
 
     InitKeyWithPressCallback(btn1Handle, 
         CONFIG_DONE_COFFEE_MAKER_COOKING_MODE_GRINDER,
@@ -383,7 +383,7 @@ static app_driver_handle_t CookingModeInit()
         CONFIG_DONE_COFFEE_MAKER_COOKING_MODE_TEA,
         CookingModeTeaCB);        
 
-    return (app_driver_handle_t)handle;
+    return (AppDriverHandle_t)handle;
 }
 
 static void CupCounterKeyCB(void *Arg, void *Data)
@@ -393,20 +393,20 @@ static void CupCounterKeyCB(void *Arg, void *Data)
         INCREMENT_MODE, DONT_CARE, CupCounterEndpointID);        
 }
 
-static app_driver_handle_t CupCounterInit()
+static AppDriverHandle_t CupCounterInit()
 {
-    app_driver_handle_t handle;
-    button_handle_t btnHandle;    
+    AppDriverHandle_t handle;
+    ButtonHandle_t btnHandle;    
 
     InitKeyWithPressCallback(btnHandle, 
         CONFIG_DONE_COFFEE_MAKER_CUP_COUNTER_KEY,
         CupCounterKeyCB);
 
-    return (app_driver_handle_t)handle;
+    return (AppDriverHandle_t)handle;
 }
 
 esp_err_t CookingModeSetEnable(
-    app_driver_handle_t DriverHandle, 
+    AppDriverHandle_t DriverHandle, 
     esp_matter_attr_val_t *Val)
 {
     esp_err_t err = ESP_OK;
@@ -415,7 +415,7 @@ esp_err_t CookingModeSetEnable(
 }
 
 esp_err_t GrinderSetEnable(
-    app_driver_handle_t DriverHandle, 
+    AppDriverHandle_t DriverHandle, 
     esp_matter_attr_val_t *Val)
 {
     esp_err_t err = ESP_OK;
@@ -424,7 +424,7 @@ esp_err_t GrinderSetEnable(
 }
 
 esp_err_t CupCounterSetEnable(
-    app_driver_handle_t DriverHandle, 
+    AppDriverHandle_t DriverHandle, 
     esp_matter_attr_val_t *Val)
 {
     esp_err_t err = ESP_OK;
@@ -443,7 +443,7 @@ esp_err_t CupCounterSetEnable(
  * @return error in case of failure.
  */
 esp_err_t DoneCoffeeMakerAttributeUpdate(
-    app_driver_handle_t DriverHandle, 
+    AppDriverHandle_t DriverHandle, 
     const uint16_t &EndpointID, const uint32_t &ClusterID,
     const uint32_t &AttributeID, esp_matter_attr_val_t *Val)
 {
@@ -507,7 +507,7 @@ esp_err_t DoneCoffeeMakerCreate(node_t* Node)
 {
     esp_err_t err = ESP_OK;
 
-    app_driver_handle_t powerKeyHandle = PowerKeyInit();    
+    AppDriverHandle_t powerKeyHandle = PowerKeyInit();    
     DoneMasterPowerKey::config_t powerKeyConfig;
     powerKeyConfig.on_off.on_off = true;//for powerOn when Plug in Powerline.  
     powerKeyConfig.boolean.state_value = true;//MicroSwitchMode_t::NORMAL_MODE  
@@ -527,7 +527,7 @@ esp_err_t DoneCoffeeMakerCreate(node_t* Node)
         ESP_LOGI(TAG, "powerKeyEndpoint created with EndpointID %d", PowerKeyEndpointID);
     }
 
-    app_driver_handle_t cookingModeHandle = CookingModeInit();    
+    AppDriverHandle_t cookingModeHandle = CookingModeInit();    
     DoneMultiFunctionSwitch::config_t CookingModeConfig;
     CookingModeConfig.on_off.on_off= true;
     CookingModeConfig.level_control.current_level = GRINDER_MODE;
@@ -560,7 +560,7 @@ esp_err_t DoneCoffeeMakerCreate(node_t* Node)
         ESP_LOGI(TAG, "grinderEndpoint created with EndpointID %d", GrinderEndpointID);
     }
 
-    app_driver_handle_t cupCounterHandle = CupCounterInit();
+    AppDriverHandle_t cupCounterHandle = CupCounterInit();
     DoneMultiFunctionSwitch::config_t cupCounterConfig;
     cupCounterConfig.on_off.on_off= true;        
     cupCounterConfig.level_control.current_level = 2;

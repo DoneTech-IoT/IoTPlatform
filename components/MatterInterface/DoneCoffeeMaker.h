@@ -44,7 +44,7 @@ typedef enum {
  * @return error in case of failure.
  */
 esp_err_t DoneCoffeeMakerAttributeUpdate(
-    app_driver_handle_t DriverHandle,
+    AppDriverHandle_t DriverHandle,
     const uint16_t &EndpointID, const uint32_t &ClusterID,
     const uint32_t &AttributeID, esp_matter_attr_val_t *Val);
 

@@ -16,8 +16,8 @@
 #include "esp_openthread_types.h"
 #endif
 
-typedef void *app_driver_handle_t;
-typedef void *button_handle_t;
+typedef void *AppDriverHandle_t;
+typedef void *ButtonHandle_t;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #define ESP_OPENTHREAD_DEFAULT_RADIO_CONFIG()                                                  \

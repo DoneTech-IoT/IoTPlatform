@@ -138,7 +138,7 @@ static esp_err_t app_attribute_update_cb(callback_type_t type,
 
     if (type == PRE_UPDATE)//update before save in database(usually drivers)
     {
-        app_driver_handle_t driver_handle = (app_driver_handle_t)priv_data;
+        AppDriverHandle_t driver_handle = (AppDriverHandle_t)priv_data;
         
 #ifdef CONFIG_DONE_MATTER_DEVICE_COFFEE_MAKER            
         err = DoneCoffeeMakerAttributeUpdate(
