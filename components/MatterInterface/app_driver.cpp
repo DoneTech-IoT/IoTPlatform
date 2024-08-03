@@ -18,6 +18,8 @@
 #include <app_priv.h>
 #include <app_reset.h>
 
+#include "DoneCoffeeMaker.h"
+
 using chip::kInvalidClusterId;
 static constexpr chip::CommandId kInvalidCommandId = 0xFFFF'FFFF;
 
@@ -26,7 +28,6 @@ using namespace esp_matter;
 using namespace esp_matter::cluster;
 
 static const char *TAG = "app_driver";
-extern uint16_t switch_endpoint_id;
 
 #if CONFIG_ENABLE_CHIP_SHELL
 static char console_buffer[101] = {0};
@@ -176,114 +177,3 @@ static void app_driver_register_commands()
 }
 #endif // CONFIG_ENABLE_CHIP_SHELL
 
-void app_driver_client_command_callback(client::peer_device_t *peer_device, client::command_handle_t *cmd_handle,
-                                        void *priv_data)
-{
-    // on_off light switch should support on_off cluster and identify cluster commands sending.
-    if (cmd_handle->cluster_id == OnOff::Id) {
-        switch (cmd_handle->command_id) {
-        case OnOff::Commands::Off::Id: {
-            on_off::command::send_off(peer_device, cmd_handle->endpoint_id);
-            break;
-        };
-        case OnOff::Commands::On::Id: {
-            on_off::command::send_on(peer_device, cmd_handle->endpoint_id);
-            break;
-        };
-        case OnOff::Commands::Toggle::Id: {
-            on_off::command::send_toggle(peer_device, cmd_handle->endpoint_id);
-            break;
-        };
-        default:
-            break;
-        }
-    } else if (cmd_handle->cluster_id == Identify::Id) {
-        if (cmd_handle->command_id == Identify::Commands::Identify::Id) {
-            if (((char *)cmd_handle->command_data)[0] != 1) {
-                ESP_LOGE(TAG, "Number of parameters error");
-                return;
-            }
-            identify::command::send_identify(peer_device, cmd_handle->endpoint_id,
-                                             strtol((const char *)(cmd_handle->command_data) + 1, NULL, 16));
-        } else {
-            ESP_LOGE(TAG, "Unsupported command");
-        }
-    } else {
-        ESP_LOGE(TAG, "Unsupported cluster");
-    }
-}
-
-void app_driver_client_group_command_callback(uint8_t fabric_index, client::command_handle_t *cmd_handle,
-                                              void *priv_data)
-{
-    // on_off light switch should support on_off cluster and identify cluster commands sending.
-    if (cmd_handle->cluster_id == OnOff::Id) {
-        switch (cmd_handle->command_id) {
-        case OnOff::Commands::Off::Id: {
-            on_off::command::group_send_off(fabric_index, cmd_handle->group_id);
-            break;
-        }
-        case OnOff::Commands::On::Id: {
-            on_off::command::group_send_on(fabric_index, cmd_handle->group_id);
-            break;
-        }
-        case OnOff::Commands::Toggle::Id: {
-            on_off::command::group_send_toggle(fabric_index, cmd_handle->group_id);
-            break;
-        }
-        default:
-            break;
-        }
-    } else if (cmd_handle->cluster_id == Identify::Id) {
-        if (cmd_handle->command_id == Identify::Commands::Identify::Id) {
-            if (((char *)cmd_handle->command_data)[0] != 1) {
-                ESP_LOGE(TAG, "Number of parameters error");
-                return;
-            }
-            identify::command::group_send_identify(fabric_index, cmd_handle->group_id,
-                                                   strtol((const char *)(cmd_handle->command_data) + 1, NULL, 16));
-        } else {
-            ESP_LOGE(TAG, "Unsupported command");
-        }
-    } else {
-        ESP_LOGE(TAG, "Unsupported cluster");
-    }
-}
-
-static void app_driver_button_toggle_cb(void *arg, void *data)
-{
-    ESP_LOGI(TAG, "Toggle button pressed");
-    client::command_handle_t cmd_handle;
-    cmd_handle.cluster_id = OnOff::Id;
-    cmd_handle.command_id = OnOff::Commands::Toggle::Id;    
-
-    lock::chip_stack_lock(portMAX_DELAY);
-    client::cluster_update(switch_endpoint_id, &cmd_handle);
-    lock::chip_stack_unlock();
-}
-
-app_driver_handle_t app_driver_switch_init()
-{
-    /* Initialize button */
-    button_config_t config = button_driver_get_config();
-    button_handle_t handle = iot_button_create(&config);
-    iot_button_register_cb(handle, BUTTON_PRESS_DOWN, app_driver_button_toggle_cb, NULL);
-
-    /* Other initializations */
-#if CONFIG_ENABLE_CHIP_SHELL
-    app_driver_register_commands();
-#endif // CONFIG_ENABLE_CHIP_SHELL
-    client::set_command_callback(app_driver_client_command_callback, app_driver_client_group_command_callback, NULL);
-
-    return (app_driver_handle_t)handle;
-}
-
-app_driver_handle_t app_driver_coffee_maker_init()
-{    
-    //just repeat body of above func.
-    button_config_t config = button_driver_get_config();
-    button_handle_t handle = iot_button_create(&config);
-    iot_button_register_cb(handle, BUTTON_PRESS_DOWN, app_driver_button_toggle_cb, NULL);
-
-    return (app_driver_handle_t)handle;
-}

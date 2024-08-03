@@ -10,22 +10,14 @@
 
 #include <esp_err.h>
 #include <esp_matter.h>
+#include <hal/gpio_types.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include "esp_openthread_types.h"
 #endif
 
 typedef void *app_driver_handle_t;
-
-/** Initialize the switch driver
- *
- * This initializes the switch driver associated with the selected board.
- *
- * @return Handle on success.
- * @return NULL in case of failure.
- */
-app_driver_handle_t app_driver_switch_init();
-app_driver_handle_t app_driver_coffee_maker_init();
+typedef void *button_handle_t;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #define ESP_OPENTHREAD_DEFAULT_RADIO_CONFIG()                                                  \

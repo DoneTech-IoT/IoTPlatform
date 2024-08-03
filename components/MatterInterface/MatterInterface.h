@@ -8,19 +8,14 @@
 #include <esp_matter.h>
 #include <esp_matter_console.h>
 #include <esp_matter_ota.h>
-
 #include <esp_matter_identify.h>
 #include <esp_matter_endpoint.h>
 
 #include <app_priv.h>
 #include <app_reset.h>
 #include <device.h>
-#include <esp_matter.h>
-#include <esp_matter_console.h>
 #include <led_driver.h>
 
-#include <app_priv.h>
-#include <app_reset.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 using namespace esp_matter;

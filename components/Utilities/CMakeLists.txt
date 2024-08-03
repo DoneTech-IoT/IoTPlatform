@@ -5,9 +5,11 @@ idf_component_register(
 "nvsFlash/SpiffsManger.c"
 "JsonUtility/JsonUtility.c"
 "Log/Custom_Log.c"
+"Buzzer/Buzzer.c"
  INCLUDE_DIRS 
 
 "JsonUtility/include"
 "Log"
 "nvsFlash/include"
+"Buzzer"
      REQUIRES spiffs nvs_flash esp_timer GlobalInit driver json) 
