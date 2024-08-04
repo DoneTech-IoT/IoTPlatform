@@ -8,7 +8,7 @@ extern "C"
 
 typedef enum {
     NO_EFFECT = 0,
-    ON_BIZ = 1,
+    ONE_BIZ = 1,
     DOUBLE_BIZ = 2,
     TRIPLE_BIZ = 3,
 }BuzzerEffect_t;
