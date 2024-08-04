@@ -18,6 +18,13 @@
 //#define GPIO_OUTPUT_SPEED LEDC_HIGH_SPEED_MODE
 static const char *TAG = "BUZZER";
 
+/** 
+ * @brief buzzer driver with esp-ledc pwm-driver.
+ * @param[in] gpio_num pin number of pwm to drive buzzer
+ * @param[in] freq frequency of biz
+ * @param[in] duration time between biz cycles
+ * @
+ */
 static void BuzzerMakeSound(int gpio_num, uint32_t freq,uint32_t duration)
 {	
     ledc_timer_config_t timer_conf;
@@ -46,6 +53,10 @@ static void BuzzerMakeSound(int gpio_num, uint32_t freq,uint32_t duration)
     ledc_update_duty(GPIO_OUTPUT_SPEED, LEDC_CHANNEL_0);    
 }
 
+/** 
+ * @brief make biz with constant frequency.
+ * @param[in] count number of biz of buzzer
+ */
 static void BuzzerBiz(uint8_t count)
 {
 	for (size_t i = 0; i < count; i++)
@@ -58,6 +69,10 @@ static void BuzzerBiz(uint8_t count)
 	}		
 }
 
+/** 
+ * @brief play Buzzer with an effect
+ * @param[in] effectNo effect that define in BuzzerEffect_t
+ */
 void BuzzerPlay(BuzzerEffect_t effectNo)
 {
 	switch (effectNo)
