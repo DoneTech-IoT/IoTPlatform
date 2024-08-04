@@ -6,7 +6,7 @@
 # 	url = https://github.com/lvgl/lvgl.git
 [submodule "components/SpotifyInterface"]
 	path = components/SpotifyInterface
-	url = https://github.com/Behn4m/SpotifyInterface
+	url = git@github.com:Behn4m/SpotifyInterface.git
 [submodule "components/MQTT"]
 	path = components/MQTT
 	url = git@github.com:DoneTech-IoT/MQTTS.git
