@@ -11,7 +11,7 @@ typedef enum {
     ONE_BIZ = 1,
     DOUBLE_BIZ = 2,
     TRIPLE_BIZ = 3,
-}BuzzerEffect_t;
+} BuzzerEffect_t;
 
 /** 
  * @brief play Buzzer with an effect
