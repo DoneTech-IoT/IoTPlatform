@@ -62,8 +62,8 @@ void BuzzerPlay(BuzzerEffect_t effectNo)
 {
 	switch (effectNo)
 	{
-		case ON_BIZ:
-			BuzzerBiz(ON_BIZ);
+		case ONE_BIZ:
+			BuzzerBiz(ONE_BIZ);
 			break;	
 		case DOUBLE_BIZ:
 			BuzzerBiz(DOUBLE_BIZ);
