@@ -1,0 +1,1 @@
+GEN_CSRCS += _icon_number_cups_alpha_56x56.c _frame_alpha_360x100.c _icon_coffee_beans_alpha_96x96.c _icon_coffee_powder_alpha_96x96.c _icon_tea_leaf_alpha_96x96.c _icon_coffee_grind_lvl_1_alpha_90x90.c _icon_coffee_grind_lvl_2_alpha_90x90.c _icon_coffee_grind_lvl_3_alpha_90x90.c _select_grind_size_alpha_100x100.c _select_your_drink_alpha_100x100.c
