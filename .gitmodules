@@ -7,3 +7,6 @@
 [submodule "components/SpotifyInterface"]
 	path = components/SpotifyInterface
 	url = https://github.com/Behn4m/SpotifyInterface
+[submodule "components/MQTT"]
+	path = components/MQTT
+	url = git@github.com:DoneTech-IoT/MQTTS.git
