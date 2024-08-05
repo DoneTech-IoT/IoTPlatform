@@ -9,8 +9,6 @@ lv_color_t *LVGL_BigBuf2;
 static const char *TAG = "LVGL_GUI";
 void GUI_mainTask(void *pvParameter);
 
-lv_ui guider_ui;
-
 /**
  * @brief Allocates memory for LVGL components.
  * This function allocates memory for LVGL components such as task buffer, task stack,
@@ -124,4 +122,57 @@ void GUI_TaskKill(TaskHandle_t *TaskHandler)
         free(LVGL_BigBuf2);
         free(LVGL_BigBuf1);
     }
+}
+
+/**
+ * @brief Updates the LVGL screen with Spotify information.
+ * This function updates various elements on the LVGL screen with Spotify information
+ * such as artist name, song title, album name, playback progress, and cover photo.
+ * @param songUpdated Flag indicating whether the song information has been updated.
+ * @param Artist Artist name.
+ * @param Song Title of the song.
+ * @param Album Album name.
+ * @param DurationMS Duration of the song in milliseconds.
+ * @param ProgressMS Current playback progress in milliseconds.
+ * @param coverPhoto Pointer to the cover photo image data.
+ * @return void
+ */
+void GUI_UpdateSpotifyScreen(bool songUpdated, char *Artist, char *Song, char *Album, int DurationMS, int ProgressMS, uint8_t *coverPhoto)
+{
+    int minutes = ProgressMS / 60000;
+    int second = (ProgressMS % 60000) / 1000;
+    char time[20];
+    sprintf(time, "%d:%d", minutes, second);
+    lv_event_send(guider_ui.Spotify_Page_label_time, LV_EVENT_VALUE_CHANGED, time);
+
+    if (DurationMS == 0)
+    {
+        ESP_LOGE(TAG, "Duration is zero");
+        return;
+    }
+    int progress = (ProgressMS * 100) / DurationMS;
+    lv_event_send(guider_ui.Spotify_Page_bar_progress, LV_EVENT_VALUE_CHANGED, progress);
+
+    if (!songUpdated)
+    {
+        return;
+    }
+    Log_RamStatus("LVGL", " before update screen");
+    lv_event_send(guider_ui.Spotify_Page_Artist_name, LV_EVENT_VALUE_CHANGED, Artist);
+    lv_event_send(guider_ui.Spotify_Page_Song_name, LV_EVENT_VALUE_CHANGED, Song);
+    lv_event_send(guider_ui.Spotify_Page_Album_name, LV_EVENT_VALUE_CHANGED, Album);
+    lv_event_send(guider_ui.Matter_logo, LV_EVENT_VALUE_CHANGED, NULL);
+    lv_event_send(guider_ui.Spotify_Page_img_song, LV_EVENT_VALUE_CHANGED, coverPhoto);
+    Log_RamStatus("LVGL", " after update screen");
+}
+
+/**
+ * @brief Handles the event of Matter network connection.
+ * This function is called when the Matter network is connected. It sends an event
+ * to update the Matter logo on the LVGL UI.
+ * @return void
+ */
+void MatterNetworkConnected()
+{
+    lv_event_send(guider_ui.Matter_logo, LV_EVENT_VALUE_CHANGED, NULL);
 }

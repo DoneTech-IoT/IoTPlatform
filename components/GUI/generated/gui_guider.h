@@ -18,21 +18,21 @@ extern "C" {
 typedef struct
 {
   
-	lv_obj_t *screen;
-	bool screen_del;
-	lv_obj_t *screen_img_7;
-	lv_obj_t *screen_label_1;
-	lv_obj_t *screen_label_2;
-	lv_obj_t *screen_img_8;
-	lv_obj_t *screen_img_9;
-	lv_obj_t *screen_img_10;
-	lv_obj_t *screen_img_11;
-	lv_obj_t *screen_img_12;
-	lv_obj_t *screen_img_13;
-	lv_obj_t *screen_img_14;
-	lv_obj_t *screen_img_15;
-	lv_obj_t *screen_img_16;
-	lv_obj_t *screen_img_17;
+	lv_obj_t *Spotify_Page;
+	bool Spotify_Page_del;
+	lv_obj_t *Spotify_Page_cont_Spotify;
+	lv_obj_t *Spotify_Page_label_time;
+	lv_obj_t *Spotify_Page_label_artist;
+	lv_obj_t *Spotify_Page_label_song;
+	lv_obj_t *Spotify_Page_label_album;
+	lv_obj_t *Spotify_Page_img_song;
+	lv_obj_t *Spotify_Page_img_artist;
+	lv_obj_t *Spotify_Page_img_2;
+	lv_obj_t *Matter_logo;
+	lv_obj_t *Spotify_Page_bar_progress;
+	lv_obj_t *Spotify_Page_Album_name;
+	lv_obj_t *Spotify_Page_Song_name;
+	lv_obj_t *Spotify_Page_Artist_name;
 }lv_ui;
 
 typedef void (*ui_setup_scr_t)(lv_ui * ui);
@@ -65,23 +65,14 @@ void setup_ui(lv_ui *ui);
 
 extern lv_ui guider_ui;
 
+void setup_scr_Spotify_Page(lv_ui *ui);
+LV_IMG_DECLARE(_song_cover_alpha_150x150);
+LV_IMG_DECLARE(_Spotify_Logo_RGB_White_alpha_120x35);
+LV_IMG_DECLARE(_matter_logo_alpha_64x64);
 
-void setup_scr_screen(lv_ui *ui);
-LV_IMG_DECLARE(_icon_number_cups_alpha_56x56);
-LV_IMG_DECLARE(_frame_alpha_360x100);
-LV_IMG_DECLARE(_icon_coffee_beans_alpha_96x96);
-LV_IMG_DECLARE(_icon_coffee_powder_alpha_96x96);
-LV_IMG_DECLARE(_icon_tea_leaf_alpha_96x96);
-LV_IMG_DECLARE(_frame_alpha_360x100);
-LV_IMG_DECLARE(_icon_coffee_grind_lvl_1_alpha_90x90);
-LV_IMG_DECLARE(_icon_coffee_grind_lvl_2_alpha_90x90);
-LV_IMG_DECLARE(_icon_coffee_grind_lvl_3_alpha_90x90);
-LV_IMG_DECLARE(_select_grind_size_alpha_100x100);
-LV_IMG_DECLARE(_select_your_drink_alpha_100x100);
-
-LV_FONT_DECLARE(lv_font_arial_32)
+LV_FONT_DECLARE(lv_font_arial_16)
 LV_FONT_DECLARE(lv_font_montserratMedium_16)
-LV_FONT_DECLARE(lv_font_arial_18)
+LV_FONT_DECLARE(lv_font_montserratMedium_12)
 
 
 #ifdef __cplusplus

@@ -93,6 +93,10 @@ void ServiceMangerInit()
     GUI_TaskCreator();
     ESP_LOGI(TAG, "GUI Created !");
 #endif
+#ifdef CONFIG_DONE_COMPONENT_SPOTIFY
+    SpotifyTaskCreator();
+    ESP_LOGI(TAG, "Spotify Created !");
+#endif
 }
 
 /**
@@ -104,7 +108,7 @@ void ServiceMangerInit()
 void ServiceMangerTask(void *pvParameter)
 {
     ServiceMangerInit();
-    //char pcTaskList[TASK_LIST_BUFFER_SIZE];
+    char pcTaskList[TASK_LIST_BUFFER_SIZE];
     while (true)
     {
         // vTaskList(pcTaskList);
