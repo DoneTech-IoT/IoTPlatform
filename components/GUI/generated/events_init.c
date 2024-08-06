@@ -15,7 +15,35 @@
 #include "freemaster_client.h"
 #endif
 
+static void Drink_CoffeeBean_handler(lv_event_t *e)
+{
 
+}
+
+static void Drink_CoffeePowder_handler(lv_event_t *e)
+{
+
+}
+
+static void Drink_Tea_handler(lv_event_t *e)
+{
+
+}
+
+static void CoffeeBeanSize_L_handler(lv_event_t *e)
+{
+
+}
+
+static void CoffeeBeanSize_M_handler(lv_event_t *e)
+{
+
+}
+
+static void CoffeeBeanSize_S_handler(lv_event_t *e)
+{
+
+}
 
 void events_init(lv_ui *ui)
 {
