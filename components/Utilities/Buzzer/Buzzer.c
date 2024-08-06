@@ -77,17 +77,17 @@ void BuzzerPlay(BuzzerEffect_t effectNo)
 {
 	switch (effectNo)
 	{
-	case ONE_BIZ:
-		BuzzerBiz(ONE_BIZ);
-		break;
-	case DOUBLE_BIZ:
-		BuzzerBiz(DOUBLE_BIZ);
-		break;
-	case TRIPLE_BIZ:
-		BuzzerBiz(TRIPLE_BIZ);
-		break;
-	case NO_EFFECT:
-	default:
-		break;
+		case ONE_BIZ:
+			BuzzerBiz(ONE_BIZ);
+			break;
+		case DOUBLE_BIZ:
+			BuzzerBiz(DOUBLE_BIZ);
+			break;
+		case TRIPLE_BIZ:
+			BuzzerBiz(TRIPLE_BIZ);
+			break;
+		case NO_EFFECT:
+		default:
+			break;
 	}
 }
