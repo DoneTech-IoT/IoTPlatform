@@ -19,5 +19,5 @@
 
 void events_init(lv_ui *ui)
 {
-
+//TODO call events and handle them 
 }
