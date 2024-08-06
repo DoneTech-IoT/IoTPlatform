@@ -9,7 +9,7 @@
 /*******************************************************************************
  * Size: 16 px
  * Bpp: 4
- * Opts: --user-data-dir=C:\Users\Abbasi\AppData\Roaming\gui-guider --app-path=C:\NXP\GUI-Guider-1.7.0-GA\resources\app.asar --no-sandbox --no-zygote --lang=en-US --device-scale-factor=1 --num-raster-threads=2 --enable-main-frame-before-activation --renderer-client-id=5 --time-ticks-at-unix-epoch=-1710654871242006 --launch-time-ticks=72924722 --mojo-platform-channel-handle=2888 --field-trial-handle=1664,i,8018207501706718654,14000247124071400367,131072 --disable-features=SpareRendererForSitePerProcess,WinRetrieveSuggestionsOnlyOnDemand /prefetch:1
+ * Opts: --enable-crashpad --crashpad-handler-pid=5681 --enable-crash-reporter=58fe9a95-82b5-499d-8d0a-1062183d1dda,no_channel --user-data-dir=/home/m4/.config/gui-guider --app-path=/opt/Gui-Guider/resources/app.asar --no-sandbox --no-zygote --lang=en-US --num-raster-threads=2 --enable-main-frame-before-activation --renderer-client-id=5 --time-ticks-at-unix-epoch=-1722930250462261 --launch-time-ticks=794018864 --shared-files=v8_context_snapshot_data:100 --field-trial-handle=0,i,5495302320758091136,2137075585244733913,131072 --disable-features=SpareRendererForSitePerProcess --enable-crashpad
  ******************************************************************************/
 
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
@@ -2443,8 +2443,8 @@ lv_font_t lv_font_montserratMedium_16 = {
 #endif
     .get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt,    /*Function pointer to get glyph's data*/
     .get_glyph_bitmap = lv_font_get_bitmap_fmt_txt,    /*Function pointer to get glyph's bitmap*/
-    .line_height = 16,          /*The maximum line height required by the font  default: (f.src.ascent - f.src.descent)*/
-    .base_line = 2,                          /*Baseline measured from the bottom of the line*/
+    .line_height = 16,          /*The maximum line height required by the font*/
+    .base_line = 2,             /*Baseline measured from the bottom of the line*/
 #if !(LVGL_VERSION_MAJOR == 6 && LVGL_VERSION_MINOR == 0)
     .subpx = LV_FONT_SUBPX_NONE,
 #endif

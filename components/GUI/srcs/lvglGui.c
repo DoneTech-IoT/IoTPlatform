@@ -9,6 +9,8 @@ lv_color_t *LVGL_BigBuf2;
 static const char *TAG = "LVGL_GUI";
 void GUI_mainTask(void *pvParameter);
 
+lv_ui guider_ui;
+
 /**
  * @brief Allocates memory for LVGL components.
  * This function allocates memory for LVGL components such as task buffer, task stack,
@@ -139,31 +141,31 @@ void GUI_TaskKill(TaskHandle_t *TaskHandler)
  */
 void GUI_UpdateSpotifyScreen(bool songUpdated, char *Artist, char *Song, char *Album, int DurationMS, int ProgressMS, uint8_t *coverPhoto)
 {
-    int minutes = ProgressMS / 60000;
-    int second = (ProgressMS % 60000) / 1000;
-    char time[20];
-    sprintf(time, "%d:%d", minutes, second);
-    lv_event_send(guider_ui.Spotify_Page_label_time, LV_EVENT_VALUE_CHANGED, time);
+    // int minutes = ProgressMS / 60000;
+    // int second = (ProgressMS % 60000) / 1000;
+    // char time[20];
+    // sprintf(time, "%d:%d", minutes, second);
+    // lv_event_send(guider_ui.Spotify_Page_label_time, LV_EVENT_VALUE_CHANGED, time);
 
-    if (DurationMS == 0)
-    {
-        ESP_LOGE(TAG, "Duration is zero");
-        return;
-    }
-    int progress = (ProgressMS * 100) / DurationMS;
-    lv_event_send(guider_ui.Spotify_Page_bar_progress, LV_EVENT_VALUE_CHANGED, progress);
+    // if (DurationMS == 0)
+    // {
+    //     ESP_LOGE(TAG, "Duration is zero");
+    //     return;
+    // }
+    // int progress = (ProgressMS * 100) / DurationMS;
+    // lv_event_send(guider_ui.Spotify_Page_bar_progress, LV_EVENT_VALUE_CHANGED, progress);
 
-    if (!songUpdated)
-    {
-        return;
-    }
-    Log_RamStatus("LVGL", " before update screen");
-    lv_event_send(guider_ui.Spotify_Page_Artist_name, LV_EVENT_VALUE_CHANGED, Artist);
-    lv_event_send(guider_ui.Spotify_Page_Song_name, LV_EVENT_VALUE_CHANGED, Song);
-    lv_event_send(guider_ui.Spotify_Page_Album_name, LV_EVENT_VALUE_CHANGED, Album);
-    lv_event_send(guider_ui.Matter_logo, LV_EVENT_VALUE_CHANGED, NULL);
-    lv_event_send(guider_ui.Spotify_Page_img_song, LV_EVENT_VALUE_CHANGED, coverPhoto);
-    Log_RamStatus("LVGL", " after update screen");
+    // if (!songUpdated)
+    // {
+    //     return;
+    // }
+    // Log_RamStatus("LVGL", " before update screen");
+    // lv_event_send(guider_ui.Spotify_Page_Artist_name, LV_EVENT_VALUE_CHANGED, Artist);
+    // lv_event_send(guider_ui.Spotify_Page_Song_name, LV_EVENT_VALUE_CHANGED, Song);
+    // lv_event_send(guider_ui.Spotify_Page_Album_name, LV_EVENT_VALUE_CHANGED, Album);
+    // lv_event_send(guider_ui.Matter_logo, LV_EVENT_VALUE_CHANGED, NULL);
+    // lv_event_send(guider_ui.Spotify_Page_img_song, LV_EVENT_VALUE_CHANGED, coverPhoto);
+    // Log_RamStatus("LVGL", " after update screen");
 }
 
 /**
@@ -174,5 +176,5 @@ void GUI_UpdateSpotifyScreen(bool songUpdated, char *Artist, char *Song, char *A
  */
 void MatterNetworkConnected()
 {
-    lv_event_send(guider_ui.Matter_logo, LV_EVENT_VALUE_CHANGED, NULL);
+    //lv_event_send(guider_ui.Matter_logo, LV_EVENT_VALUE_CHANGED, NULL);
 }
