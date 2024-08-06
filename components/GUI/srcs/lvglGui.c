@@ -180,3 +180,32 @@ void MatterNetworkConnected()
 }
 
 //TODO add events function here
+void Drink_CoffeeBean()
+{
+
+}
+
+void Drink_CoffeePowder()
+{
+
+}
+
+void Drink_Tea()
+{
+
+}
+
+void CoffeeBeanSize_L()
+{
+
+}
+
+void CoffeeBeanSize_M()
+{
+    
+}
+
+void CoffeeBeanSize_S()
+{
+    
+}

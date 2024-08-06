@@ -51,6 +51,15 @@ void MatterNetworkConnected();
  * @return void
  */
 void GUI_TaskKill(TaskHandle_t *TaskHandler);
+
+void Drink_CoffeeBean();
+void Drink_CoffeePowder();
+void Drink_Tea();
+
+void CoffeeBeanSize_L();
+void CoffeeBeanSize_M();
+void CoffeeBeanSize_S();
+
 #ifdef __cplusplus
 }
 #endif
