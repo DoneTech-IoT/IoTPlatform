@@ -19,5 +19,9 @@
 
 void events_init(lv_ui *ui)
 {
-//TODO call events and handle them 
+    lv_obj_add_event_cb(ui->screen_img_5, Drink_CoffeeBean_handler, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui->screen_img_3, Drink_CoffeePowder_handler, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui->screen_img_2, Drink_Tea_handler, LV_EVENT_ALL, NULL);
+
+    lv_obj_add_event_cb(ui->screen_img_6, CoffeeBeanSize_L_handler, LV_EVENT_ALL, NULL);lv_obj_add_event_cb(ui->screen_img_4, CoffeeBeanSize_M_handler, LV_EVENT_ALL, NULL);lv_obj_add_event_cb(ui->screen_img_1, CoffeeBeanSize_S_handler, LV_EVENT_ALL, NULL);
 }
