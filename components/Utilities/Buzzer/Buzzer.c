@@ -15,7 +15,7 @@
 #include "Buzzer.h"
 
 #define GPIO_OUTPUT_SPEED LEDC_LOW_SPEED_MODE
-// #define GPIO_OUTPUT_SPEED LEDC_HIGH_SPEED_MODE
+//#define GPIO_OUTPUT_SPEED LEDC_HIGH_SPEED_MODE
 static const char *TAG = "BUZZER";
 
 /**
