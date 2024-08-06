@@ -178,3 +178,5 @@ void MatterNetworkConnected()
 {
     //lv_event_send(guider_ui.Matter_logo, LV_EVENT_VALUE_CHANGED, NULL);
 }
+
+//TODO add events function here

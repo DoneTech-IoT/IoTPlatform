@@ -104,6 +104,9 @@ extern "C" void app_main()
 
     GlobalInit();
     nvsFlashInit();
+
+    //TODO add a switch/case here to call different functions
+
 //     SpiffsGlobalConfig();
 
 // #ifdef CONFIG_DONE_COMPONENT_MATTER

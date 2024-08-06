@@ -202,7 +202,7 @@ void setup_scr_screen(lv_ui *ui)
 	lv_obj_set_style_shadow_width(ui->screen_label_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
 	//The custom code of screen.
-	
+	events_init(ui);
 
 	//Update current screen layout.
 	lv_obj_update_layout(ui->screen);
