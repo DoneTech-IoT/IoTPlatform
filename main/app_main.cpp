@@ -108,18 +108,19 @@ extern "C" void app_main()
     while(1)
     {
         Drink_Tea_Event();
-        vTaskDelay(pdMS_TO_TICKS(10 * SEC));
+        vTaskDelay(pdMS_TO_TICKS(3 * SEC));
     
         Drink_CoffeePowder_Event();
-        vTaskDelay(pdMS_TO_TICKS(10 * SEC));
+        vTaskDelay(pdMS_TO_TICKS(3 * SEC));
     
         Drink_CoffeeBean_Event();
+        vTaskDelay(pdMS_TO_TICKS(3 * SEC));
         CoffeeBeanSize_L_Event();
-        vTaskDelay(pdMS_TO_TICKS(10 * SEC));
+        vTaskDelay(pdMS_TO_TICKS(3 * SEC));
         CoffeeBeanSize_M_Event();
-        vTaskDelay(pdMS_TO_TICKS(10 * SEC));
+        vTaskDelay(pdMS_TO_TICKS(3 * SEC));
         CoffeeBeanSize_S_Event();
-        vTaskDelay(pdMS_TO_TICKS(10 * SEC));
+        vTaskDelay(pdMS_TO_TICKS(3 * SEC));
     }
 //     SpiffsGlobalConfig();
 

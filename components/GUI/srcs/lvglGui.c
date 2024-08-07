@@ -180,33 +180,68 @@ void MatterNetworkConnected()
     //lv_event_send(guider_ui.Matter_logo, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
-//TODO add events function here
-void Drink_CoffeeBean_Event()
-{
-    lv_event_send(guider_ui.screen_img_5, LV_EVENT_ALL, NULL);
-}
-
 void Drink_CoffeePowder_Event()
 {
-    lv_event_send(guider_ui.screen_img_3, LV_EVENT_ALL, NULL);
+    lv_event_send(guider_ui.screen_img_3, LV_EVENT_CLICKED, NULL);
+
+    lv_event_send(guider_ui.screen_img_1, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_2, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_4, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_5, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_6, LV_EVENT_PRESSED, NULL);
 }
 
 void Drink_Tea_Event()
 {
-    lv_event_send(guider_ui.screen_img_2, LV_EVENT_ALL, NULL);
+    lv_event_send(guider_ui.screen_img_2, LV_EVENT_CLICKED, NULL);
+
+    lv_event_send(guider_ui.screen_img_1, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_3, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_4, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_5, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_6, LV_EVENT_PRESSED, NULL);
+}
+
+void Drink_CoffeeBean_Event()
+{
+    lv_event_send(guider_ui.screen_img_5, LV_EVENT_CLICKED, NULL);
+
+    lv_event_send(guider_ui.screen_img_1, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_3, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_4, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_2, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_6, LV_EVENT_PRESSED, NULL);
 }
 
 void CoffeeBeanSize_L_Event()
 {
-    lv_event_send(guider_ui.screen_img_6, LV_EVENT_ALL, NULL);
+    lv_event_send(guider_ui.screen_img_5, LV_EVENT_CLICKED, NULL);
+    lv_event_send(guider_ui.screen_img_6, LV_EVENT_CLICKED, NULL);
+
+    lv_event_send(guider_ui.screen_img_1, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_3, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_4, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_2, LV_EVENT_PRESSED, NULL);
 }
 
 void CoffeeBeanSize_M_Event()
 {
-    lv_event_send(guider_ui.screen_img_4, LV_EVENT_ALL, NULL);
+    lv_event_send(guider_ui.screen_img_5, LV_EVENT_CLICKED, NULL);
+    lv_event_send(guider_ui.screen_img_4, LV_EVENT_CLICKED, NULL);
+
+    lv_event_send(guider_ui.screen_img_1, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_3, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_6, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_2, LV_EVENT_PRESSED, NULL);
 }
 
 void CoffeeBeanSize_S_Event()
 {
-    lv_event_send(guider_ui.screen_img_1, LV_EVENT_ALL, NULL);
+    lv_event_send(guider_ui.screen_img_5, LV_EVENT_CLICKED, NULL);
+    lv_event_send(guider_ui.screen_img_1, LV_EVENT_CLICKED, NULL);
+
+    lv_event_send(guider_ui.screen_img_6, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_3, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_4, LV_EVENT_PRESSED, NULL);
+    lv_event_send(guider_ui.screen_img_2, LV_EVENT_PRESSED, NULL);
 }
