@@ -106,7 +106,17 @@ extern "C" void app_main()
     nvsFlashInit();
 
     //TODO add a switch/case here to call different functions
-
+    while(1)
+    {
+        Drink_Tea_Event();
+        vTaskDelay(pdMS_TO_TICKS(10 * SEC));
+    
+        Drink_CoffeePowder_Event();
+        vTaskDelay(pdMS_TO_TICKS(10 * SEC));
+    
+        Drink_CoffeeBean_Event();
+        vTaskDelay(pdMS_TO_TICKS(10 * SEC));
+    }
 //     SpiffsGlobalConfig();
 
 // #ifdef CONFIG_DONE_COMPONENT_MATTER

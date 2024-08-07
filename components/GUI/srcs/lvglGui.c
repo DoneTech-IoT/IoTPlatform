@@ -1,6 +1,7 @@
 #include "lvglGui.h"
 #include "gui_guider.h"
 #include "Custom_Log.h"
+
 StaticTask_t *xTaskLVGLBuffer;
 StackType_t *xLVGLStack;
 lv_color_t *LVGL_BigBuf1;
@@ -180,32 +181,32 @@ void MatterNetworkConnected()
 }
 
 //TODO add events function here
-void Drink_CoffeeBean()
+void Drink_CoffeeBean_Event()
 {
-
+    lv_event_send(guider_ui.screen_img_5, LV_EVENT_ALL, NULL);
 }
 
-void Drink_CoffeePowder()
+void Drink_CoffeePowder_Event()
 {
-
+    lv_event_send(guider_ui.screen_img_3, LV_EVENT_ALL, NULL);
 }
 
-void Drink_Tea()
+void Drink_Tea_Event()
 {
-
+    lv_event_send(guider_ui.screen_img_2, LV_EVENT_ALL, NULL);
 }
 
-void CoffeeBeanSize_L()
-{
+// void CoffeeBeanSize_L()
+// {
 
-}
+// }
 
-void CoffeeBeanSize_M()
-{
+// void CoffeeBeanSize_M()
+// {
     
-}
+// }
 
-void CoffeeBeanSize_S()
-{
+// void CoffeeBeanSize_S()
+// {
     
-}
+// }
