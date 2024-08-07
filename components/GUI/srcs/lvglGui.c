@@ -196,17 +196,17 @@ void Drink_Tea_Event()
     lv_event_send(guider_ui.screen_img_2, LV_EVENT_ALL, NULL);
 }
 
-// void CoffeeBeanSize_L()
-// {
+void CoffeeBeanSize_L_Event()
+{
+    lv_event_send(guider_ui.screen_img_6, LV_EVENT_ALL, NULL);
+}
 
-// }
+void CoffeeBeanSize_M_Event()
+{
+    lv_event_send(guider_ui.screen_img_4, LV_EVENT_ALL, NULL);
+}
 
-// void CoffeeBeanSize_M()
-// {
-    
-// }
-
-// void CoffeeBeanSize_S()
-// {
-    
-// }
+void CoffeeBeanSize_S_Event()
+{
+    lv_event_send(guider_ui.screen_img_1, LV_EVENT_ALL, NULL);
+}

@@ -56,9 +56,9 @@ void Drink_CoffeeBean_Event();
 void Drink_CoffeePowder_Event();
 void Drink_Tea_Event();
 
-// void CoffeeBeanSize_L();
-// void CoffeeBeanSize_M();
-// void CoffeeBeanSize_S();
+void CoffeeBeanSize_L_Event();
+void CoffeeBeanSize_M_Event();
+void CoffeeBeanSize_S_Event();
 
 #ifdef __cplusplus
 }

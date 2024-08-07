@@ -61,17 +61,38 @@ static void Drink_Tea_handler(lv_event_t *e)
 
 static void CoffeeBeanSize_L_handler(lv_event_t *e)
 {
+    lv_obj_t *obj = lv_event_get_target(e);
+	lv_obj_set_style_img_opa(obj, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(event_ui->screen_img_5, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
 
+    lv_obj_set_style_img_opa(event_ui->screen_img_3, 50, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(event_ui->screen_img_2, 50, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(event_ui->screen_img_4, 50, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(event_ui->screen_img_1, 50, LV_PART_MAIN|LV_STATE_DEFAULT);
 }
 
 static void CoffeeBeanSize_M_handler(lv_event_t *e)
 {
+    lv_obj_t *obj = lv_event_get_target(e);
+	lv_obj_set_style_img_opa(obj, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(event_ui->screen_img_5, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
 
+    lv_obj_set_style_img_opa(event_ui->screen_img_3, 50, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(event_ui->screen_img_6, 50, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(event_ui->screen_img_2, 50, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(event_ui->screen_img_1, 50, LV_PART_MAIN|LV_STATE_DEFAULT);
 }
 
 static void CoffeeBeanSize_S_handler(lv_event_t *e)
 {
+    lv_obj_t *obj = lv_event_get_target(e);
+	lv_obj_set_style_img_opa(obj, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(event_ui->screen_img_5, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
 
+    lv_obj_set_style_img_opa(event_ui->screen_img_3, 50, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(event_ui->screen_img_6, 50, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(event_ui->screen_img_2, 50, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(event_ui->screen_img_4, 50, LV_PART_MAIN|LV_STATE_DEFAULT);
 }
 
 void events_init(lv_ui *ui)
@@ -81,7 +102,7 @@ void events_init(lv_ui *ui)
     lv_obj_add_event_cb(ui->screen_img_3, Drink_CoffeePowder_handler, LV_EVENT_ALL, NULL);
     lv_obj_add_event_cb(ui->screen_img_2, Drink_Tea_handler, LV_EVENT_ALL, NULL);
 
-    // lv_obj_add_event_cb(ui->screen_img_6, CoffeeBeanSize_L_handler, LV_EVENT_ALL, NULL);
-    //lv_obj_add_event_cb(ui->screen_img_4, CoffeeBeanSize_M_handler, LV_EVENT_ALL, NULL);
-    //lv_obj_add_event_cb(ui->screen_img_1, CoffeeBeanSize_S_handler, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui->screen_img_6, CoffeeBeanSize_L_handler, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui->screen_img_4, CoffeeBeanSize_M_handler, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui->screen_img_1, CoffeeBeanSize_S_handler, LV_EVENT_ALL, NULL);
 }
