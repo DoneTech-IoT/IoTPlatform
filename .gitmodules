@@ -7,3 +7,6 @@
 [submodule "components/SpotifyInterface"]
 	path = components/SpotifyInterface
 	url = https://github.com/Behn4m/SpotifyInterface
+[submodule "components/CoffeeMaker_UI"]
+	path = components/CoffeeMaker_UI
+	url = git@github.com:DoneTech-IoT/CoffeeMaker_UI.git
