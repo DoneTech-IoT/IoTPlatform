@@ -21,4 +21,4 @@ idf_component_register(
 "generated"
 "generated/guider_customer_fonts"
 "include"
-     REQUIRES lvgl__lvgl lvgl_esp32_drivers  driver esp_timer GlobalInit driver espressif__button Utilities)
+     REQUIRES lvgl__lvgl lvgl_esp32_drivers  driver esp_timer esp_event nvs_flash driver espressif__button Utilities)
