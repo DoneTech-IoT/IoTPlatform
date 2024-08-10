@@ -37,6 +37,7 @@ static void screen_SmallGrind_event_handler(lv_event_t *e)
 	default:
 		break;
 	}
+	lv_refr_now(NULL);
 }
 
 static void screen_tea_event_handler(lv_event_t *e)
@@ -60,6 +61,7 @@ static void screen_tea_event_handler(lv_event_t *e)
 	default:
 		break;
 	}
+	lv_refr_now(NULL);
 }
 
 static void screen_scop_event_handler(lv_event_t *e)
@@ -83,6 +85,7 @@ static void screen_scop_event_handler(lv_event_t *e)
 	default:
 		break;
 	}
+	lv_refr_now(NULL);
 }
 
 static void screen_MediumGrind_event_handler(lv_event_t *e)
@@ -106,6 +109,7 @@ static void screen_MediumGrind_event_handler(lv_event_t *e)
 	default:
 		break;
 	}
+	lv_refr_now(NULL);
 }
 
 static void screen_Coffee_event_handler(lv_event_t *e)
@@ -129,6 +133,7 @@ static void screen_Coffee_event_handler(lv_event_t *e)
 	default:
 		break;
 	}
+	lv_refr_now(NULL);
 }
 
 static void screen_longGrind_event_handler(lv_event_t *e)
@@ -152,29 +157,39 @@ static void screen_longGrind_event_handler(lv_event_t *e)
 	default:
 		break;
 	}
+	lv_refr_now(NULL);
 }
 
 static void screen_Timer_event_handler(lv_event_t *e)
 {
 	lv_event_code_t code = lv_event_get_code(e);
+	lv_obj_t *obj = lv_event_get_target(e);
+	char *inputText = (char *)lv_event_get_param(e);
 	switch (code)
 	{
 	case LV_EVENT_VALUE_CHANGED:
 	{
+		lv_obj_set_style_text_font(obj, &lv_font_montserratMedium_19, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_label_set_text(obj, inputText);
 		break;
 	}
 	default:
 		break;
 	}
+	lv_refr_now(NULL);
 }
 
 static void screen_CountOfCup_event_handler(lv_event_t *e)
 {
 	lv_event_code_t code = lv_event_get_code(e);
+	lv_obj_t *obj = lv_event_get_target(e);
+	char *inputText = (char *)lv_event_get_param(e);
 	switch (code)
 	{
 	case LV_EVENT_VALUE_CHANGED:
 	{
+		lv_obj_set_style_text_font(obj, &lv_font_montserratMedium_22, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_label_set_text(obj, inputText);
 		break;
 	}
 	case LV_EVENT_CLICKED:
@@ -184,6 +199,7 @@ static void screen_CountOfCup_event_handler(lv_event_t *e)
 	default:
 		break;
 	}
+	lv_refr_now(NULL);
 }
 
 void events_init_screen(lv_ui *ui)
