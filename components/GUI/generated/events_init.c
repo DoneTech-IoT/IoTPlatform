@@ -10,7 +10,9 @@
 #include "events_init.h"
 #include <stdio.h>
 #include "lvgl.h"
+#include <esp_log.h>
 
+static const char *TAG = "LVGL_GUI";
 #if LV_USE_GUIDER_SIMULATOR && LV_USE_FREEMASTER
 #include "freemaster_client.h"
 #endif
@@ -25,19 +27,18 @@ static void screen_SmallGrind_event_handler(lv_event_t *e)
 	case LV_EVENT_CLICKED:
 	{
 		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_1, LV_PART_MAIN | LV_STATE_DEFAULT);
-
+		lv_obj_set_style_img_recolor_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 		break;
 	}
 	case LV_EVENT_KEY:
 	{
 		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_2, LV_PART_MAIN | LV_STATE_DEFAULT);
-
+		lv_obj_set_style_img_recolor_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 		break;
 	}
 	default:
 		break;
 	}
-	lv_refr_now(NULL);
 }
 
 static void screen_tea_event_handler(lv_event_t *e)
@@ -49,19 +50,21 @@ static void screen_tea_event_handler(lv_event_t *e)
 	case LV_EVENT_CLICKED:
 	{
 		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_1, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_obj_set_style_img_recolor_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
 		break;
 	}
 	case LV_EVENT_KEY:
 	{
 		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_2, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_obj_set_style_img_recolor_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
 		break;
 	}
 	default:
 		break;
 	}
-	lv_refr_now(NULL);
+	// lv_refr_now(NULL);
 }
 
 static void screen_scop_event_handler(lv_event_t *e)
@@ -73,19 +76,21 @@ static void screen_scop_event_handler(lv_event_t *e)
 	case LV_EVENT_CLICKED:
 	{
 		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_1, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_obj_set_style_img_recolor_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
 		break;
 	}
 	case LV_EVENT_KEY:
 	{
 		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_2, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_obj_set_style_img_recolor_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
 		break;
 	}
 	default:
 		break;
 	}
-	lv_refr_now(NULL);
+	// lv_refr_now(NULL);
 }
 
 static void screen_MediumGrind_event_handler(lv_event_t *e)
@@ -97,18 +102,20 @@ static void screen_MediumGrind_event_handler(lv_event_t *e)
 	case LV_EVENT_CLICKED:
 	{
 		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_1, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_obj_set_style_img_recolor_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
 		break;
 	}
 	case LV_EVENT_KEY:
 	{
 		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_2, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_obj_set_style_img_recolor_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
 		break;
 	}
 	default:
 		break;
 	}
-	lv_refr_now(NULL);
 }
 
 static void screen_Coffee_event_handler(lv_event_t *e)
@@ -119,18 +126,20 @@ static void screen_Coffee_event_handler(lv_event_t *e)
 	{
 	case LV_EVENT_CLICKED:
 	{
+		ESP_LOGE(TAG, "Coffee_event LV_EVENT_CLICKED");
 		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_1, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_obj_set_style_img_recolor_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 		break;
 	}
 	case LV_EVENT_KEY:
 	{
-		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_2, LV_PART_MAIN | LV_STATE_DEFAULT);
+		ESP_LOGE(TAG, "Coffee_event LV_EVENT_KEY");
+		// lv_obj_set_style_img_recolor_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 		break;
 	}
 	default:
 		break;
 	}
-	lv_refr_now(NULL);
 }
 
 static void screen_longGrind_event_handler(lv_event_t *e)
@@ -142,19 +151,19 @@ static void screen_longGrind_event_handler(lv_event_t *e)
 	case LV_EVENT_CLICKED:
 	{
 		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_1, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_obj_set_style_img_recolor_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
 		break;
 	}
 	case LV_EVENT_KEY:
 	{
 		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_2, LV_PART_MAIN | LV_STATE_DEFAULT);
-
+		lv_obj_set_style_img_recolor_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 		break;
 	}
 	default:
 		break;
 	}
-	lv_refr_now(NULL);
 }
 
 static void screen_Timer_event_handler(lv_event_t *e)
@@ -173,7 +182,6 @@ static void screen_Timer_event_handler(lv_event_t *e)
 	default:
 		break;
 	}
-	lv_refr_now(NULL);
 }
 
 static void screen_CountOfCup_event_handler(lv_event_t *e)
@@ -196,7 +204,6 @@ static void screen_CountOfCup_event_handler(lv_event_t *e)
 	default:
 		break;
 	}
-	lv_refr_now(NULL);
 }
 
 void events_init_screen(lv_ui *ui)
@@ -213,4 +220,5 @@ void events_init_screen(lv_ui *ui)
 
 void events_init(lv_ui *ui)
 {
+	events_init_screen(ui);
 }

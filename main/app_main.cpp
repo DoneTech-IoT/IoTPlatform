@@ -13,9 +13,7 @@
 #ifdef CONFIG_DONE_COMPONENT_MATTER
 #endif
 // ****************************** GLobal Variables ****************************** //
-static const char *TAG = "Main";       
-
-
+static const char *TAG = "Main";
 
 extern "C" void app_main()
 {
@@ -27,6 +25,6 @@ extern "C" void app_main()
 
     GlobalInit();
     nvsFlashInit();
-    SpiffsGlobalConfig();  
+    SpiffsGlobalConfig();
+    GUItest();
 }
-

@@ -100,8 +100,9 @@ void GUI_mainTask(void *pvParameter)
 
     while (true)
     {
-        vTaskDelay(pdMS_TO_TICKS(1));
+        vTaskDelay(pdMS_TO_TICKS(50));
         lv_task_handler();
+        // lv_refr_now(NULL);
     }
 }
 
@@ -133,23 +134,23 @@ void TimerTest(int milliseconds)
     char *timeString = (char *)malloc(20 * sizeof(char));
     if (timeString == NULL)
     {
-        return ;
+        return;
     }
     snprintf(timeString, 20, "%02d:%02d", minutes, seconds);
     lv_event_send(guider_ui.screen_Timer, LV_EVENT_VALUE_CHANGED, timeString);
 }
 void CountOfCountTest(int cup)
 {
-    lv_event_send(guider_ui.screen_CountOfCup, LV_EVENT_VALUE_CHANGED, cup);
+    lv_event_send(guider_ui.screen_CountOfCup, LV_EVENT_VALUE_CHANGED, (void *)cup);
 }
 void GUItest()
 {
     // CountOfCountTest(1);
-    // lv_event_send(guider_ui.screen_Coffee, IMAGE_ON, NULL);
+    lv_event_send(guider_ui.screen_Coffee, IMAGE_ON, NULL);
     // vTaskDelay(pdMS_TO_TICKS(1000));
     // TimerTest(SEC);
-    // lv_event_send(guider_ui.screen_Coffee, IMAGE_OFF, NULL);
-    // vTaskDelay(pdMS_TO_TICKS(1000));
+    lv_event_send(guider_ui.screen_Coffee, LV_EVENT_KEY, NULL);
+    vTaskDelay(pdMS_TO_TICKS(1000));
     // TimerTest(SEC * 2);
     // lv_event_send(guider_ui.screen_tea, IMAGE_ON, NULL);
     // vTaskDelay(pdMS_TO_TICKS(1000));
@@ -178,49 +179,3 @@ void GUItest()
     // lv_event_send(guider_ui.screen_longGrind, IMAGE_OFF, NULL);
     // CountOfCountTest(6);
 }
-// void GUI_UpdateSpotifyScreen(bool songUpdated, char *Artist, char *Song, char *Album, int DurationMS, int ProgressMS, uint8_t *coverPhoto)
-// {
-//     int minutes = ProgressMS / 60000;
-//     int second = (ProgressMS % 60000) / 1000;
-//     char time[20];
-//     sprintf(time, "%d:%d", minutes, second);
-//     lv_event_send(guider_ui.Spotify_Page_label_time, LV_EVENT_VALUE_CHANGED, time);
-
-//     if (DurationMS == 0)
-//     {
-//         ESP_LOGE(TAG, "Duration is zero");
-//         return;
-//     }
-//     int progress = (ProgressMS * 100) / DurationMS;
-//     lv_event_send(guider_ui.Spotify_Page_bar_progress, LV_EVENT_VALUE_CHANGED, progress);
-
-//     if (!songUpdated)
-//     {
-//         return;
-//     }
-//     Log_RamStatus("LVGL", " before update screen");
-//     lv_event_send(guider_ui.Spotify_Page_Artist_name, LV_EVENT_VALUE_CHANGED, Artist);
-//     lv_event_send(guider_ui.Spotify_Page_Song_name, LV_EVENT_VALUE_CHANGED, Song);
-//     lv_event_send(guider_ui.Spotify_Page_Album_name, LV_EVENT_VALUE_CHANGED, Album);
-//     lv_event_send(guider_ui.Matter_logo, LV_EVENT_VALUE_CHANGED, NULL);
-//     lv_event_send(guider_ui.Spotify_Page_img_song, LV_EVENT_VALUE_CHANGED, coverPhoto);
-//     Log_RamStatus("LVGL", " after update screen");
-// }
-
-// /**
-//  * @brief Handles the event of Matter network connection.
-//  * This function is called when the Matter network is connected. It sends an event
-//  * to update the Matter logo on the LVGL UI.
-//  * @return void
-//  */
-// void MatterNetworkConnected()
-// {
-//     lv_event_send(guider_ui.Matter_logo, LV_EVENT_VALUE_CHANGED, NULL);
-// }
-// lv_event_send(guider_ui.screen_img_3, LV_EVENT_CLICKED, NULL);
-
-// lv_event_send(guider_ui.screen_img_1, LV_EVENT_PRESSED, NULL);
-// lv_event_send(guider_ui.screen_img_2, LV_EVENT_PRESSED, NULL);
-// lv_event_send(guider_ui.screen_img_4, LV_EVENT_PRESSED, NULL);
-// lv_event_send(guider_ui.screen_img_5, LV_EVENT_PRESSED, NULL);
-// lv_event_send(guider_ui.screen_img_6, LV_EVENT_PRESSED, NULL);
