@@ -1,20 +1,12 @@
 #include "lvglGui.h"
 #include "GlobalInit.h"
 #include "nvsFlash.h"
-#include "SpotifyInterface.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "Setup_GPIO.h"
-// #include "MatterInterface.h"
 #include "ServiceManger.h"
 #include "Custom_Log.h"
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
-
-#ifdef CONFIG_DONE_COMPONENT_MATTER
-// QueueHandle_t MatterBufQueue;
-// SemaphoreHandle_t MatterSemaphore = NULL;
-// MatterInterfaceHandler_t MatterInterfaceHandler;
-#endif
 // ****************************** GLobal Variables ****************************** //
 static const char *TAG = "Main";       
 
@@ -32,63 +24,5 @@ extern "C" void app_main()
     nvsFlashInit();
     SpiffsGlobalConfig();
 
-#ifdef CONFIG_DONE_COMPONENT_MATTER
-    // Log_RamOccupy("main", "service manager");
-    // Log_RamOccupy("main", "Matter usage");
-    // MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
-    // MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
-    // MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
-    // MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
-    // Matter_TaskInit(&MatterInterfaceHandler);
-#endif
-
-#ifdef CONFIG_DONE_COMPONENT_SPOTIFY
-    vTaskDelay(pdMS_TO_TICKS(5000));
-    Log_RamOccupy("main", "Matter usage");
-    Log_RamOccupy("main", "spotify");
-  
-    SpotifyInterfaceHandler.IsSpotifyAuthorizedSemaphore = &IsSpotifyAuthorizedSemaphore;
-    SpotifyInterfaceHandler.ConfigAddressInSpiffs = SpotifyConfigAddressInSpiffs;
-    Spotify_TaskInit(&SpotifyInterfaceHandler);
-
-    vTaskDelay(pdMS_TO_TICKS(3000));
-
-    Log_RamOccupy("main", "spotify");
-
-    if (xSemaphoreTake(IsSpotifyAuthorizedSemaphore, portMAX_DELAY) == pdTRUE)
-    {
-        bool CommandResult = false;
-        CommandResult = Spotify_SendCommand(SpotifyInterfaceHandler, GetUserInfo);
-        if (CommandResult == false)
-        {
-            ESP_LOGE(TAG, "User info update failed");
-            return;
-        }
-        ESP_LOGI(TAG, "User info updated");
-
-        TimerHandle_t xTimer = xTimerCreate("update", TIMER_TIME, pdTRUE, NULL, SpotifyPeriodicTimer);
-        xTimerStart(xTimer, 0);
-        if (xTimer != NULL)
-        {
-            if (xTimerStart(xTimer, 0) == pdPASS)
-            {
-                ESP_LOGI(TAG, "Timer getting start");
-            }
-        }
-    }
-#endif    
 }
 
-// void MatterAttributeUpdateCBMain(
-//     callback_type_t type,
-//     uint16_t endpoint_id, uint32_t cluster_id,
-//     uint32_t attribute_id, esp_matter_attr_val_t *val,
-//     void *priv_data)
-// {
-//     // printf("callback_type_t: %u\n", type);
-//     // printf("endpoint_id: %u\n", endpoint_id);
-//     // printf("cluster_id: %lu\n", cluster_id);
-//     // printf("attribute_id: %lu\n", attribute_id);
-//     // printf("val: %p\n", val);
-//     // printf("priv_data: %p\n", priv_data);
-// }

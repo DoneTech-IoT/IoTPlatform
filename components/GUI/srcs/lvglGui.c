@@ -176,3 +176,10 @@ void GUI_TaskKill(TaskHandle_t *TaskHandler)
 // {
 //     lv_event_send(guider_ui.Matter_logo, LV_EVENT_VALUE_CHANGED, NULL);
 // }
+    // lv_event_send(guider_ui.screen_img_3, LV_EVENT_CLICKED, NULL);
+
+    // lv_event_send(guider_ui.screen_img_1, LV_EVENT_PRESSED, NULL);
+    // lv_event_send(guider_ui.screen_img_2, LV_EVENT_PRESSED, NULL);
+    // lv_event_send(guider_ui.screen_img_4, LV_EVENT_PRESSED, NULL);
+    // lv_event_send(guider_ui.screen_img_5, LV_EVENT_PRESSED, NULL);
+    // lv_event_send(guider_ui.screen_img_6, LV_EVENT_PRESSED, NULL);
