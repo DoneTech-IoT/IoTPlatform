@@ -16,4 +16,4 @@ find "$main_folder" -mindepth 0 -maxdepth 20 -type f -name '*.c' -printf "\"%P\"
 echo " INCLUDE_DIRS 
 "
 find "$main_folder" -mindepth 0 -maxdepth 20 -type f -name '*.h' -printf "\"%P\"\n" | sed 's|/[^/]*$||' | sort -u
-echo "     REQUIRES lvgl__lvgl lvgl_esp32_drivers  driver esp_timer GlobalInit driver espressif__button) "
+echo "     REQUIRES lvgl__lvgl lvgl_esp32_drivers  driver esp_timer GlobalInit driver espressif__button Utilities) "
