@@ -12,4 +12,4 @@ idf_component_register(
 "Log"
 "nvsFlash/include"
 "Buzzer"
-     REQUIRES spiffs nvs_flash esp_timer GlobalInit driver json) 
+     REQUIRES spiffs nvs_flash esp_timer esp_event nvs_flash driver json) 

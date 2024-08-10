@@ -290,17 +290,6 @@ bool ReadTxtFileFromSpiffs(char *addressInSpiffs, char *key, char *value, ...)
     return keyFound;
 }
 
-/**
- *@brief This function does global initialization for Spiffs and checks for save existence, and sends a signal if it exists
- */
-void SpiffsGlobalConfig()
-{
-    SpiffsInit();
-    if (SpiffsExistenceCheck(WifiConfigDirectoryAddressInSpiffs) == 1)
-    {
-        xSemaphoreGive(WifiParamExistenceCheckerSemaphore);
-    }
-}
 #ifdef TEST
 /**
  *@brief This function is a test scenario that demonstrates the usage of the SPIFFS and JSON-related functions.

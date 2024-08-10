@@ -1,5 +1,4 @@
 #include "ServiceManger.h"
-#include "lvglGui.h"
 #include <stdio.h>
 #include"string.h"
 static const char *TAG = "Service_Manger";
@@ -19,27 +18,6 @@ StackType_t *xServiceMangerStack;
 
 // Global instance of Service Manager
 ServiceManger_t ServiceManger;
-
-#ifdef CONFIG_DONE_COMPONENT_LVGL
-/**
- * @brief Creates the GUI task.
- * This function configures and creates the GUI task.
- * @return void
- */
-void GUI_TaskCreator()
-{
-    ServiceManger.tasks[GUI_Task].maximumRAM_Needed = LVGL_STACK * 2;
-    strcpy(ServiceManger.tasks[GUI_Task].name, "GUI");
-    ServiceManger.tasks[GUI_Task].ramType = PSRAM_;
-    ServiceManger.tasks[GUI_Task].startupRAM = GUI_Task;
-    ServiceManger.tasks[GUI_Task].TaskCreator = GUI_TaskCreator;
-    ServiceManger.tasks[GUI_Task].TaskKiller = GUI_TaskKill;
-    ServiceManger.tasks[GUI_Task].taskStack = LVGL_STACK;
-    ServiceManger.tasks[GUI_Task].priority = tskIDLE_PRIORITY + 1;
-    ServiceManger.tasks[GUI_Task].taskHandler = NULL;
-    GUI_TaskInit(&ServiceManger.tasks[GUI_Task].taskHandler, ServiceManger.tasks[GUI_Task].priority, ServiceManger.tasks[GUI_Task].taskStack);
-}
-#endif
 
 /**
  * @brief Deletes a task.
@@ -89,10 +67,6 @@ void ServiceMangerTaskInit()
  */
 void ServiceMangerInit()
 {
-#ifdef CONFIG_DONE_COMPONENT_LVGL
-    GUI_TaskCreator();
-    ESP_LOGI(TAG, "GUI Created !");
-#endif
 #ifdef CONFIG_DONE_COMPONENT_SPOTIFY
     SpotifyTaskCreator();
     ESP_LOGI(TAG, "Spotify Created !");
