@@ -15,11 +15,10 @@ MatterInterfaceHandler_t MatterInterfaceHandler;
 static const char *TAG = "Main";       
 // ****************************** GLobal Functions ****************************** //
 
-void MatterAttributeUpdateCBMain(
-    callback_type_t type,
-    uint16_t endpoint_id, uint32_t cluster_id,
-    uint32_t attribute_id, esp_matter_attr_val_t *val,
-    void *priv_data)
+void MatterAttributeUpdateCBMain(callback_type_t type,
+                                uint16_t endpoint_id, uint32_t cluster_id,
+                                uint32_t attribute_id, esp_matter_attr_val_t *val,
+                                void *priv_data)
 {
     // printf("callback_type_t: %u\n", type);
     // printf("endpoint_id: %u\n", endpoint_id);
