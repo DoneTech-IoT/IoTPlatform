@@ -8,14 +8,12 @@
 #include "Custom_Log.h"
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 // ****************************** GLobal Variables ****************************** //
-static const char *TAG = "Main";       
-
-
+static const char *TAG = "Main";
 
 extern "C" void app_main()
 {
 
-    Log_RamOccupy("main", "service manager");
+    // Log_RamOccupy("main", "service manager");
 
     ServiceMangerTaskInit();
     vTaskDelay(pdMS_TO_TICKS(1 * SEC));
@@ -23,6 +21,5 @@ extern "C" void app_main()
     GlobalInit();
     nvsFlashInit();
     SpiffsGlobalConfig();
-
+    // GUItest();
 }
-

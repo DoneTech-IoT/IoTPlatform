@@ -11,6 +11,8 @@ extern "C" {
 #include"LVGLInterface.h"
 #include"lvglTimer.h"
 
+#define IMAGE_ON LV_EVENT_CLICKED
+#define IMAGE_OFF LV_EVENT_KEY
 /**
  * @brief Initializes the GUI task.
  * This function initializes the GUI task by allocating memory and creating the task.
@@ -51,6 +53,8 @@ void MatterNetworkConnected();
  * @return void
  */
 void GUI_TaskKill(TaskHandle_t *TaskHandler);
+
+void GUItest();
 #ifdef __cplusplus
 }
 #endif

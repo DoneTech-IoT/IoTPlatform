@@ -103,7 +103,6 @@ static void screen_MediumGrind_event_handler(lv_event_t *e)
 	case LV_EVENT_KEY:
 	{
 		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_2, LV_PART_MAIN | LV_STATE_DEFAULT);
-
 		break;
 	}
 	default:
@@ -121,13 +120,11 @@ static void screen_Coffee_event_handler(lv_event_t *e)
 	case LV_EVENT_CLICKED:
 	{
 		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_1, LV_PART_MAIN | LV_STATE_DEFAULT);
-
 		break;
 	}
 	case LV_EVENT_KEY:
 	{
 		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_2, LV_PART_MAIN | LV_STATE_DEFAULT);
-
 		break;
 	}
 	default:

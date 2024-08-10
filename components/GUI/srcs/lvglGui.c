@@ -97,7 +97,7 @@ void GUI_mainTask(void *pvParameter)
     setup_ui(&guider_ui);
     LVGL_Timer();
     Log_RamOccupy("LVGL", "starting GUI task");
-    
+
     while (true)
     {
         vTaskDelay(pdMS_TO_TICKS(1));
@@ -123,20 +123,61 @@ void GUI_TaskKill(TaskHandle_t *TaskHandler)
         free(LVGL_BigBuf1);
     }
 }
+#define SEC 1000
 
-/**
- * @brief Updates the LVGL screen with Spotify information.
- * This function updates various elements on the LVGL screen with Spotify information
- * such as artist name, song title, album name, playback progress, and cover photo.
- * @param songUpdated Flag indicating whether the song information has been updated.
- * @param Artist Artist name.
- * @param Song Title of the song.
- * @param Album Album name.
- * @param DurationMS Duration of the song in milliseconds.
- * @param ProgressMS Current playback progress in milliseconds.
- * @param coverPhoto Pointer to the cover photo image data.
- * @return void
- */
+void TimerTest(int milliseconds)
+{
+    int totalSeconds = milliseconds / 1000;
+    int minutes = totalSeconds / 60;
+    int seconds = totalSeconds % 60;
+    char *timeString = (char *)malloc(20 * sizeof(char));
+    if (timeString == NULL)
+    {
+        return ;
+    }
+    snprintf(timeString, 20, "%02d:%02d", minutes, seconds);
+    lv_event_send(guider_ui.screen_Timer, LV_EVENT_VALUE_CHANGED, timeString);
+}
+void CountOfCountTest(int cup)
+{
+    lv_event_send(guider_ui.screen_CountOfCup, LV_EVENT_VALUE_CHANGED, cup);
+}
+void GUItest()
+{
+    // CountOfCountTest(1);
+    // lv_event_send(guider_ui.screen_Coffee, IMAGE_ON, NULL);
+    // vTaskDelay(pdMS_TO_TICKS(1000));
+    // TimerTest(SEC);
+    // lv_event_send(guider_ui.screen_Coffee, IMAGE_OFF, NULL);
+    // vTaskDelay(pdMS_TO_TICKS(1000));
+    // TimerTest(SEC * 2);
+    // lv_event_send(guider_ui.screen_tea, IMAGE_ON, NULL);
+    // vTaskDelay(pdMS_TO_TICKS(1000));
+    // TimerTest(SEC * 3);
+    // lv_event_send(guider_ui.screen_tea, IMAGE_OFF, NULL);
+    // vTaskDelay(pdMS_TO_TICKS(1000));
+    // TimerTest(SEC * 4);
+    // lv_event_send(guider_ui.screen_scop, IMAGE_ON, NULL);
+    // vTaskDelay(pdMS_TO_TICKS(1000));
+    // TimerTest(SEC * 5);
+    // lv_event_send(guider_ui.screen_SmallGrind, IMAGE_ON, NULL);
+    // vTaskDelay(pdMS_TO_TICKS(1000));
+    // TimerTest(SEC * 6);
+    // lv_event_send(guider_ui.screen_SmallGrind, IMAGE_OFF, NULL);
+    // vTaskDelay(pdMS_TO_TICKS(1000));
+    // TimerTest(SEC * 7);
+    // lv_event_send(guider_ui.screen_MediumGrind, IMAGE_ON, NULL);
+    // vTaskDelay(pdMS_TO_TICKS(1000));
+    // TimerTest(SEC * 8);
+    // lv_event_send(guider_ui.screen_MediumGrind, IMAGE_OFF, NULL);
+    // vTaskDelay(pdMS_TO_TICKS(1000));
+    // TimerTest(SEC * 9);
+    // lv_event_send(guider_ui.screen_longGrind, IMAGE_ON, NULL);
+    // vTaskDelay(pdMS_TO_TICKS(1000));
+    // TimerTest(SEC * 10);
+    // lv_event_send(guider_ui.screen_longGrind, IMAGE_OFF, NULL);
+    // CountOfCountTest(6);
+}
 // void GUI_UpdateSpotifyScreen(bool songUpdated, char *Artist, char *Song, char *Album, int DurationMS, int ProgressMS, uint8_t *coverPhoto)
 // {
 //     int minutes = ProgressMS / 60000;
@@ -176,10 +217,10 @@ void GUI_TaskKill(TaskHandle_t *TaskHandler)
 // {
 //     lv_event_send(guider_ui.Matter_logo, LV_EVENT_VALUE_CHANGED, NULL);
 // }
-    // lv_event_send(guider_ui.screen_img_3, LV_EVENT_CLICKED, NULL);
+// lv_event_send(guider_ui.screen_img_3, LV_EVENT_CLICKED, NULL);
 
-    // lv_event_send(guider_ui.screen_img_1, LV_EVENT_PRESSED, NULL);
-    // lv_event_send(guider_ui.screen_img_2, LV_EVENT_PRESSED, NULL);
-    // lv_event_send(guider_ui.screen_img_4, LV_EVENT_PRESSED, NULL);
-    // lv_event_send(guider_ui.screen_img_5, LV_EVENT_PRESSED, NULL);
-    // lv_event_send(guider_ui.screen_img_6, LV_EVENT_PRESSED, NULL);
+// lv_event_send(guider_ui.screen_img_1, LV_EVENT_PRESSED, NULL);
+// lv_event_send(guider_ui.screen_img_2, LV_EVENT_PRESSED, NULL);
+// lv_event_send(guider_ui.screen_img_4, LV_EVENT_PRESSED, NULL);
+// lv_event_send(guider_ui.screen_img_5, LV_EVENT_PRESSED, NULL);
+// lv_event_send(guider_ui.screen_img_6, LV_EVENT_PRESSED, NULL);
