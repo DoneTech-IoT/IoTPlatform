@@ -7,11 +7,10 @@
 #include "MatterInterface.h"
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 
-#ifdef CONFIG_DONE_COMPONENT_MATTER
+
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
 MatterInterfaceHandler_t MatterInterfaceHandler;
-#endif
 // ****************************** GLobal Variables ****************************** //
 static const char *TAG = "Main";       
 // ****************************** GLobal Functions ****************************** //
@@ -44,9 +43,8 @@ extern "C" void app_main()
     Log_RamOccupy("main", "service manager");
 
     ServiceMangerTaskInit();
-    nvsFlashInit();
+nvsFlashInit();
 
-#ifdef CONFIG_DONE_COMPONENT_MATTER
     Log_RamOccupy("main", "service manager");
     Log_RamOccupy("main", "Matter usage");
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
@@ -54,5 +52,4 @@ extern "C" void app_main()
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
-#endif
 }
