@@ -43,7 +43,7 @@ extern "C" void app_main()
     Log_RamOccupy("main", "service manager");
 
     ServiceMangerTaskInit();
-nvsFlashInit();
+    nvsFlashInit();
 
     Log_RamOccupy("main", "service manager");
     Log_RamOccupy("main", "Matter usage");
