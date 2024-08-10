@@ -13,7 +13,6 @@ extern "C"
 #include "esp_spiffs.h"
 #include <stdarg.h>
 #include "cJSON.h"
-#include "GlobalInit.h"
 
 /**
  *@brief This function removes a file from SPIFFS.
@@ -21,11 +20,6 @@ extern "C"
  *@return Returns true if the file removal is successful, and false otherwise.
  */
 bool SpiffsRemoveFile(char *addressInSpiffs);
-
-/**
- *@brief This function does global initialization for Spiffs, checks for save existence, and sends a signal if it exists
- */
-void SpiffsGlobalConfig();
 
 /**
  *@brief Perform a SPIFFS check on the specified partition and initd globally
