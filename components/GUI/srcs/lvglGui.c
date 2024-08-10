@@ -5,7 +5,7 @@ StaticTask_t *xTaskLVGLBuffer;
 StackType_t *xLVGLStack;
 lv_color_t *LVGL_BigBuf1;
 lv_color_t *LVGL_BigBuf2;
-
+#define LVGL_SEC 1000
 static const char *TAG = "LVGL_GUI";
 void GUI_mainTask(void *pvParameter);
 
@@ -124,11 +124,15 @@ void GUI_TaskKill(TaskHandle_t *TaskHandler)
         free(LVGL_BigBuf1);
     }
 }
-#define SEC 1000
 
-void TimerTest(int milliseconds)
+/**
+ * @brief Updates the timer display on the GUI with the given time in milliseconds.
+ * 
+ * @param milliseconds Duration in milliseconds to be converted and displayed as minutes and seconds.
+ */
+void CoffeeMakerTimer(int milliseconds)
 {
-    int totalSeconds = milliseconds / 1000;
+    int totalSeconds = milliseconds / LVGL_SEC;
     int minutes = totalSeconds / 60;
     int seconds = totalSeconds % 60;
     char *timeString = (char *)malloc(20 * sizeof(char));
@@ -139,43 +143,138 @@ void TimerTest(int milliseconds)
     snprintf(timeString, 20, "%02d:%02d", minutes, seconds);
     lv_event_send(guider_ui.screen_Timer, LV_EVENT_VALUE_CHANGED, timeString);
 }
-void CountOfCountTest(int cup)
+
+/**
+ * @brief Sends the current count of cups to the GUI.
+ * 
+ * @param cup The number of cups to be displayed.
+ */
+void CountOfCup(int cup)
 {
-    // lv_event_send(guider_ui.screen_CountOfCup, LV_EVENT_VALUE_CHANGED, (void *)cup);
+    char temp[] = "0";
+    temp[0] = temp[0] + cup;
+    lv_event_send(guider_ui.screen_CountOfCup, LV_EVENT_VALUE_CHANGED, temp);
 }
+
+/**
+ * @brief Controls the visibility of the CoffeeNut image on the GUI.
+ * 
+ * @param flag If true, the CoffeeNut image is shown; otherwise, it is hidden.
+ */
+void CoffeeNutImage(int flag)
+{
+    if (flag == true)
+    {
+        lv_event_send(guider_ui.screen_CoffeeNutImage, IMAGE_ON, NULL);
+        return;
+    }
+    lv_event_send(guider_ui.screen_CoffeeNutImage, IMAGE_OFF, NULL);
+}
+
+/**
+ * @brief Controls the visibility of the Scop image on the GUI.
+ * 
+ * @param flag If true, the Scop image is shown; otherwise, it is hidden.
+ */
+void ScopImage(int flag)
+{
+    if (flag == true)
+    {
+        lv_event_send(guider_ui.screen_ScopImage, IMAGE_ON, NULL);
+        return;
+    }
+    lv_event_send(guider_ui.screen_ScopImage, IMAGE_OFF, NULL);
+}
+
+/**
+ * @brief Controls the visibility of the Tea image on the GUI.
+ * 
+ * @param flag If true, the Tea image is shown; otherwise, it is hidden.
+ */
+void TeaImage(int flag)
+{
+    if (flag == true)
+    {
+        lv_event_send(guider_ui.screen_TeaImage, IMAGE_ON, NULL);
+        return;
+    }
+    lv_event_send(guider_ui.screen_TeaImage, IMAGE_OFF, NULL);
+}
+
+/**
+ * @brief Controls the visibility of the SmallGrind image on the GUI.
+ * 
+ * @param flag If true, the SmallGrind image is shown; otherwise, it is hidden.
+ */
+void SmallGrindImage(int flag)
+{
+    if (flag == true)
+    {
+        lv_event_send(guider_ui.screen_SmallGrindImage, IMAGE_ON, NULL);
+        return;
+    }
+    lv_event_send(guider_ui.screen_SmallGrindImage, IMAGE_OFF, NULL);
+}
+
+/**
+ * @brief Controls the visibility of the MediumGrind image on the GUI.
+ * 
+ * @param flag If true, the MediumGrind image is shown; otherwise, it is hidden.
+ */
+void MediumGrindImage(int flag)
+{
+    if (flag == true)
+    {
+        lv_event_send(guider_ui.screen_MediumGrindImage, IMAGE_ON, NULL);
+        return;
+    }
+    lv_event_send(guider_ui.screen_MediumGrindImage, IMAGE_OFF, NULL);
+}
+
+/**
+ * @brief Controls the visibility of the LongGrind image on the GUI.
+ * 
+ * @param flag If true, the LongGrind image is shown; otherwise, it is hidden.
+ */
+void LongGrindImage(int flag)
+{
+    if (flag == true)
+    {
+        lv_event_send(guider_ui.screen_longGrindImage, IMAGE_ON, NULL);
+        return;
+    }
+    lv_event_send(guider_ui.screen_longGrindImage, IMAGE_OFF, NULL);
+}
+
+/**
+ * @brief Runs a sequence of GUI tests, controlling various images on the display.
+ * 
+ * This function toggles the visibility of different images on the GUI in a sequence,
+ * with delays in between each toggle.
+ */
 void GUItest()
 {
-    // CountOfCountTest(1);
-    lv_event_send(guider_ui.screen_CoffeeNutImage, IMAGE_ON, NULL);
-    vTaskDelay(pdMS_TO_TICKS(SEC*10));
-    TimerTest(SEC);
-    lv_event_send(guider_ui.screen_CoffeeNutImage, IMAGE_OFF, NULL);
-    // vTaskDelay(pdMS_TO_TICKS(1000));
-    // TimerTest(SEC * 2);
-    // lv_event_send(guider_ui.screen_tea, IMAGE_ON, NULL);
-    // vTaskDelay(pdMS_TO_TICKS(1000));
-    // TimerTest(SEC * 3);
-    // lv_event_send(guider_ui.screen_tea, IMAGE_OFF, NULL);
-    // vTaskDelay(pdMS_TO_TICKS(1000));
-    // TimerTest(SEC * 4);
-    // lv_event_send(guider_ui.screen_scop, IMAGE_ON, NULL);
-    // vTaskDelay(pdMS_TO_TICKS(1000));
-    // TimerTest(SEC * 5);
-    // lv_event_send(guider_ui.screen_SmallGrind, IMAGE_ON, NULL);
-    // vTaskDelay(pdMS_TO_TICKS(1000));
-    // TimerTest(SEC * 6);
-    // lv_event_send(guider_ui.screen_SmallGrind, IMAGE_OFF, NULL);
-    // vTaskDelay(pdMS_TO_TICKS(1000));
-    // TimerTest(SEC * 7);
-    // lv_event_send(guider_ui.screen_MediumGrind, IMAGE_ON, NULL);
-    // vTaskDelay(pdMS_TO_TICKS(1000));
-    // TimerTest(SEC * 8);
-    // lv_event_send(guider_ui.screen_MediumGrind, IMAGE_OFF, NULL);
-    // vTaskDelay(pdMS_TO_TICKS(1000));
-    // TimerTest(SEC * 9);
-    // lv_event_send(guider_ui.screen_longGrind, IMAGE_ON, NULL);
-    // vTaskDelay(pdMS_TO_TICKS(1000));
-    // TimerTest(SEC * 10);
-    // lv_event_send(guider_ui.screen_longGrind, IMAGE_OFF, NULL);
-    // CountOfCountTest(6);
+    CoffeeNutImage(true);
+    vTaskDelay(pdMS_TO_TICKS(LVGL_SEC));
+    CoffeeNutImage(false);
+
+    ScopImage(true);
+    vTaskDelay(pdMS_TO_TICKS(LVGL_SEC));
+    ScopImage(false);
+
+    TeaImage(true);
+    vTaskDelay(pdMS_TO_TICKS(LVGL_SEC));
+    TeaImage(false);
+
+    SmallGrindImage(true);
+    vTaskDelay(pdMS_TO_TICKS(LVGL_SEC));
+    SmallGrindImage(false);
+
+    MediumGrindImage(true);
+    vTaskDelay(pdMS_TO_TICKS(LVGL_SEC));
+    MediumGrindImage(false);
+
+    LongGrindImage(true);
+    vTaskDelay(pdMS_TO_TICKS(LVGL_SEC));
+    LongGrindImage(false);
 }

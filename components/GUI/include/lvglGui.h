@@ -54,7 +54,64 @@ void MatterNetworkConnected();
  */
 void GUI_TaskKill(TaskHandle_t *TaskHandler);
 
+/**
+ * @brief Updates the timer display on the GUI with the given time in milliseconds.
+ * 
+ * @param milliseconds Duration in milliseconds to be converted and displayed as minutes and seconds.
+ */
+void CoffeeMakerTimer(int milliseconds);
+
+
+/**
+ * @brief Sends the current count of cups to the GUI.
+ * 
+ * @param cup The number of cups to be displayed.
+ */
+void CountOfCup(int cup);
+
+/**
+ * @brief Controls the visibility of the Scop image on the GUI.
+ * 
+ * @param flag If true, the Scop image is shown; otherwise, it is hidden.
+ */
+void ScopImage(int flag);
+
+/**
+ * @brief Controls the visibility of the Tea image on the GUI.
+ * 
+ * @param flag If true, the Tea image is shown; otherwise, it is hidden.
+ */
+void TeaImage(int flag);
+
+/**
+ * @brief Controls the visibility of the SmallGrind image on the GUI.
+ * 
+ * @param flag If true, the SmallGrind image is shown; otherwise, it is hidden.
+ */
+void SmallGrindImage(int flag);
+
+/**
+ * @brief Controls the visibility of the MediumGrind image on the GUI.
+ * 
+ * @param flag If true, the MediumGrind image is shown; otherwise, it is hidden.
+ */
+void MediumGrindImage(int flag);
+
+/**
+ * @brief Controls the visibility of the LongGrind image on the GUI.
+ * 
+ * @param flag If true, the LongGrind image is shown; otherwise, it is hidden.
+ */
+void LongGrindImage(int flag);
+
+/**
+ * @brief Runs a sequence of GUI tests, controlling various images on the display.
+ * 
+ * This function toggles the visibility of different images on the GUI in a sequence,
+ * with delays in between each toggle.
+ */
 void GUItest();
+
 #ifdef __cplusplus
 }
 #endif

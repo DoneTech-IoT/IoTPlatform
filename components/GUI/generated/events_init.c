@@ -141,10 +141,14 @@ static void screen_longGrindImage_event_handler(lv_event_t *e)
 static void screen_Timer_event_handler(lv_event_t *e)
 {
 	lv_event_code_t code = lv_event_get_code(e);
+	lv_obj_t *object = lv_event_get_current_target(e);
+	char *inputText = (char *)lv_event_get_param(e);
 	switch (code)
 	{
 	case LV_EVENT_VALUE_CHANGED:
 	{
+		lv_obj_set_style_text_font(object, &lv_font_montserratMedium_19, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_label_set_text(object, inputText);
 		break;
 	}
 	default:
@@ -155,10 +159,14 @@ static void screen_Timer_event_handler(lv_event_t *e)
 static void screen_CountOfCup_event_handler(lv_event_t *e)
 {
 	lv_event_code_t code = lv_event_get_code(e);
+	lv_obj_t *object = lv_event_get_current_target(e);
+	char *inputText = (char *)lv_event_get_param(e);
 	switch (code)
 	{
 	case LV_EVENT_VALUE_CHANGED:
 	{
+		lv_obj_set_style_text_font(object, &lv_font_montserratMedium_22, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_label_set_text(object, inputText);
 		break;
 	}
 	default:

@@ -247,7 +247,7 @@ void setup_scr_screen(lv_ui *ui)
 
 	//Write codes screen_Timer
 	ui->screen_Timer = lv_label_create(ui->screen);
-	lv_label_set_text(ui->screen_Timer, "10:00");
+	lv_label_set_text(ui->screen_Timer, "00:00");
 	lv_label_set_long_mode(ui->screen_Timer, LV_LABEL_LONG_WRAP);
 	lv_obj_set_pos(ui->screen_Timer, 318, 209);
 	lv_obj_set_size(ui->screen_Timer, 100, 32);
