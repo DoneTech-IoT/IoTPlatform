@@ -141,16 +141,16 @@ void TimerTest(int milliseconds)
 }
 void CountOfCountTest(int cup)
 {
-    lv_event_send(guider_ui.screen_CountOfCup, LV_EVENT_VALUE_CHANGED, (void *)cup);
+    // lv_event_send(guider_ui.screen_CountOfCup, LV_EVENT_VALUE_CHANGED, (void *)cup);
 }
 void GUItest()
 {
     // CountOfCountTest(1);
-    lv_event_send(guider_ui.screen_Coffee, IMAGE_ON, NULL);
+    lv_event_send(guider_ui.screen_CoffeeNutImage, IMAGE_ON, NULL);
+    vTaskDelay(pdMS_TO_TICKS(SEC*10));
+    TimerTest(SEC);
+    lv_event_send(guider_ui.screen_CoffeeNutImage, IMAGE_OFF, NULL);
     // vTaskDelay(pdMS_TO_TICKS(1000));
-    // TimerTest(SEC);
-    lv_event_send(guider_ui.screen_Coffee, LV_EVENT_KEY, NULL);
-    vTaskDelay(pdMS_TO_TICKS(1000));
     // TimerTest(SEC * 2);
     // lv_event_send(guider_ui.screen_tea, IMAGE_ON, NULL);
     // vTaskDelay(pdMS_TO_TICKS(1000));

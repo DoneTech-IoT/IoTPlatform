@@ -20,21 +20,22 @@ typedef struct
   
 	lv_obj_t *screen;
 	bool screen_del;
-	lv_obj_t *screen_img_11;
-	lv_obj_t *screen_img_10;
-	lv_obj_t *screen_SmallGrind;
-	lv_obj_t *screen_tea;
-	lv_obj_t *screen_scop;
-	lv_obj_t *screen_MediumGrind;
-	lv_obj_t *screen_Coffee;
-	lv_obj_t *screen_longGrind;
-	lv_obj_t *screen_img_7;
-	lv_obj_t *screen_img_8;
-	lv_obj_t *screen_img_9;
-	lv_obj_t *screen_label_1;
-	lv_obj_t *screen_label_2;
+	lv_obj_t *screen_BackGround1;
+	lv_obj_t *screen_BackGround2;
+	lv_obj_t *screen_SmallGrindImage;
+	lv_obj_t *screen_TeaImage;
+	lv_obj_t *screen_ScopImage;
+	lv_obj_t *screen_MediumGrindImage;
+	lv_obj_t *screen_CoffeeNutImage;
+	lv_obj_t *screen_longGrindImage;
+	lv_obj_t *screen_SidebarTop;
+	lv_obj_t *screen_SidebarDown;
+	lv_obj_t *screen_CupImage;
+	lv_obj_t *screen_EstimatedTime_Text;
+	lv_obj_t *screen_TextObject_X;
 	lv_obj_t *screen_Timer;
 	lv_obj_t *screen_CountOfCup;
+	lv_obj_t *screen_ReadyToStart_Text;
 }lv_ui;
 
 typedef void (*ui_setup_scr_t)(lv_ui * ui);

@@ -11,29 +11,23 @@
 #include <stdio.h>
 #include "lvgl.h"
 #include <esp_log.h>
-
-static const char *TAG = "LVGL_GUI";
 #if LV_USE_GUIDER_SIMULATOR && LV_USE_FREEMASTER
 #include "freemaster_client.h"
 #endif
-#define OVER_LAYER_LEVEL_1 255
-#define OVER_LAYER_LEVEL_2 50
-static void screen_SmallGrind_event_handler(lv_event_t *e)
+
+static void screen_SmallGrindImage_event_handler(lv_event_t *e)
 {
 	lv_event_code_t code = lv_event_get_code(e);
-	lv_obj_t *obj = lv_event_get_target(e);
 	switch (code)
 	{
 	case LV_EVENT_CLICKED:
 	{
-		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_1, LV_PART_MAIN | LV_STATE_DEFAULT);
-		lv_obj_set_style_img_recolor_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_obj_set_style_img_recolor(guider_ui.screen_SmallGrindImage, lv_color_hex(0x793f15), LV_PART_MAIN);
 		break;
 	}
-	case LV_EVENT_KEY:
+	case LV_EVENT_PRESSED:
 	{
-		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_2, LV_PART_MAIN | LV_STATE_DEFAULT);
-		lv_obj_set_style_img_recolor_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_obj_set_style_img_recolor(guider_ui.screen_SmallGrindImage, lv_color_hex(0x6d6d6d), LV_PART_MAIN);
 		break;
 	}
 	default:
@@ -41,76 +35,19 @@ static void screen_SmallGrind_event_handler(lv_event_t *e)
 	}
 }
 
-static void screen_tea_event_handler(lv_event_t *e)
+static void screen_TeaImage_event_handler(lv_event_t *e)
 {
 	lv_event_code_t code = lv_event_get_code(e);
-	lv_obj_t *obj = lv_event_get_target(e);
 	switch (code)
 	{
 	case LV_EVENT_CLICKED:
 	{
-		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_1, LV_PART_MAIN | LV_STATE_DEFAULT);
-		lv_obj_set_style_img_recolor_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-
+		lv_obj_set_style_img_recolor(guider_ui.screen_TeaImage, lv_color_hex(0x793f15), LV_PART_MAIN);
 		break;
 	}
-	case LV_EVENT_KEY:
+	case LV_EVENT_PRESSED:
 	{
-		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_2, LV_PART_MAIN | LV_STATE_DEFAULT);
-		lv_obj_set_style_img_recolor_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-		break;
-	}
-	default:
-		break;
-	}
-	// lv_refr_now(NULL);
-}
-
-static void screen_scop_event_handler(lv_event_t *e)
-{
-	lv_event_code_t code = lv_event_get_code(e);
-	lv_obj_t *obj = lv_event_get_target(e);
-	switch (code)
-	{
-	case LV_EVENT_CLICKED:
-	{
-		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_1, LV_PART_MAIN | LV_STATE_DEFAULT);
-		lv_obj_set_style_img_recolor_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-		break;
-	}
-	case LV_EVENT_KEY:
-	{
-		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_2, LV_PART_MAIN | LV_STATE_DEFAULT);
-		lv_obj_set_style_img_recolor_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-		break;
-	}
-	default:
-		break;
-	}
-	// lv_refr_now(NULL);
-}
-
-static void screen_MediumGrind_event_handler(lv_event_t *e)
-{
-	lv_event_code_t code = lv_event_get_code(e);
-	lv_obj_t *obj = lv_event_get_target(e);
-	switch (code)
-	{
-	case LV_EVENT_CLICKED:
-	{
-		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_1, LV_PART_MAIN | LV_STATE_DEFAULT);
-		lv_obj_set_style_img_recolor_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-		break;
-	}
-	case LV_EVENT_KEY:
-	{
-		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_2, LV_PART_MAIN | LV_STATE_DEFAULT);
-		lv_obj_set_style_img_recolor_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
+		lv_obj_set_style_img_recolor(guider_ui.screen_TeaImage, lv_color_hex(0x6d6d6d), LV_PART_MAIN);
 		break;
 	}
 	default:
@@ -118,23 +55,19 @@ static void screen_MediumGrind_event_handler(lv_event_t *e)
 	}
 }
 
-static void screen_Coffee_event_handler(lv_event_t *e)
+static void screen_ScopImage_event_handler(lv_event_t *e)
 {
 	lv_event_code_t code = lv_event_get_code(e);
-	lv_obj_t *obj = lv_event_get_target(e);
 	switch (code)
 	{
 	case LV_EVENT_CLICKED:
 	{
-		ESP_LOGE(TAG, "Coffee_event LV_EVENT_CLICKED");
-		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_1, LV_PART_MAIN | LV_STATE_DEFAULT);
-		lv_obj_set_style_img_recolor_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_obj_set_style_img_recolor(guider_ui.screen_ScopImage, lv_color_hex(0x793f15), LV_PART_MAIN);
 		break;
 	}
-	case LV_EVENT_KEY:
+	case LV_EVENT_PRESSED:
 	{
-		ESP_LOGE(TAG, "Coffee_event LV_EVENT_KEY");
-		// lv_obj_set_style_img_recolor_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_obj_set_style_img_recolor(guider_ui.screen_ScopImage, lv_color_hex(0x6d6d6d), LV_PART_MAIN);
 		break;
 	}
 	default:
@@ -142,23 +75,62 @@ static void screen_Coffee_event_handler(lv_event_t *e)
 	}
 }
 
-static void screen_longGrind_event_handler(lv_event_t *e)
+static void screen_MediumGrindImage_event_handler(lv_event_t *e)
 {
 	lv_event_code_t code = lv_event_get_code(e);
-	lv_obj_t *obj = lv_event_get_target(e);
 	switch (code)
 	{
 	case LV_EVENT_CLICKED:
 	{
-		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_1, LV_PART_MAIN | LV_STATE_DEFAULT);
-		lv_obj_set_style_img_recolor_opa(obj, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_obj_set_style_img_recolor(guider_ui.screen_MediumGrindImage, lv_color_hex(0x793f15), LV_PART_MAIN);
+		break;
+	}
+	case LV_EVENT_PRESSED:
+	{
+		lv_obj_set_style_img_recolor(guider_ui.screen_MediumGrindImage, lv_color_hex(0x6d6d6d), LV_PART_MAIN);
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+static void screen_CoffeeNutImage_event_handler(lv_event_t *e)
+{
+	lv_event_code_t code = lv_event_get_code(e);
+	switch (code)
+	{
+	case LV_EVENT_CLICKED:
+	{
+		lv_obj_set_style_img_recolor(guider_ui.screen_CoffeeNutImage, lv_color_hex(0x7e3f15), LV_PART_MAIN);
+		ESP_LOGI("TAG", "CoffeeNutImage LV_EVENT_CLICKED");
 
 		break;
 	}
-	case LV_EVENT_KEY:
+	case LV_EVENT_PRESSED:
 	{
-		lv_obj_set_style_img_opa(obj, OVER_LAYER_LEVEL_2, LV_PART_MAIN | LV_STATE_DEFAULT);
-		lv_obj_set_style_img_recolor_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+		lv_obj_set_style_img_recolor(guider_ui.screen_CoffeeNutImage, lv_color_hex(0x6d6d6d), LV_PART_MAIN);
+		ESP_LOGI("TAG", "CoffeeNutImage LV_EVENT_PRESSED");
+		break;
+	}
+	default:
+		break;
+	}
+}
+
+static void screen_longGrindImage_event_handler(lv_event_t *e)
+{
+	lv_event_code_t code = lv_event_get_code(e);
+	switch (code)
+	{
+	case LV_EVENT_CLICKED:
+	{
+		lv_obj_set_style_img_recolor(guider_ui.screen_longGrindImage, lv_color_hex(0x793f15), LV_PART_MAIN);
+		break;
+	}
+	case LV_EVENT_PRESSED:
+	{
+		lv_obj_set_style_img_recolor(guider_ui.screen_longGrindImage, lv_color_hex(0x6d6d6d), LV_PART_MAIN);
 		break;
 	}
 	default:
@@ -169,14 +141,10 @@ static void screen_longGrind_event_handler(lv_event_t *e)
 static void screen_Timer_event_handler(lv_event_t *e)
 {
 	lv_event_code_t code = lv_event_get_code(e);
-	lv_obj_t *obj = lv_event_get_target(e);
-	char *inputText = (char *)lv_event_get_param(e);
 	switch (code)
 	{
 	case LV_EVENT_VALUE_CHANGED:
 	{
-		lv_obj_set_style_text_font(obj, &lv_font_montserratMedium_19, LV_PART_MAIN | LV_STATE_DEFAULT);
-		lv_label_set_text(obj, inputText);
 		break;
 	}
 	default:
@@ -187,17 +155,9 @@ static void screen_Timer_event_handler(lv_event_t *e)
 static void screen_CountOfCup_event_handler(lv_event_t *e)
 {
 	lv_event_code_t code = lv_event_get_code(e);
-	lv_obj_t *obj = lv_event_get_target(e);
-	char *inputText = (char *)lv_event_get_param(e);
 	switch (code)
 	{
 	case LV_EVENT_VALUE_CHANGED:
-	{
-		lv_obj_set_style_text_font(obj, &lv_font_montserratMedium_22, LV_PART_MAIN | LV_STATE_DEFAULT);
-		lv_label_set_text(obj, inputText);
-		break;
-	}
-	case LV_EVENT_CLICKED:
 	{
 		break;
 	}
@@ -208,17 +168,16 @@ static void screen_CountOfCup_event_handler(lv_event_t *e)
 
 void events_init_screen(lv_ui *ui)
 {
-	lv_obj_add_event_cb(ui->screen_SmallGrind, screen_SmallGrind_event_handler, LV_EVENT_ALL, ui);
-	lv_obj_add_event_cb(ui->screen_tea, screen_tea_event_handler, LV_EVENT_ALL, ui);
-	lv_obj_add_event_cb(ui->screen_scop, screen_scop_event_handler, LV_EVENT_ALL, ui);
-	lv_obj_add_event_cb(ui->screen_MediumGrind, screen_MediumGrind_event_handler, LV_EVENT_ALL, ui);
-	lv_obj_add_event_cb(ui->screen_Coffee, screen_Coffee_event_handler, LV_EVENT_ALL, ui);
-	lv_obj_add_event_cb(ui->screen_longGrind, screen_longGrind_event_handler, LV_EVENT_ALL, ui);
+	lv_obj_add_event_cb(ui->screen_SmallGrindImage, screen_SmallGrindImage_event_handler, LV_EVENT_ALL, ui);
+	lv_obj_add_event_cb(ui->screen_TeaImage, screen_TeaImage_event_handler, LV_EVENT_ALL, ui);
+	lv_obj_add_event_cb(ui->screen_ScopImage, screen_ScopImage_event_handler, LV_EVENT_ALL, ui);
+	lv_obj_add_event_cb(ui->screen_MediumGrindImage, screen_MediumGrindImage_event_handler, LV_EVENT_ALL, ui);
+	lv_obj_add_event_cb(ui->screen_CoffeeNutImage, screen_CoffeeNutImage_event_handler, LV_EVENT_ALL, ui);
+	lv_obj_add_event_cb(ui->screen_longGrindImage, screen_longGrindImage_event_handler, LV_EVENT_ALL, ui);
 	lv_obj_add_event_cb(ui->screen_Timer, screen_Timer_event_handler, LV_EVENT_ALL, ui);
 	lv_obj_add_event_cb(ui->screen_CountOfCup, screen_CountOfCup_event_handler, LV_EVENT_ALL, ui);
 }
 
 void events_init(lv_ui *ui)
 {
-	events_init_screen(ui);
 }

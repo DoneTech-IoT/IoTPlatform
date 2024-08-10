@@ -12,7 +12,7 @@ extern "C" {
 #include"lvglTimer.h"
 
 #define IMAGE_ON LV_EVENT_CLICKED
-#define IMAGE_OFF LV_EVENT_KEY
+#define IMAGE_OFF LV_EVENT_PRESSED
 /**
  * @brief Initializes the GUI task.
  * This function initializes the GUI task by allocating memory and creating the task.
