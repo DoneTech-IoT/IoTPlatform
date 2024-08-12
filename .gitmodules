@@ -1,3 +1,6 @@
 [submodule "components/Matter"]
 	path = components/Matter
 	url = git@github.com:DoneTech-IoT/Matter.git
+[submodule "components/UserInterface"]
+	path = components/UserInterface
+	url = git@github.com:DoneTech-IoT/CoffeeMaker_UI.git
