@@ -51,4 +51,5 @@ extern "C" void app_main()
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
+    
 }

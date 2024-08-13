@@ -1,0 +1,36 @@
+#ifndef COFFEE_MAKER_APP_H_
+#define COFFEE_MAKER_APP_H_
+
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/timers.h"
+#include "esp_freertos_hooks.h"
+#include "freertos/semphr.h"
+#include "esp_log.h"
+#include "esp_system.h"
+#include "driver/gpio.h"
+#include <esp_event.h>
+#include <esp_log.h>
+#include <esp_system.h>
+#include <sys/param.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include <stdint.h>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif

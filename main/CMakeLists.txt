@@ -1,5 +1,11 @@
-idf_component_register(SRC_DIRS          "."
-                      PRIV_INCLUDE_DIRS  ".")                      
+idf_component_register(SRC_DIRS          "." "ServiceManger.cpp"  "Setup_GPIO.c" "CoffeeMakerApp.cpp"
+                      PRIV_INCLUDE_DIRS  "."
+                      INCLUDE_DIRS 
+
+                      "GPIO"
+                      "ServiceManager"
+                      "CoffeeMaker"
+                      )                      
 
 spiffs_create_partition_image(
     storage 
