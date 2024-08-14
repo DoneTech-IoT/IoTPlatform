@@ -1,8 +1,8 @@
-#include "ServiceManger.h"
+#include "ServiceManager.h"
 #include"GUI.h"
 #include <stdio.h>
 #include"string.h"
-static const char *TAG = "Service_Manger";
+static const char *TAG = "Service_Manager";
 #define TASK_LIST_BUFFER_SIZE 512
 // #define MONITORING
 /**
