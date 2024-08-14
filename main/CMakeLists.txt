@@ -1,4 +1,4 @@
-idf_component_register(SRC_DIRS          "." "ServiceManger.cpp"  "Setup_GPIO.c" "CoffeeMakerApp.cpp"
+idf_component_register(SRC_DIRS          "." "ServiceManager.cpp"  "Setup_GPIO.c" "CoffeeMakerApp.cpp"
                       PRIV_INCLUDE_DIRS  "."
                       INCLUDE_DIRS 
 
