@@ -134,19 +134,23 @@ void JSON_TEST()
 }
 void ApplyOnScreen()
 {
-
 }
 QueueHandle_t MQTTDataFromBrokerQueue;
 SemaphoreHandle_t MQTTConnectedSemaphore;
 SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
 void RunMQTTAndTestJson()
 {
-    MQTT_defalut
+    MQTT_DefaultConfig(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
     memset(CoffeeMakerJsonOutPut, 0x0, sizeof(CoffeeMakerJsonOutPut));
     while (true)
     {
         if (xSemaphoreTake(MQTTConnectedSemaphore, pdMS_TO_TICKS(MQTT_SEC)) == pdTRUE)
         {
+            CoffeeMakerJson_str CoffeeMakerJson;
+            MQTT_Subscribe("AndroidApp/TV");
+            CoffeeMakerJsonCreator(CoffeeMakerJson, CoffeeMakerJsonOutPut);
+            MQTT_Publish("AndroidApp/TV", CoffeeMakerJsonOutPut);
+            memset(CoffeeMakerJsonOutPut, 0x0, sizeof(CoffeeMakerJsonOutPut));
         }
         if (xSemaphoreTake(MQTTErrorOrDisconnectSemaphore, pdMS_TO_TICKS(MQTT_SEC)) == pdTRUE)
         {
@@ -155,8 +159,9 @@ void RunMQTTAndTestJson()
 
         if (xQueueReceive(MQTTDataFromBrokerQueue, CoffeeMakerJsonOutPut, pdMS_TO_TICKS(MQTT_SEC)) == pdTRUE)
         {
-            CoffeeMakerJson_str CoffeeMakerJson;
-            CoffeeMakerJsonParser(&CoffeeMakerJson, CoffeeMakerJsonOutPut);
+            // CoffeeMakerJson_str CoffeeMakerJson;
+            // CoffeeMakerJsonParser(&CoffeeMakerJson, CoffeeMakerJsonOutPut);
+            parserTEST(CoffeeMakerJsonOutPut);
             ApplyOnScreen();
         }
     }

@@ -4,6 +4,7 @@
 #include "Setup_GPIO.h"
 #include "ServiceManager.h"
 #include "Custom_Log.h"
+#include"CoffeeMakerApp.hpp"
 // #include "MatterInterface.h"
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 
