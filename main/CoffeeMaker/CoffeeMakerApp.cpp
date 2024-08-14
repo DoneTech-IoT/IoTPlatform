@@ -132,23 +132,31 @@ void JSON_TEST()
     CoffeeMakerJsonCreator(CoffeeMakerJson, CoffeeMakerJsonOutPut);
     parserTEST(CoffeeMakerJsonOutPut);
 }
-
+void ApplyOnScreen()
+{
+    
+}
 QueueHandle_t MQTTDataFromBrokerQueue;
 SemaphoreHandle_t MQTTConnectedSemaphore;
 SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
 void RunMQTTAndTestJson()
 {
+    memset(CoffeeMakerJsonOutPut, 0x0, sizeof(CoffeeMakerJsonOutPut));
     while (true)
     {
         if (xSemaphoreTake(MQTTConnectedSemaphore, pdMS_TO_TICKS(MQTT_SEC)) == pdTRUE)
         {
-
         }
         if (xSemaphoreTake(MQTTErrorOrDisconnectSemaphore, pdMS_TO_TICKS(MQTT_SEC)) == pdTRUE)
         {
-            
+            break;
         }
 
-
+        if (xQueueReceive(MQTTDataFromBrokerQueue, CoffeeMakerJsonOutPut, pdMS_TO_TICKS(MQTT_SEC)) == pdTRUE)
+        {
+            CoffeeMakerJson_str CoffeeMakerJson;
+            CoffeeMakerJsonParser(&CoffeeMakerJson, CoffeeMakerJsonOutPut);
+            ApplyOnScreen();
+        }
     }
 }
