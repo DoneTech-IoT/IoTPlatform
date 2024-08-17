@@ -5,7 +5,7 @@
 #include "ServiceManager.h"
 #include "Custom_Log.h"
 #include"CoffeeMakerApp.hpp"
-// #include "MatterInterface.h"
+#include "MatterInterface.h"
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 
 
@@ -46,6 +46,7 @@ extern "C" void app_main()
     nvsFlashInit();
 
     Log_RamOccupy("main", "service manager");
+    
     // Log_RamOccupy("main", "Matter usage");
     // MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     // MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;

@@ -2,6 +2,7 @@
 #define COFFEE_MAKER_APP_H_
 #include <stdint.h>
 #include <sys/param.h>
+#include "cJSON.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -16,7 +17,6 @@
 
 #include "MQTT_Interface.h"
 
-
 typedef struct CoffeeMakerApp
 {
     uint8_t GinderLevel;
@@ -29,17 +29,6 @@ typedef struct CoffeeMakerApp
     char Pass[18];
 } CoffeeMakerJson_str;
 
-
-
-
+void RunMQTTAndTestJson();
 #endif
 
-
-
-
-
-
-
-
-
-#endif

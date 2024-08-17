@@ -1,12 +1,8 @@
 idf_component_register(
-    
-SRC       
-"app_main.cpp" 
-"ServiceManager/ServiceManager.cpp"
-"GPIO/Setup_GPIO.c"
-"ServiceManager/CoffeeMakerApp.cpp"
+SRCS       "app_main.cpp"  "ServiceManager/ServiceManager.cpp" "GPIO/Setup_GPIO.c" "CoffeeMaker/CoffeeMakerApp.cpp"
 
-INCLUDE_DIRS 
+
+INCLUDE_DIRS          
                       "GPIO"
                       "ServiceManager"
                       "CoffeeMaker"
