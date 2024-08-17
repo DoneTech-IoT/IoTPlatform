@@ -1,16 +1,9 @@
-# [submodule "components/components/lvgl"]
-# 	path = components/components/lvgl
-# 	url = https://github.com/lvgl/lvgl.git
-# [submodule "components/lvgl"]
-# 	path = components/lvgl
-# 	url = https://github.com/lvgl/lvgl.git
-[submodule "components/SpotifyInterface"]
-	path = components/SpotifyInterface
-	url = git@github.com/DoneTech-IoT/MQTTS.git
-[submodule "components/MQTT"]
-	path = components/MQTT
-	url = git@github.com:DoneTech-IoT/MQTTS.git
-	url = https://github.com/DoneTech-IoT/Matter
 [submodule "components/Matter"]
 	path = components/Matter
 	url = git@github.com:DoneTech-IoT/Matter.git
+[submodule "components/UserInterface"]
+	path = components/UserInterface
+	url = git@github.com:DoneTech-IoT/CoffeeMaker_UI.git
+[submodule "components/MQTT"]
+	path = components/MQTT
+	url = git@github.com/DoneTech-IoT/MQTTS.git
