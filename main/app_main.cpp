@@ -28,7 +28,7 @@ SpotifyInterfaceHandler_t SpotifyInterfaceHandler;
 // ****************************** GLobal Functions ****************************** //
 /**
  * @brief Function to change colors based on a timer callback
- */
+ */ 
 void SpotifyPeriodicTimer(TimerHandle_t xTimer)
 {
     static char imgLink[100];
