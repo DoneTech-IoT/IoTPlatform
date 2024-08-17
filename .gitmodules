@@ -4,3 +4,6 @@
 [submodule "components/UserInterface"]
 	path = components/UserInterface
 	url = git@github.com:DoneTech-IoT/CoffeeMaker_UI.git
+[submodule "components/MQTT"]
+	path = components/MQTT
+	url = git@github.com/DoneTech-IoT/MQTTS.git
