@@ -39,5 +39,6 @@
         "OPENOCD_SCRIPTS": "/home/mj/.espressif/tools/openocd-esp32/v0.12.0-esp32-20230921/openocd-esp32/share/openocd/scripts",
         "ESP_ROM_ELF_DIR": "/home/mj/.espressif/tools/esp-rom-elfs/20230320/"
     },
-    "idf.gitPath": "git"
+    "idf.gitPath": "git",
+    "idf.flashType": "UART"
 }

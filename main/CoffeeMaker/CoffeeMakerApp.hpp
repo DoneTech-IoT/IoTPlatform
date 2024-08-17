@@ -31,4 +31,3 @@ typedef struct CoffeeMakerApp
 
 void RunMQTTAndTestJson();
 #endif
-

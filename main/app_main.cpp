@@ -4,16 +4,15 @@
 #include "Setup_GPIO.h"
 #include "ServiceManager.h"
 #include "Custom_Log.h"
-#include"CoffeeMakerApp.hpp"
+#include "CoffeeMakerApp.hpp"
 #include "MatterInterface.h"
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
-
 
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
 MatterInterfaceHandler_t MatterInterfaceHandler;
 // ****************************** GLobal Variables ****************************** //
-static const char *TAG = "Main";       
+static const char *TAG = "Main";
 // ****************************** GLobal Functions ****************************** //
 
 // void MatterAttributeUpdateCBMain(callback_type_t type,
@@ -46,12 +45,11 @@ extern "C" void app_main()
     nvsFlashInit();
 
     Log_RamOccupy("main", "service manager");
-    
+
     // Log_RamOccupy("main", "Matter usage");
     // MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     // MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     // MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     // MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     // Matter_TaskInit(&MatterInterfaceHandler);
-    
 }
