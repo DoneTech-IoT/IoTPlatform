@@ -40,5 +40,6 @@
         "ESP_ROM_ELF_DIR": "/home/mj/.espressif/tools/esp-rom-elfs/20230320/"
     },
     "idf.gitPath": "git",
-    "idf.flashType": "UART"
+    "idf.flashType": "UART",
+    "idf.port": "/dev/ttyACM0"
 }

@@ -9,9 +9,9 @@ void CoffeeMakerJsonCreator(CoffeeMakerJson_str CoffeeMakerJson, char *CoffeeMak
     cJSON *root = cJSON_CreateObject();
     cJSON_AddBoolToObject(root, "Coffee", CoffeeMakerJson.CoffeeFlag); // true
     cJSON *coffeeProperty = cJSON_CreateObject();
-    cJSON_AddNumberToObject(coffeeProperty, "Ginder level", CoffeeMakerJson.GinderLevel);
+    cJSON_AddNumberToObject(coffeeProperty, "GinderLevel", CoffeeMakerJson.GinderLevel);
     cJSON_AddNumberToObject(coffeeProperty, "Cup", CoffeeMakerJson.Cups);
-    cJSON_AddItemToObject(root, "Coffee Property", coffeeProperty);
+    cJSON_AddItemToObject(root, "CoffeeProperty", coffeeProperty);
 
     cJSON *security = cJSON_CreateObject();
     cJSON_AddStringToObject(security, "Mac", CoffeeMakerJson.DeviceMACAddress);
@@ -23,9 +23,9 @@ void CoffeeMakerJsonCreator(CoffeeMakerJson_str CoffeeMakerJson, char *CoffeeMak
     cJSON *teaProperty = cJSON_CreateObject();
     cJSON_AddNumberToObject(teaProperty, "Cups", CoffeeMakerJson.Cups);
     cJSON_AddNumberToObject(teaProperty, "Temp", CoffeeMakerJson.Temp);
-    cJSON_AddItemToObject(root, "Tea property", teaProperty);
+    cJSON_AddItemToObject(root, "TeaProperty", teaProperty);
 
-    cJSON_AddNumberToObject(root, "Update Time", CoffeeMakerJson.UpdateTime);
+    cJSON_AddNumberToObject(root, "UpdateTime", CoffeeMakerJson.UpdateTime);
 
     strcpy(CoffeeMakerJsonOutPut, cJSON_Print(root));
 
@@ -46,10 +46,10 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
         CoffeeMakerJson->CoffeeFlag = cJSON_IsTrue(coffee) ? 1 : 0;
     }
 
-    cJSON *coffee_property = cJSON_GetObjectItem(root, "Coffee Property");
+    cJSON *coffee_property = cJSON_GetObjectItem(root, "CoffeeProperty");
     if (cJSON_IsObject(coffee_property))
     {
-        cJSON *ginder_level = cJSON_GetObjectItem(coffee_property, "Ginder level");
+        cJSON *ginder_level = cJSON_GetObjectItem(coffee_property, "GinderLevel");
         if (cJSON_IsNumber(ginder_level))
         {
             CoffeeMakerJson->GinderLevel = (uint8_t)ginder_level->valueint;
@@ -77,8 +77,8 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
         CoffeeMakerJson->TeaFlag = cJSON_IsTrue(tea) ? 1 : 0;
     }
 
-    // Extract and set the "Tea property" object
-    cJSON *tea_property = cJSON_GetObjectItem(root, "Tea property");
+    // Extract and set the "TeaProperty" object
+    cJSON *tea_property = cJSON_GetObjectItem(root, "TeaProperty");
     if (cJSON_IsObject(tea_property))
     {
         cJSON *cups = cJSON_GetObjectItem(tea_property, "Cups");
@@ -93,8 +93,8 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
         }
     }
 
-    // Extract and set the "Update Time" value
-    cJSON *update_time = cJSON_GetObjectItem(root, "Update Time");
+    // Extract and set the "UpdateTime" value
+    cJSON *update_time = cJSON_GetObjectItem(root, "UpdateTime");
     if (cJSON_IsNumber(update_time))
 
     {
@@ -110,16 +110,16 @@ void parserTEST(char *temp)
     CoffeeMakerJsonParser(&CoffeeMakerJson, temp);
     printf("Coffee Flag: %u\n", CoffeeMakerJson.CoffeeFlag);
     printf("Tea Flag: %u\n", CoffeeMakerJson.TeaFlag);
-    printf("Ginder Level: %u\n", CoffeeMakerJson.GinderLevel);
+    printf("GinderLevel: %u\n", CoffeeMakerJson.GinderLevel);
     printf("Cups: %u\n", CoffeeMakerJson.Cups);
     printf("Temp: %u\n", CoffeeMakerJson.Temp);
-    printf("Update Time: %u\n", CoffeeMakerJson.UpdateTime);
+    printf("UpdateTime: %u\n", CoffeeMakerJson.UpdateTime);
     printf("Device MAC Address: %s\n", CoffeeMakerJson.DeviceMACAddress);
     printf("Pass: %s\n", CoffeeMakerJson.Pass);
 }
-void JSON_TEST()
+void JSON_TEST(CoffeeMakerJson_str *CoffeeMakerJson)
 {
-    CoffeeMakerJson_str CoffeeMakerJson;
+
     CoffeeMakerJson.CoffeeFlag = true;
     CoffeeMakerJson.Cups = 4;
     strcpy(CoffeeMakerJson.DeviceMACAddress, "EE:EE:EE:EE:EE:EE");
@@ -130,16 +130,18 @@ void JSON_TEST()
     CoffeeMakerJson.UpdateTime = 60;
 
     CoffeeMakerJsonCreator(CoffeeMakerJson, CoffeeMakerJsonOutPut);
-    parserTEST(CoffeeMakerJsonOutPut);
+    // parserTEST(CoffeeMakerJsonOutPut);
 }
 void ApplyOnScreen()
 {
 }
-QueueHandle_t MQTTDataFromBrokerQueue;
-SemaphoreHandle_t MQTTConnectedSemaphore;
-SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
+static QueueHandle_t MQTTDataFromBrokerQueue;
+static SemaphoreHandle_t MQTTConnectedSemaphore;
+static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
+
 void RunMQTTAndTestJson()
 {
+    // JSON_TEST();
     MQTT_DefaultConfig(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
     memset(CoffeeMakerJsonOutPut, 0x0, sizeof(CoffeeMakerJsonOutPut));
     while (true)
@@ -148,7 +150,9 @@ void RunMQTTAndTestJson()
         {
             CoffeeMakerJson_str CoffeeMakerJson;
             MQTT_Subscribe("AndroidApp/TV");
+            JSON_TEST(&CoffeeMakerJson);
             CoffeeMakerJsonCreator(CoffeeMakerJson, CoffeeMakerJsonOutPut);
+            ESP_LOGI("json ", " CoffeeMakerJsonOutPut: %s\n", CoffeeMakerJsonOutPut);
             MQTT_Publish("AndroidApp/TV", CoffeeMakerJsonOutPut);
             memset(CoffeeMakerJsonOutPut, 0x0, sizeof(CoffeeMakerJsonOutPut));
         }
@@ -156,7 +160,6 @@ void RunMQTTAndTestJson()
         {
             break;
         }
-
         if (xQueueReceive(MQTTDataFromBrokerQueue, CoffeeMakerJsonOutPut, pdMS_TO_TICKS(MQTT_SEC)) == pdTRUE)
         {
             // CoffeeMakerJson_str CoffeeMakerJson;

@@ -1,7 +1,9 @@
 #include "ServiceManager.h"
-#include"GUI.h"
+#include "GUI.h"
 #include <stdio.h>
-#include"string.h"
+#include "string.h"
+
+#include "CoffeeMakerApp.hpp"
 static const char *TAG = "Service_Manager";
 #define TASK_LIST_BUFFER_SIZE 512
 // #define MONITORING
@@ -109,6 +111,7 @@ void ServiceMangerTask(void *pvParameter)
 {
     ServiceMangerInit();
     char pcTaskList[TASK_LIST_BUFFER_SIZE];
+    RunMQTTAndTestJson();
     while (true)
     {
         // vTaskList(pcTaskList);

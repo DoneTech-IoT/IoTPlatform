@@ -6,6 +6,11 @@
 #include "Custom_Log.h"
 #include "CoffeeMakerApp.hpp"
 #include "MatterInterface.h"
+
+#include "esp_event.h"
+#include "esp_netif.h"
+#include "protocol_examples_common.h"
+
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 
 QueueHandle_t MatterBufQueue;
@@ -38,11 +43,13 @@ void MatterNetworkConnected()
  */
 extern "C" void app_main()
 {
-
+    nvsFlashInit();
+    ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
+    ESP_ERROR_CHECK(example_connect());
     Log_RamOccupy("main", "service manager");
 
     ServiceMangerTaskInit();
-    nvsFlashInit();
 
     Log_RamOccupy("main", "service manager");
 
