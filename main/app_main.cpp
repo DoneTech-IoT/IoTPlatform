@@ -5,9 +5,10 @@
 #include "ServiceManger.h"
 #include "Custom_Log.h"
 #include "MatterInterface.h"
+#include "DoneCoffeeMaker.h"
+
 #define CONFIG_DONE_COMPONENT_MQTT
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
-
 
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
@@ -52,4 +53,17 @@ extern "C" void app_main()
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
+
+    KeyStatePair_t pKeyStatePair;
+
+    while (true)
+    {
+        if(xQueueReceive(
+            *(MatterInterfaceHandler.SharedBufQueue), 
+            &pKeyStatePair, pdMS_TO_TICKS(1)) == pdTRUE)
+        {
+            ESP_LOGW(TAG, "pKeyStatePair-> Key: %d, State: %d\n", 
+            pKeyStatePair.Key, pKeyStatePair.State);        
+        }
+    }        
 }
