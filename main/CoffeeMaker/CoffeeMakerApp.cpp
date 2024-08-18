@@ -1,4 +1,5 @@
 #include "CoffeeMakerApp.hpp"
+#include "coffeeMaker_GUI.h"
 
 static const char *TAG = "coffeeMakerApp";
 
@@ -142,8 +143,41 @@ void JSON_TEST(CoffeeMakerJson_str *CoffeeMakerJson)
 
     // parserTEST(CoffeeMakerJsonOutPut);
 }
-void ApplyOnScreen()
+void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
 {
+    GUI_DisplayUpdateCupsCounts(CoffeeMakerJson->Cups);
+    if (CoffeeMakerJson->CoffeeFlag == true)
+    {
+        GUI_DisplayShowCoffeeBeansIcon(true);
+        switch (CoffeeMakerJson->GinderLevel)
+        {
+        case 1:
+        {
+            GUI_DisplayShowFineGrindIcon(true);
+            break;
+        }
+        case 2:
+        {
+            GUI_DisplayShowMediumGrindIcon(true);
+            break;
+        }
+        case 3:
+        {
+            GUI_DisplayShowCourseGrindIcon(true);
+            break;
+        }
+        }
+    }
+    int counter = 1;
+    while (true)
+    {
+
+        vTaskDelay(pdMS_TO_TICKS(GUI_SEC));
+        GUI_DisplayUpdateCoffeeMakerTimer(GUI_SEC * counter);
+        counter++;
+        if (counter == 30)
+            break;
+    }
 }
 
 void RunMQTTAndTestJson()
@@ -174,7 +208,7 @@ void RunMQTTAndTestJson()
             // CoffeeMakerJsonParser(&CoffeeMakerJson, CoffeeMakerJsonOutPut);
             ESP_LOGW("json ", " CoffeeMakerJsonOutPut: %s\n", CoffeeMakerJsonOutPut_t);
             parserTEST(CoffeeMakerJsonOutPut_t);
-            ApplyOnScreen();
+            ApplyOnScreen(&CoffeeMakerJson);
         }
     }
 }
