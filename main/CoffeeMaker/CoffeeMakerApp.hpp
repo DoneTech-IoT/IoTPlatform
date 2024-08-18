@@ -27,6 +27,7 @@ typedef struct CoffeeMakerApp
     uint16_t UpdateTime;
     char DeviceMACAddress[18];
     char Pass[18];
+    char State[18];
 } CoffeeMakerJson_str;
 
 void RunMQTTAndTestJson();

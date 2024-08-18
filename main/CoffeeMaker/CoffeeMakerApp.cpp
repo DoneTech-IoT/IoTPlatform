@@ -1,7 +1,10 @@
 #include "CoffeeMakerApp.hpp"
 
 static const char *TAG = "coffeeMakerApp";
-static char CoffeeMakerJsonOutPut[2500];
+
+static QueueHandle_t MQTTDataFromBrokerQueue;
+static SemaphoreHandle_t MQTTConnectedSemaphore;
+static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
 
 void CoffeeMakerJsonCreator(CoffeeMakerJson_str CoffeeMakerJson, char *CoffeeMakerJsonOutPut)
 {
@@ -26,6 +29,7 @@ void CoffeeMakerJsonCreator(CoffeeMakerJson_str CoffeeMakerJson, char *CoffeeMak
     cJSON_AddItemToObject(root, "TeaProperty", teaProperty);
 
     cJSON_AddNumberToObject(root, "UpdateTime", CoffeeMakerJson.UpdateTime);
+    cJSON_AddStringToObject(root, "State", CoffeeMakerJson.State);
 
     strcpy(CoffeeMakerJsonOutPut, cJSON_Print(root));
 
@@ -100,6 +104,12 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
     {
         CoffeeMakerJson->UpdateTime = (uint16_t)update_time->valueint;
     }
+    cJSON *State = cJSON_GetObjectItem(root, "State");
+    if (cJSON_IsString(State))
+    {
+        strncpy(CoffeeMakerJson->State, State->valuestring, sizeof(CoffeeMakerJson->State) - 1);
+    }
+
     cJSON_Delete(root);
 }
 
@@ -120,30 +130,28 @@ void parserTEST(char *temp)
 void JSON_TEST(CoffeeMakerJson_str *CoffeeMakerJson)
 {
 
-    CoffeeMakerJson.CoffeeFlag = true;
-    CoffeeMakerJson.Cups = 4;
-    strcpy(CoffeeMakerJson.DeviceMACAddress, "EE:EE:EE:EE:EE:EE");
-    strcpy(CoffeeMakerJson.Pass, "12345");
-    CoffeeMakerJson.GinderLevel = 1;
-    CoffeeMakerJson.TeaFlag = false;
-    CoffeeMakerJson.Temp = 60;
-    CoffeeMakerJson.UpdateTime = 60;
+    CoffeeMakerJson->CoffeeFlag = true;
+    CoffeeMakerJson->Cups = 4;
+    strcpy(CoffeeMakerJson->DeviceMACAddress, "EE:EE:EE:EE:EE:EE");
+    strcpy(CoffeeMakerJson->Pass, "12345");
+    CoffeeMakerJson->GinderLevel = 1;
+    CoffeeMakerJson->TeaFlag = false;
+    CoffeeMakerJson->Temp = 60;
+    CoffeeMakerJson->UpdateTime = 60;
+    strcpy(CoffeeMakerJson->State, "Ready");
 
-    CoffeeMakerJsonCreator(CoffeeMakerJson, CoffeeMakerJsonOutPut);
     // parserTEST(CoffeeMakerJsonOutPut);
 }
 void ApplyOnScreen()
 {
 }
-static QueueHandle_t MQTTDataFromBrokerQueue;
-static SemaphoreHandle_t MQTTConnectedSemaphore;
-static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
 
 void RunMQTTAndTestJson()
 {
     // JSON_TEST();
     MQTT_DefaultConfig(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
-    memset(CoffeeMakerJsonOutPut, 0x0, sizeof(CoffeeMakerJsonOutPut));
+    char CoffeeMakerJsonOutPut[2500];
+    char CoffeeMakerJsonOutPut_t[2500] = {0};
     while (true)
     {
         if (xSemaphoreTake(MQTTConnectedSemaphore, pdMS_TO_TICKS(MQTT_SEC)) == pdTRUE)
@@ -153,18 +161,19 @@ void RunMQTTAndTestJson()
             JSON_TEST(&CoffeeMakerJson);
             CoffeeMakerJsonCreator(CoffeeMakerJson, CoffeeMakerJsonOutPut);
             ESP_LOGI("json ", " CoffeeMakerJsonOutPut: %s\n", CoffeeMakerJsonOutPut);
-            MQTT_Publish("AndroidApp/TV", CoffeeMakerJsonOutPut);
+            MQTT_Publish("Device", CoffeeMakerJsonOutPut);
             memset(CoffeeMakerJsonOutPut, 0x0, sizeof(CoffeeMakerJsonOutPut));
         }
         if (xSemaphoreTake(MQTTErrorOrDisconnectSemaphore, pdMS_TO_TICKS(MQTT_SEC)) == pdTRUE)
         {
             break;
         }
-        if (xQueueReceive(MQTTDataFromBrokerQueue, CoffeeMakerJsonOutPut, pdMS_TO_TICKS(MQTT_SEC)) == pdTRUE)
+        if (xQueueReceive(MQTTDataFromBrokerQueue, CoffeeMakerJsonOutPut_t, pdMS_TO_TICKS(MQTT_SEC)) == pdTRUE)
         {
-            // CoffeeMakerJson_str CoffeeMakerJson;
+            CoffeeMakerJson_str CoffeeMakerJson;
             // CoffeeMakerJsonParser(&CoffeeMakerJson, CoffeeMakerJsonOutPut);
-            parserTEST(CoffeeMakerJsonOutPut);
+            ESP_LOGW("json ", " CoffeeMakerJsonOutPut: %s\n", CoffeeMakerJsonOutPut_t);
+            parserTEST(CoffeeMakerJsonOutPut_t);
             ApplyOnScreen();
         }
     }
