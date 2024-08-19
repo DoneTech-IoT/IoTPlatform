@@ -34,4 +34,10 @@ typedef struct CoffeeMakerApp
 
 void RunMQTTAndTestJson();
 
+#ifdef COFFEE_MAKER_APP_TEST
+void PublishJsonForTest(char *CoffeeMakerJsonOutPut);
+void JSON_TEST(CoffeeMakerJson_str *CoffeeMakerJson);
+void parserTEST(char *temp);
+#endif
+
 #endif

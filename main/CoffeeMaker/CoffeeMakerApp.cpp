@@ -8,6 +8,7 @@ static SemaphoreHandle_t MQTTConnectedSemaphore;
 static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
 
 static uint8_t TimerCounter;
+TimerHandle_t xTimer;
 
 void CoffeeMakerGUIRest()
 {
@@ -160,13 +161,16 @@ void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
 
 void RunMQTTAndTestJson()
 {
-    TimerHandle_t xTimer = xTimerCreate("Coffee Maker Timer", pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC), pdTRUE, (void *)0, CoffeeMakerTimerCallBack);
+    xTimer = xTimerCreate("Coffee Maker Timer", pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC), pdTRUE, (void *)0, CoffeeMakerTimerCallBack);
     MQTT_DefaultConfig(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
     char CoffeeMakerJsonOutPut[2500];
     while (true)
     {
         if (xSemaphoreTake(MQTTConnectedSemaphore, pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
         {
+#ifdef COFFEE_MAKER_APP_TEST
+            PublishJsonForTest(CoffeeMakerJsonOutPut);
+#endif
         }
         if (xSemaphoreTake(MQTTErrorOrDisconnectSemaphore, pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
         {
