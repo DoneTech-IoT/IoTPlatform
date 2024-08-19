@@ -25,11 +25,11 @@ void CoffeeMakerStopTimer(TimerHandle_t *xTimer)
 {
     if (xTimerStop(*xTimer, 0) == pdPASS)
     {
-        printf("Timer successfully stopped.\n");
+        ESP_LOGE(TAG, "Timer successfully stopped.\n");
         CoffeeMakerGUIRest();
         return;
     }
-    printf("Timer unsuccessfully stopped please restart this task.\n");
+    ESP_LOGE(TAG, "Timer unsuccessfully stopped please restart this task.\n");
     return;
 }
 void CoffeeMakerTimerCallBack(TimerHandle_t xTimer)
@@ -84,7 +84,6 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
     cJSON *coffee = cJSON_GetObjectItem(root, "Coffee");
     if (cJSON_IsBool(coffee))
         CoffeeMakerJson->CoffeeFlag = cJSON_IsTrue(coffee) ? 1 : 0;
-
     cJSON *coffee_property = cJSON_GetObjectItem(root, "CoffeeProperty");
     if (cJSON_IsObject(coffee_property))
     {
@@ -105,7 +104,6 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
     cJSON *tea = cJSON_GetObjectItem(root, "Tea");
     if (cJSON_IsBool(tea))
         CoffeeMakerJson->TeaFlag = cJSON_IsTrue(tea) ? 1 : 0;
-
     // Extract and set the "TeaProperty" object
     cJSON *tea_property = cJSON_GetObjectItem(root, "TeaProperty");
     if (cJSON_IsObject(tea_property))
@@ -117,7 +115,6 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
         if (cJSON_IsNumber(temp))
             CoffeeMakerJson->Temp = (uint8_t)temp->valueint;
     }
-
     // Extract and set the "UpdateTime" value
     cJSON *update_time = cJSON_GetObjectItem(root, "UpdateTime");
     if (cJSON_IsNumber(update_time))
@@ -151,25 +148,19 @@ void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
     {
         GUI_DisplayShowTeaLeafIcon(true);
     }
-    TimerHandle_t xTimer = xTimerCreate("Coffee Maker Timer", pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC), pdTRUE, (void *)0, CoffeeMakerTimerCallBack);
     if (xTimerStart(xTimer, 0) != pdPASS)
-        printf("Failed to start the timer\n");
+        ESP_LOGE(TAG, "Failed to start the timer\n");
 }
 
 void RunMQTTAndTestJson()
 {
+    TimerHandle_t xTimer = xTimerCreate("Coffee Maker Timer", pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC), pdTRUE, (void *)0, CoffeeMakerTimerCallBack);
     MQTT_DefaultConfig(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
     char CoffeeMakerJsonOutPut[2500];
     while (true)
     {
         if (xSemaphoreTake(MQTTConnectedSemaphore, pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
         {
-            CoffeeMakerJson_str CoffeeMakerJson;
-            MQTT_Subscribe("AndroidApp/TV");
-            CoffeeMakerJsonCreator(CoffeeMakerJson, CoffeeMakerJsonOutPut);
-            ESP_LOGI("json ", " CoffeeMakerJsonOutPut: %s\n", CoffeeMakerJsonOutPut);
-            MQTT_Publish("Device", CoffeeMakerJsonOutPut);
-            memset(CoffeeMakerJsonOutPut, 0x0, sizeof(CoffeeMakerJsonOutPut));
         }
         if (xSemaphoreTake(MQTTErrorOrDisconnectSemaphore, pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
         {
@@ -189,16 +180,16 @@ void RunMQTTAndTestJson()
 void parserTEST(char *temp)
 {
     CoffeeMakerJson_str CoffeeMakerJson;
-    printf("%s", temp);
+    ESP_LOGI(TAG, "%s", temp);
     CoffeeMakerJsonParser(&CoffeeMakerJson, temp);
-    printf("Coffee Flag: %u\n", CoffeeMakerJson.CoffeeFlag);
-    printf("Tea Flag: %u\n", CoffeeMakerJson.TeaFlag);
-    printf("GinderLevel: %u\n", CoffeeMakerJson.GinderLevel);
-    printf("Cups: %u\n", CoffeeMakerJson.Cups);
-    printf("Temp: %u\n", CoffeeMakerJson.Temp);
-    printf("UpdateTime: %u\n", CoffeeMakerJson.UpdateTime);
-    printf("Device MAC Address: %s\n", CoffeeMakerJson.DeviceMACAddress);
-    printf("Pass: %s\n", CoffeeMakerJson.Pass);
+    ESP_LOGI(TAG, "Coffee Flag: %u\n", CoffeeMakerJson.CoffeeFlag);
+    ESP_LOGI(TAG, "Tea Flag: %u\n", CoffeeMakerJson.TeaFlag);
+    ESP_LOGI(TAG, "GinderLevel: %u\n", CoffeeMakerJson.GinderLevel);
+    ESP_LOGI(TAG, "Cups: %u\n", CoffeeMakerJson.Cups);
+    ESP_LOGI(TAG, "Temp: %u\n", CoffeeMakerJson.Temp);
+    ESP_LOGI(TAG, "UpdateTime: %u\n", CoffeeMakerJson.UpdateTime);
+    ESP_LOGI(TAG, "Device MAC Address: %s\n", CoffeeMakerJson.DeviceMACAddress);
+    ESP_LOGI(TAG, "Pass: %s\n", CoffeeMakerJson.Pass);
 }
 void JSON_TEST(CoffeeMakerJson_str *CoffeeMakerJson)
 {
@@ -214,5 +205,14 @@ void JSON_TEST(CoffeeMakerJson_str *CoffeeMakerJson)
     strcpy(CoffeeMakerJson->State, "Ready");
 
     // parserTEST(CoffeeMakerJsonOutPut);
+}
+void PublishJsonForTest(char *CoffeeMakerJsonOutPut)
+{
+    CoffeeMakerJson_str CoffeeMakerJson;
+    MQTT_Subscribe("AndroidApp/TV");
+    CoffeeMakerJsonCreator(CoffeeMakerJson, CoffeeMakerJsonOutPut);
+    ESP_LOGI("json ", " CoffeeMakerJsonOutPut: %s\n", CoffeeMakerJsonOutPut);
+    MQTT_Publish("Device", CoffeeMakerJsonOutPut);
+    memset(CoffeeMakerJsonOutPut, 0x0, sizeof(CoffeeMakerJsonOutPut));
 }
 #endif
