@@ -84,6 +84,7 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
     cJSON *coffee = cJSON_GetObjectItem(root, "Coffee");
     if (cJSON_IsBool(coffee))
         CoffeeMakerJson->CoffeeFlag = cJSON_IsTrue(coffee) ? 1 : 0;
+
     cJSON *coffee_property = cJSON_GetObjectItem(root, "CoffeeProperty");
     if (cJSON_IsObject(coffee_property))
     {
@@ -91,6 +92,7 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
         if (cJSON_IsNumber(ginder_level))
             CoffeeMakerJson->GinderLevel = (uint8_t)ginder_level->valueint;
     }
+
     cJSON *security = cJSON_GetObjectItem(root, "Security");
     if (cJSON_IsObject(security))
     {
@@ -101,9 +103,11 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
         if (cJSON_IsString(pass))
             strncpy(CoffeeMakerJson->Pass, pass->valuestring, sizeof(CoffeeMakerJson->Pass) - 1);
     }
+
     cJSON *tea = cJSON_GetObjectItem(root, "Tea");
     if (cJSON_IsBool(tea))
         CoffeeMakerJson->TeaFlag = cJSON_IsTrue(tea) ? 1 : 0;
+
     // Extract and set the "TeaProperty" object
     cJSON *tea_property = cJSON_GetObjectItem(root, "TeaProperty");
     if (cJSON_IsObject(tea_property))
@@ -115,10 +119,12 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
         if (cJSON_IsNumber(temp))
             CoffeeMakerJson->Temp = (uint8_t)temp->valueint;
     }
+
     // Extract and set the "UpdateTime" value
     cJSON *update_time = cJSON_GetObjectItem(root, "UpdateTime");
     if (cJSON_IsNumber(update_time))
         CoffeeMakerJson->UpdateTime = (uint16_t)update_time->valueint;
+
     cJSON *State = cJSON_GetObjectItem(root, "State");
     if (cJSON_IsString(State))
         strncpy(CoffeeMakerJson->State, State->valuestring, sizeof(CoffeeMakerJson->State) - 1);
