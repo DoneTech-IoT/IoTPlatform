@@ -17,6 +17,8 @@
 
 #include "MQTT_Interface.h"
 
+#define COFFEE_TIME 120
+#define COFFEE_MAKER_APP_SEC 1000
 typedef struct CoffeeMakerApp
 {
     uint8_t GinderLevel;

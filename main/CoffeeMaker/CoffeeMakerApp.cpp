@@ -7,6 +7,36 @@ static QueueHandle_t MQTTDataFromBrokerQueue;
 static SemaphoreHandle_t MQTTConnectedSemaphore;
 static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
 
+void CoffeeMakerGUIRest()
+{
+    GUI_DisplayUpdateCoffeeMakerTimer(0);
+    GUI_DisplayUpdateCupsCounts(0);
+    GUI_DisplayShowCoffeeBeansIcon(false);
+    GUI_DisplayShowCoffeeScopIcon(false);
+    GUI_DisplayShowTeaLeafIcon(false);
+    GUI_DisplayShowFineGrindIcon(false);
+    GUI_DisplayShowMediumGrindIcon(false);
+    GUI_DisplayShowCourseGrindIcon(false);
+}
+void CoffeeMakerTimer(TimerHandle_t xTimer)
+{
+    static counter;
+    if (counter == COFFEE_TIME)
+    {
+        counter = 0;
+        if (xTimerStop(xTimer, 0) == pdPASS)
+        {
+            printf("Timer successfully stopped.\n");
+            CoffeeMakerGUIRest();
+            return;
+        }
+        printf("Timer unsuccessfully stopped please restart this task.\n");
+        return;
+    }
+    GUI_DisplayUpdateCoffeeMakerTimer(COFFEE_MAKER_APP_SEC * counter);
+    counter++;
+}
+
 void CoffeeMakerJsonCreator(CoffeeMakerJson_str CoffeeMakerJson, char *CoffeeMakerJsonOutPut)
 {
 
@@ -76,7 +106,6 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
         }
     }
     // Extract and set the "Tea" value
-    cJSON *tea = cJSON_GetObjectItem(root, "Tea");
     if (cJSON_IsBool(tea))
     {
         CoffeeMakerJson->TeaFlag = cJSON_IsTrue(tea) ? 1 : 0;
@@ -114,6 +143,69 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
     cJSON_Delete(root);
 }
 
+void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
+{
+    GUI_DisplayUpdateCupsCounts(CoffeeMakerJson->Cups);
+    if (CoffeeMakerJson->CoffeeFlag == true && CoffeeMakerJson->TeaFlag == false)
+    {
+        GUI_DisplayShowCoffeeBeansIcon(true);
+        switch (CoffeeMakerJson->GinderLevel)
+        {
+        case 1:
+        {
+            GUI_DisplayShowFineGrindIcon(true);
+            break;
+        }
+        case 2:
+        {
+            GUI_DisplayShowMediumGrindIcon(true);
+            break;
+        }
+        case 3:
+        {
+            GUI_DisplayShowCourseGrindIcon(true);
+            break;
+        }
+        }
+    }
+    else if (CoffeeMakerJson->TeaFlag == true && CoffeeMakerJson->CoffeeFlag == false)
+    {
+        GUI_DisplayShowTeaLeafIcon(true);
+    }
+    xTimer = xTimerCreate("Coffee Maker Timer", pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC), pdTRUE, (void *)0, CoffeeMakerTimer);
+}
+
+void RunMQTTAndTestJson()
+{
+    MQTT_DefaultConfig(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
+    char CoffeeMakerJsonOutPut[2500];
+    while (true)
+    {
+        if (xSemaphoreTake(MQTTConnectedSemaphore, pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
+        {
+            CoffeeMakerJson_str CoffeeMakerJson;
+            MQTT_Subscribe("AndroidApp/TV");
+            JSON_TEST(&CoffeeMakerJson);
+            CoffeeMakerJsonCreator(CoffeeMakerJson, CoffeeMakerJsonOutPut);
+            ESP_LOGI("json ", " CoffeeMakerJsonOutPut: %s\n", CoffeeMakerJsonOutPut);
+            MQTT_Publish("Device", CoffeeMakerJsonOutPut);
+            memset(CoffeeMakerJsonOutPut, 0x0, sizeof(CoffeeMakerJsonOutPut));
+        }
+        if (xSemaphoreTake(MQTTErrorOrDisconnectSemaphore, pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
+        {
+            break;
+        }
+        if (xQueueReceive(MQTTDataFromBrokerQueue, CoffeeMakerJsonOutPut, pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
+        {
+            CoffeeMakerJson_str CoffeeMakerJson;
+            CoffeeMakerJsonParser(&CoffeeMakerJson, CoffeeMakerJsonOutPut);
+            CoffeeMakerGUIRest();
+            ApplyOnScreen(&CoffeeMakerJson);
+        }
+    }
+}
+
+#ifdef COFFEE_MAKER_APP_TEST
 void parserTEST(char *temp)
 {
     CoffeeMakerJson_str CoffeeMakerJson;
@@ -143,72 +235,4 @@ void JSON_TEST(CoffeeMakerJson_str *CoffeeMakerJson)
 
     // parserTEST(CoffeeMakerJsonOutPut);
 }
-void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
-{
-    GUI_DisplayUpdateCupsCounts(CoffeeMakerJson->Cups);
-    if (CoffeeMakerJson->CoffeeFlag == true)
-    {
-        GUI_DisplayShowCoffeeBeansIcon(true);
-        switch (CoffeeMakerJson->GinderLevel)
-        {
-        case 1:
-        {
-            GUI_DisplayShowFineGrindIcon(true);
-            break;
-        }
-        case 2:
-        {
-            GUI_DisplayShowMediumGrindIcon(true);
-            break;
-        }
-        case 3:
-        {
-            GUI_DisplayShowCourseGrindIcon(true);
-            break;
-        }
-        }
-    }
-    int counter = 1;
-    while (true)
-    {
-
-        vTaskDelay(pdMS_TO_TICKS(GUI_SEC));
-        GUI_DisplayUpdateCoffeeMakerTimer(GUI_SEC * counter);
-        counter++;
-        if (counter == 30)
-            break;
-    }
-}
-
-void RunMQTTAndTestJson()
-{
-    // JSON_TEST();
-    MQTT_DefaultConfig(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
-    char CoffeeMakerJsonOutPut[2500];
-    char CoffeeMakerJsonOutPut_t[2500] = {0};
-    while (true)
-    {
-        if (xSemaphoreTake(MQTTConnectedSemaphore, pdMS_TO_TICKS(MQTT_SEC)) == pdTRUE)
-        {
-            CoffeeMakerJson_str CoffeeMakerJson;
-            MQTT_Subscribe("AndroidApp/TV");
-            JSON_TEST(&CoffeeMakerJson);
-            CoffeeMakerJsonCreator(CoffeeMakerJson, CoffeeMakerJsonOutPut);
-            ESP_LOGI("json ", " CoffeeMakerJsonOutPut: %s\n", CoffeeMakerJsonOutPut);
-            MQTT_Publish("Device", CoffeeMakerJsonOutPut);
-            memset(CoffeeMakerJsonOutPut, 0x0, sizeof(CoffeeMakerJsonOutPut));
-        }
-        if (xSemaphoreTake(MQTTErrorOrDisconnectSemaphore, pdMS_TO_TICKS(MQTT_SEC)) == pdTRUE)
-        {
-            break;
-        }
-        if (xQueueReceive(MQTTDataFromBrokerQueue, CoffeeMakerJsonOutPut_t, pdMS_TO_TICKS(MQTT_SEC)) == pdTRUE)
-        {
-            CoffeeMakerJson_str CoffeeMakerJson;
-            // CoffeeMakerJsonParser(&CoffeeMakerJson, CoffeeMakerJsonOutPut);
-            ESP_LOGW("json ", " CoffeeMakerJsonOutPut: %s\n", CoffeeMakerJsonOutPut_t);
-            parserTEST(CoffeeMakerJsonOutPut_t);
-            ApplyOnScreen(&CoffeeMakerJson);
-        }
-    }
-}
+#endif
