@@ -15,10 +15,14 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include <stdint.h>
-
+#include "esp_wifi.h"
+#include "esp_http_client.h"
+#include "esp_err.h"
+#include "esp_event.h"
 #define LVGL_STACK 100 * 1000 // in word not byte
 #define SERVICE_MANGER_STACK 30 * 1000
 #define NUMBER_OF_COSTUME_TASK 10
+// #define MONITORING
 typedef enum
 {
     GUI_Task = 0,

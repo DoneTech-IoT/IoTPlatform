@@ -101,6 +101,65 @@ void ServiceMangerInit()
 #endif
 }
 
+bool check_wifi_status()
+{
+    wifi_ap_record_t ap_info;
+    esp_err_t status = esp_wifi_sta_get_ap_info(&ap_info);
+
+    if (status == ESP_OK)
+    {
+        ESP_LOGI("WIFI", "Connected to SSID: %s", ap_info.ssid);
+        return true;
+    }
+    else
+    {
+        // ESP_LOGI("WIFI", "Not connected to any Wi-Fi");
+        return false;
+    }
+}
+
+esp_err_t _http_event_handler(esp_http_client_event_t *evt)
+{
+    return ESP_OK;
+}
+
+bool check_internet_connection()
+{
+    esp_http_client_config_t config = {
+        .url = "http://www.google.com",
+        .event_handler = _http_event_handler,
+    };
+    esp_http_client_handle_t client = esp_http_client_init(&config);
+    esp_err_t err = esp_http_client_perform(client);
+    if (err == ESP_OK)
+    {
+        ESP_LOGI(TAG, "Connected to the internet");
+        return true;
+    }
+    else
+    {
+        // ESP_LOGI(TAG, "No internet connection");
+        return false;
+    }
+    esp_http_client_cleanup(client);
+}
+
+void PermissionToRun()
+{
+    while (true)
+    {
+        if (check_wifi_status())
+            break;
+        vTaskDelay(100);
+    }
+    while (true)
+    {
+        if (check_internet_connection())
+            break;
+        vTaskDelay(100);
+    }
+}
+
 /**
  * @brief Task function for the Service Manager task.
  * This task initializes and manages other tasks.
@@ -111,15 +170,16 @@ void ServiceMangerTask(void *pvParameter)
 {
     ServiceMangerInit();
     char pcTaskList[TASK_LIST_BUFFER_SIZE];
-#ifndef DONE_COMPONENT_MATTER
+    PermissionToRun();
     RunMQTTAndTestJson();
-#endif
+
     while (true)
     {
-        // vTaskList(pcTaskList);
+
 #ifdef MONITORING
+        // vTaskList(pcTaskList);
         // ESP_LOGI(TAG, "Task List:\n%s\n", pcTaskList);
 #endif
-        vTaskDelay(pdMS_TO_TICKS(500));
+        vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }

@@ -40,15 +40,14 @@ void MatterNetworkConnected()
  */
 extern "C" void app_main()
 {
-
-    Log_RamOccupy("main", "service manager");
     nvsFlashInit();
-    ServiceMangerTaskInit();
-    Log_RamOccupy("main", "service manager");
-    Log_RamOccupy("main", "Matter usage");
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
+    Log_RamOccupy("main", "service manager");
+
+    ServiceMangerTaskInit();
+    Log_RamOccupy("main", "service manager");
 }
