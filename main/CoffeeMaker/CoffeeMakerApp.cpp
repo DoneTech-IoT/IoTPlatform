@@ -26,7 +26,7 @@ void CoffeeMakerStopTimer(TimerHandle_t *xTimer)
 {
     if (xTimerStop(*xTimer, 0) == pdPASS)
     {
-        ESP_LOGE(TAG, "Timer successfully stopped.\n");
+        ESP_LOGI(TAG, "Timer successfully stopped.\n");
         CoffeeMakerGUIRest();
         return;
     }
@@ -168,12 +168,14 @@ void RunMQTTAndTestJson()
     {
         if (xSemaphoreTake(MQTTConnectedSemaphore, pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
         {
+            MQTT_Subscribe("AndroidApp/TV");
 #ifdef COFFEE_MAKER_APP_TEST
             PublishJsonForTest(CoffeeMakerJsonOutPut);
 #endif
         }
         if (xSemaphoreTake(MQTTErrorOrDisconnectSemaphore, pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
         {
+            ESP_LOGE(TAG, "we lose Mqtt");
             break;
         }
         if (xQueueReceive(MQTTDataFromBrokerQueue, CoffeeMakerJsonOutPut, pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
@@ -219,7 +221,6 @@ void JSON_TEST(CoffeeMakerJson_str *CoffeeMakerJson)
 void PublishJsonForTest(char *CoffeeMakerJsonOutPut)
 {
     CoffeeMakerJson_str CoffeeMakerJson;
-    MQTT_Subscribe("AndroidApp/TV");
     CoffeeMakerJsonCreator(CoffeeMakerJson, CoffeeMakerJsonOutPut);
     ESP_LOGI("json ", " CoffeeMakerJsonOutPut: %s\n", CoffeeMakerJsonOutPut);
     MQTT_Publish("Device", CoffeeMakerJsonOutPut);
