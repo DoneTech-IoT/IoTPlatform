@@ -5,13 +5,7 @@
 #include "ServiceManager.h"
 #include "Custom_Log.h"
 #include "MatterInterface.h"
-
-#ifndef DONE_COMPONENT_MATTER
-#include "esp_event.h"
-#include "esp_netif.h"
-#include "protocol_examples_common.h"
 #include "CoffeeMakerApp.hpp"
-#endif
 
 #define CONFIG_DONE_COMPONENT_MQTT
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
@@ -22,7 +16,7 @@ MatterInterfaceHandler_t MatterInterfaceHandler;
 // ****************************** GLobal Variables ****************************** //
 static const char *TAG = "Main";
 // ****************************** GLobal Functions ****************************** //
-#ifdef DONE_COMPONENT_MATTER
+
 void MatterAttributeUpdateCBMain(callback_type_t type,
                                  uint16_t endpoint_id, uint32_t cluster_id,
                                  uint32_t attribute_id, esp_matter_attr_val_t *val,
@@ -40,7 +34,7 @@ void MatterNetworkConnected()
 {
     ESP_LOGI(TAG, "Matter Network Connected\n");
 }
-#endif
+
 /**
  * @brief Function to change colors based on a timer callback
  */
@@ -48,24 +42,13 @@ extern "C" void app_main()
 {
 
     Log_RamOccupy("main", "service manager");
-
-#ifndef DONE_COMPONENT_MATTER
     nvsFlashInit();
-    ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
-    ESP_ERROR_CHECK(example_connect());
-#else
-    nvsFlashInit();
-#endif
     ServiceMangerTaskInit();
-
     Log_RamOccupy("main", "service manager");
-#ifdef DONE_COMPONENT_MATTER
     Log_RamOccupy("main", "Matter usage");
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
     Matter_TaskInit(&MatterInterfaceHandler);
-#endif
 }
