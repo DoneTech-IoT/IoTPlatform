@@ -1,10 +1,10 @@
 #include "ServiceManger.h"
-#include "GUI.h"
+#include "lvglGui.h"
 #include "MatterInterface.h"
 #include "nvsFlash.h"
 #include <stdio.h>
 #include "string.h"
-#include "coffeeMaker_GUI.h"
+
 static const char *TAG = "Service_Manger";
 #define TASK_LIST_BUFFER_SIZE 512
 // #define MONITORING
@@ -142,21 +142,8 @@ void ServiceMangerTask(void *pvParameter)
     ServiceMangerInit();
     vTaskDelay(pdMS_TO_TICKS(5 * 1000));
     MatterTAskCreator();
-    vTaskDelay(pdMS_TO_TICKS(10000));
-    GUI_DisplayUpdateCupsCounts(4);
-    GUI_DisplayShowCoffeeBeansIcon(true);
-    vTaskDelay(pdMS_TO_TICKS(GUI_SEC * 5));
-    GUI_DisplayShowCoffeeBeansIcon(true);
-    vTaskDelay(pdMS_TO_TICKS(GUI_SEC));
-    GUI_DisplayUpdateCoffeeMakerTimer(GUI_SEC);
-    GUI_DisplayUpdateCupsCounts(1);
-    GUI_DisplayShowCoffeeBeansIcon(false);
-
-    GUI_DisplayShowCoffeeScopIcon(true);
-    vTaskDelay(pdMS_TO_TICKS(GUI_SEC));
-    GUI_DisplayUpdateCoffeeMakerTimer(GUI_SEC * 2);
-    GUI_DisplayUpdateCupsCounts(2);
-    GUI_DisplayShowCoffeeScopIcon(false);
+    MatterNetworkConnected();
+    EventTest_();
     //  char pcTaskList[TASK_LIST_BUFFER_SIZE];
     while (true)
     {
