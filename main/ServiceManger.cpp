@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include "string.h"
 #include "coffeeMaker_GUI.h"
+#include "Custom_Log.h"
+
 static const char *TAG = "Service_Manger";
 #define TASK_LIST_BUFFER_SIZE 512
 // #define MONITORING
@@ -138,25 +140,26 @@ void MatterTAskCreator()
  */
 void ServiceMangerTask(void *pvParameter)
 {
+    Log_RamOccupy("Service_Manger", "nvsFlashInit");
     nvsFlashInit();
+    Log_RamStatus("Service_Manger", "nvsFlashInit");
+    Log_RamOccupy("Service_Manger", "nvsFlashInit");
+
+    Log_RamOccupy("Service_Manger", "ServiceMangerInit");
     ServiceMangerInit();
     vTaskDelay(pdMS_TO_TICKS(5 * 1000));
+    Log_RamStatus("Service_Manger", "ServiceMangerInit");
+    Log_RamOccupy("Service_Manger", "ServiceMangerInit");
+
+    Log_RamOccupy("Service_Manger", "MatterTAskCreator");
     MatterTAskCreator();
-    vTaskDelay(pdMS_TO_TICKS(10000));
+    vTaskDelay(pdMS_TO_TICKS(10 * 1000));
+    Log_RamStatus("Service_Manger", "MatterTAskCreator");
+    Log_RamOccupy("Service_Manger", "MatterTAskCreator");
+
     GUI_DisplayUpdateCupsCounts(4);
     GUI_DisplayShowCoffeeBeansIcon(true);
-    vTaskDelay(pdMS_TO_TICKS(GUI_SEC * 5));
-    GUI_DisplayShowCoffeeBeansIcon(true);
-    vTaskDelay(pdMS_TO_TICKS(GUI_SEC));
-    GUI_DisplayUpdateCoffeeMakerTimer(GUI_SEC);
-    GUI_DisplayUpdateCupsCounts(1);
-    GUI_DisplayShowCoffeeBeansIcon(false);
 
-    GUI_DisplayShowCoffeeScopIcon(true);
-    vTaskDelay(pdMS_TO_TICKS(GUI_SEC));
-    GUI_DisplayUpdateCoffeeMakerTimer(GUI_SEC * 2);
-    GUI_DisplayUpdateCupsCounts(2);
-    GUI_DisplayShowCoffeeScopIcon(false);
     //  char pcTaskList[TASK_LIST_BUFFER_SIZE];
     while (true)
     {
