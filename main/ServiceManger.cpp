@@ -1,7 +1,10 @@
 #include "ServiceManger.h"
-#include"GUI.h"
+#include "GUI.h"
+#include "MatterInterface.h"
+#include "nvsFlash.h"
 #include <stdio.h>
-#include"string.h"
+#include "string.h"
+#include "coffeeMaker_GUI.h"
 static const char *TAG = "Service_Manger";
 #define TASK_LIST_BUFFER_SIZE 512
 // #define MONITORING
@@ -35,7 +38,7 @@ void GUI_TaskCreator()
     ServiceManger.tasks[GUI_Task].TaskCreator = GUI_TaskCreator;
     ServiceManger.tasks[GUI_Task].TaskKiller = GUI_TaskKill;
     ServiceManger.tasks[GUI_Task].taskStack = LVGL_STACK;
-    ServiceManger.tasks[GUI_Task].priority = tskIDLE_PRIORITY + 1;
+    ServiceManger.tasks[GUI_Task].priority = tskIDLE_PRIORITY + 0;
     ServiceManger.tasks[GUI_Task].taskHandler = NULL;
     GUI_TaskInit(&ServiceManger.tasks[GUI_Task].taskHandler, ServiceManger.tasks[GUI_Task].priority, ServiceManger.tasks[GUI_Task].taskStack);
 }
@@ -99,6 +102,34 @@ void ServiceMangerInit()
 #endif
 }
 
+QueueHandle_t MatterBufQueue;
+SemaphoreHandle_t MatterSemaphore = NULL;
+MatterInterfaceHandler_t MatterInterfaceHandler;
+void MatterAttributeUpdateCBMain(callback_type_t type,
+                                 uint16_t endpoint_id, uint32_t cluster_id,
+                                 uint32_t attribute_id, esp_matter_attr_val_t *val,
+                                 void *priv_data)
+{
+    // printf("callback_type_t: %u\n", type);
+    // printf("endpoint_id: %u\n", endpoint_id);
+    // printf("cluster_id: %lu\n", cluster_id);
+    // printf("attribute_id: %lu\n", attribute_id);
+    // printf("val: %p\n", val);
+    // printf("priv_data: %pGlobalInitGlobalInitGlobalInit\n", priv_data);
+}
+
+void MatterNetworkConnectedt()
+{
+    ESP_LOGI(TAG, "Matter Network Connected\n");
+}
+void MatterTAskCreator()
+{
+    MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
+    MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
+    MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
+    MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnectedt;
+    Matter_TaskInit(&MatterInterfaceHandler);
+}
 /**
  * @brief Task function for the Service Manager task.
  * This task initializes and manages other tasks.
@@ -107,8 +138,26 @@ void ServiceMangerInit()
  */
 void ServiceMangerTask(void *pvParameter)
 {
+    nvsFlashInit();
     ServiceMangerInit();
-    char pcTaskList[TASK_LIST_BUFFER_SIZE];
+    vTaskDelay(pdMS_TO_TICKS(5 * 1000));
+    MatterTAskCreator();
+    vTaskDelay(pdMS_TO_TICKS(10000));
+    GUI_DisplayUpdateCupsCounts(4);
+    GUI_DisplayShowCoffeeBeansIcon(true);
+    vTaskDelay(pdMS_TO_TICKS(GUI_SEC * 5));
+    GUI_DisplayShowCoffeeBeansIcon(true);
+    vTaskDelay(pdMS_TO_TICKS(GUI_SEC));
+    GUI_DisplayUpdateCoffeeMakerTimer(GUI_SEC);
+    GUI_DisplayUpdateCupsCounts(1);
+    GUI_DisplayShowCoffeeBeansIcon(false);
+
+    GUI_DisplayShowCoffeeScopIcon(true);
+    vTaskDelay(pdMS_TO_TICKS(GUI_SEC));
+    GUI_DisplayUpdateCoffeeMakerTimer(GUI_SEC * 2);
+    GUI_DisplayUpdateCupsCounts(2);
+    GUI_DisplayShowCoffeeScopIcon(false);
+    //  char pcTaskList[TASK_LIST_BUFFER_SIZE];
     while (true)
     {
         // vTaskList(pcTaskList);
