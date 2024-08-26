@@ -48,7 +48,31 @@ esp_err_t SharedBusSend(
 esp_err_t SharedBusRecieve(    
     QueueHandle_t *QueueHandle)
 {
+    SharedBusPacket_t *recievedPacket;
+    
+    xQueuePeek(QueueHandle, recievedPacket, 1);
 
+    if (recievedPacket->SourceID == currentTaskID)
+    {
+        EventBits = xEventGroupWaitBits(
+                    EventGroupHandleLocal,   /* The event group being tested. */
+                    BIT_23         /* The bits within the event group to wait for. */
+                    pdTRUE,        /* BIT_23 should be cleared before returning. */
+                    pdTRUE,        /* Wait for 23th bit, either bit will do. */
+                    portMAX_DELAY);/* Wait a maximum of 100ms for either bit to be set. */
+
+        xQueueReceive(QueueHandle, recievedPacket, 1);
+        return 0;
+    }
+
+    EventBits = xEventGroupWaitBits(
+                    EventGroupHandleLocal,   /* The event group being tested. */
+                    BIT_23         /* The bits within the event group to wait for. */
+                    pdTRUE,        /* BIT_23 should be cleared before returning. */
+                    pdTRUE,        /* Wait for 23th bit, either bit will do. */
+                    portMAX_DELAY);/* Wait a maximum of 100ms for either bit to be set. */
+    
+    return 0;
 }  
 
 esp_err_t SharedBusTransaction(    
