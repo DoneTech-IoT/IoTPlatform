@@ -108,7 +108,7 @@ void ServiceMangerInit()
 void ServiceMangerTask(void *pvParameter)
 {
     ServiceMangerInit();
-    char pcTaskList[TASK_LIST_BUFFER_SIZE];
+    //char pcTaskList[TASK_LIST_BUFFER_SIZE];
     while (true)
     {
         // vTaskList(pcTaskList);
