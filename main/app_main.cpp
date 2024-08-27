@@ -6,7 +6,7 @@
 #include "Custom_Log.h"
 #include "MatterInterface.h"
 
-#ifndef DONE_COMPONENT_MATTER
+#ifndef CONFIG_DONE_COMPONENT_MATTER
 #include "esp_event.h"
 #include "esp_netif.h"
 #include "protocol_examples_common.h"
@@ -22,7 +22,7 @@ MatterInterfaceHandler_t MatterInterfaceHandler;
 // ****************************** GLobal Variables ****************************** //
 static const char *TAG = "Main";
 // ****************************** GLobal Functions ****************************** //
-#ifdef DONE_COMPONENT_MATTER
+#ifdef CONFIG_DONE_COMPONENT_MATTER
 void MatterAttributeUpdateCBMain(callback_type_t type,
                                  uint16_t endpoint_id, uint32_t cluster_id,
                                  uint32_t attribute_id, esp_matter_attr_val_t *val,
@@ -49,7 +49,7 @@ extern "C" void app_main()
 
     Log_RamOccupy("main", "service manager");
 
-#ifndef DONE_COMPONENT_MATTER
+#ifndef CONFIG_DONE_COMPONENT_MATTER
     nvsFlashInit();
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
@@ -60,7 +60,7 @@ extern "C" void app_main()
     ServiceMangerTaskInit();
 
     Log_RamOccupy("main", "service manager");
-#ifdef DONE_COMPONENT_MATTER
+#ifdef CONFIG_DONE_COMPONENT_MATTER
     Log_RamOccupy("main", "Matter usage");
     MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;

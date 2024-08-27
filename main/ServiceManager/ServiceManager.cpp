@@ -111,7 +111,7 @@ void ServiceMangerTask(void *pvParameter)
 {
     ServiceMangerInit();
     char pcTaskList[TASK_LIST_BUFFER_SIZE];
-#ifndef DONE_COMPONENT_MATTER
+#ifndef CONFIG_DONE_COMPONENT_MATTER
     RunMQTTAndTestJson();
 #endif
     while (true)

@@ -31,7 +31,7 @@ menu "Done Main Config"
             depends on DONE_BOARDS_LILYGO_S3
             default y         
 
-        config DONE_COMPONENT_MATTER
+        config CONFIG_DONE_COMPONENT_MATTER
             bool "Matter component"        
             default y        
 
