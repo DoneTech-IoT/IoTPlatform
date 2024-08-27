@@ -18,10 +18,15 @@
 #include <sys/param.h>
 
 #include "nvsFlash.h"
+#ifdef CONFIG_DONE_COMPONENT_LVGL
 #include "GUI.h"
+#endif
+#ifdef CONFIG_DONE_COMPONENT_MATTER
 #include "MatterInterface.h"
-#include "CoffeeMakerApp.hpp"
-
+#endif
+#ifdef CONFIG_DONE_LOG
+#include "Custom_Log.h"
+#endif
 #ifndef CONFIG_DONE_COMPONENT_MATTER
 #include "esp_netif.h"
 #include "protocol_examples_common.h"

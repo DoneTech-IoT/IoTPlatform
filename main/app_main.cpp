@@ -3,6 +3,7 @@
 #include "Setup_GPIO.h"
 #include "ServiceManager.h"
 #include "Custom_Log.h"
+#include "CoffeeMakerApp.hpp"
 
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 
@@ -19,4 +20,5 @@ extern "C" void app_main()
     Log_RamOccupy("main", "service manager");
     ServiceMangerTaskInit();
     Log_RamOccupy("main", "service manager");
+    // RunMQTTAndTestJson();
 }

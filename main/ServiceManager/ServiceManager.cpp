@@ -7,7 +7,9 @@ QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
 MatterInterfaceHandler_t MatterInterfaceHandler;
 #endif
+#ifdef CONFIG_DONE_COMPONENT_MQTT
 
+#endif
 #define TASK_LIST_BUFFER_SIZE 512
 // #define MONITORING
 /**
@@ -152,9 +154,6 @@ void ServiceMangerTask(void *pvParameter)
 {
     ServiceMangerInit();
     char pcTaskList[TASK_LIST_BUFFER_SIZE];
-#ifdef CONFIG_DONE_COMPONENT_MATTER
-    RunMQTTAndTestJson();
-#endif
     while (true)
     {
 #ifdef MONITORING
