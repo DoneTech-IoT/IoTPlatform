@@ -1,6 +1,5 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "Setup_GPIO.h"
 #include "ServiceManager.h"
 #include "Custom_Log.h"
 #include "CoffeeMakerApp.hpp"
