@@ -5,11 +5,7 @@
 #include "Custom_Log.h"
 #include "CoffeeMakerApp.hpp"
 
-#define TIMER_TIME pdMS_TO_TICKS(500) // in millis
-
-// ****************************** GLobal Variables ****************************** //
 static const char *TAG = "Main";
-// ****************************** GLobal Functions ****************************** //
 
 /**
  * @brief Function to change colors based on a timer callback
