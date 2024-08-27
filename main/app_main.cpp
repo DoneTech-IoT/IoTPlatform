@@ -13,7 +13,6 @@
 #include "CoffeeMakerApp.hpp"
 #endif
 
-#define CONFIG_DONE_COMPONENT_MQTT
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 
 QueueHandle_t MatterBufQueue;
