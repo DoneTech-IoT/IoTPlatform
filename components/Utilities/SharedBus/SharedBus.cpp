@@ -4,13 +4,14 @@
 #define UI_EVENT_FLAG	( 1 << UI_INTERFACE_ID )
 #define UI_EVENT_FLAG	( 1 << UI_INTERFACE_ID )
 
+#define BIT_23	( 1 << 23 )
+
 static EventBits_t EventBits;
 static EventGroupHandle_t *EventGroupHandleLocal;
 
 const TickType_t xTicksToWait = 1 ;// portTICK_PERIOD_MS;
 
-esp_err_t SharedBusInit(
-    EventGroupHandle_t *EventGroupHandle)    
+esp_err_t SharedBusInit(void)    
 {
     EventGroupHandleLocal = EventGroupHandle;
     *EventGroupHandleLocal = xEventGroupCreate();            
@@ -31,8 +32,7 @@ esp_err_t SharedBusSend(
                     EventGroupHandleLocal, /* The event group being updated. */
                     BIT_23);               /* The bits being set. */
 
-    *QueueHandle = xQueueCreate(1, packet->DataLength +
-                        sizeof(SharedBusPacket_t) - sizeo );    
+    *QueueHandle = xQueueCreate(1, sizeof(SharedBusPacket_t));    
 
     xQueueSend(*QueueHandle, SharedBusPacket, 1); 
     
@@ -75,14 +75,14 @@ esp_err_t SharedBusRecieve(
     return 0;
 }  
 
-esp_err_t SharedBusTransaction(    
-    QueueHandle_t *QueueHandle)
-{
-    EventBits = xEventGroupWaitBits(
-                    *EventGroupHandleLocal,   /* The event group being tested. */
-                    BIT_23, /* The bits within the event group to wait for. */
-                    pdTRUE,        /* BIT_23 should be cleared before returning. */
-                    pdFALSE,       /* Don't wait for both bits, either bit will do. */
-                    1); /* Wait a maximum of 100ms for either bit to be set. */
-} 
+// esp_err_t SharedBusTransaction(    
+//     QueueHandle_t *QueueHandle)
+// {
+//     EventBits = xEventGroupWaitBits(
+//                     *EventGroupHandleLocal,   /* The event group being tested. */
+//                     BIT_23, /* The bits within the event group to wait for. */
+//                     pdTRUE,        /* BIT_23 should be cleared before returning. */
+//                     pdFALSE,       /* Don't wait for both bits, either bit will do. */
+//                     1); /* Wait a maximum of 100ms for either bit to be set. */
+// } 
 

@@ -4,31 +4,32 @@
 #include "Setup_GPIO.h"
 #include "ServiceManger.h"
 #include "Custom_Log.h"
-#include "MatterInterface.h"
-#include "DoneCoffeeMaker.h"
+#include "SharedBus.h"
+//#include "MatterInterface.h"
+//#include "DoneCoffeeMaker.h"
 
 #define CONFIG_DONE_COMPONENT_MQTT
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
 
-QueueHandle_t MatterBufQueue;
-SemaphoreHandle_t MatterSemaphore = NULL;
-MatterInterfaceHandler_t MatterInterfaceHandler;
+// QueueHandle_t MatterBufQueue;
+// SemaphoreHandle_t MatterSemaphore = NULL;
+// MatterInterfaceHandler_t MatterInterfaceHandler;
 // ****************************** GLobal Variables ****************************** //
 static const char *TAG = "Main";       
 // ****************************** GLobal Functions ****************************** //
 
-void MatterAttributeUpdateCBMain(callback_type_t type,
-                                uint16_t endpoint_id, uint32_t cluster_id,
-                                uint32_t attribute_id, esp_matter_attr_val_t *val,
-                                void *priv_data)
-{
-    // printf("callback_type_t: %u\n", type);
-    // printf("endpoint_id: %u\n", endpoint_id);
-    // printf("cluster_id: %lu\n", cluster_id);
-    // printf("attribute_id: %lu\n", attribute_id);
-    // printf("val: %p\n", val);
-    // printf("priv_data: %pGlobalInitGlobalInitGlobalInit\n", priv_data);
-}
+// void MatterAttributeUpdateCBMain(callback_type_t type,
+//                                 uint16_t endpoint_id, uint32_t cluster_id,
+//                                 uint32_t attribute_id, esp_matter_attr_val_t *val,
+//                                 void *priv_data)
+// {
+//     // printf("callback_type_t: %u\n", type);
+//     // printf("endpoint_id: %u\n", endpoint_id);
+//     // printf("cluster_id: %lu\n", cluster_id);
+//     // printf("attribute_id: %lu\n", attribute_id);
+//     // printf("val: %p\n", val);
+//     // printf("priv_data: %pGlobalInitGlobalInitGlobalInit\n", priv_data);
+// }
 
 void MatterNetworkConnected()
 {
@@ -47,23 +48,26 @@ extern "C" void app_main()
     nvsFlashInit();
 
     Log_RamOccupy("main", "service manager");
-    Log_RamOccupy("main", "Matter usage");
-    MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
-    MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
-    MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
-    MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
-    Matter_TaskInit(&MatterInterfaceHandler);
 
-    KeyStatePair_t pKeyStatePair;
+    //SharedBusRecieve(QueueHandler);
 
-    while (true)
-    {
-        if(xQueueReceive(
-            *(MatterInterfaceHandler.SharedBufQueue), 
-            &pKeyStatePair, pdMS_TO_TICKS(1)) == pdTRUE)
-        {
-            ESP_LOGW(TAG, "pKeyStatePair-> Key: %d, State: %d\n", 
-            pKeyStatePair.Key, pKeyStatePair.State);        
-        }
-    }        
+    // Log_RamOccupy("main", "Matter usage");
+    // MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
+    // MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
+    // MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
+    // MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
+    // Matter_TaskInit(&MatterInterfaceHandler);
+
+    //KeyStatePair_t pKeyStatePair;
+
+    // while (true)
+    // {
+    //     if(xQueueReceive(
+    //         *(MatterInterfaceHandler.SharedBufQueue), 
+    //         &pKeyStatePair, pdMS_TO_TICKS(1)) == pdTRUE)
+    //     {
+    //         ESP_LOGW(TAG, "pKeyStatePair-> Key: %d, State: %d\n", 
+    //         pKeyStatePair.Key, pKeyStatePair.State);        
+    //     }
+    // }        
 }
