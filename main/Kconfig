@@ -39,11 +39,11 @@ menu "Done Main Config"
             bool "Log Utility"        
             default y  
 
-        config DONE_MQTT
+        config DONE_COMPONENT_MQTT
              bool "MQTT"        
              default y   
 
-        config DONE_COFFEE_MAKER_APP
+        config DONE_APLLICAION_COFFEE_MAKER
             bool "Coffee Maker Application"        
             default y 
 
