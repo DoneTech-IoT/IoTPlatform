@@ -37,7 +37,15 @@ menu "Done Main Config"
 
         config DONE_LOG
             bool "Log Utility"        
-            default y            
+            default y  
+
+        config DONE_MQTT
+             bool "MQTT"        
+             default y   
+
+        config DONE_COFFEE_MAKER_APP
+            bool "Coffee Maker Application"        
+            default y 
 
         config DONE_LOG_PRINT
             bool "Print Log"        
