@@ -146,7 +146,7 @@ void ServiceMangerInit()
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     ESP_ERROR_CHECK(example_connect());
 #endif
-#ifdef DONE_COMPONENT_MQTT_DEFAULT
+#ifdef CONFIG_DONE_COMPONENT_MQTT_DEFAULT
     MQTT_DefaultConfig(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
 #endif
 }

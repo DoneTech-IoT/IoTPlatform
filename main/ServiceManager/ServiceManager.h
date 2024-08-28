@@ -32,6 +32,10 @@
 #include "Custom_Log.h"
 #endif
 
+#ifdef CONFIG_DONE_COMPONENT_MQTT
+#include "MQTT_Interface.h"
+#endif
+
 #define LVGL_STACK 100 * 1000 // in word not byte
 #define SERVICE_MANGER_STACK 30 * 1000
 #define NUMBER_OF_COSTUME_TASK 10

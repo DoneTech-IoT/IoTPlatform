@@ -15,7 +15,9 @@
 #include <esp_system.h>
 #include "esp_log.h"
 
+#ifdef COFFEE_MAKER_APP_TEST
 #include "MQTT_Interface.h"
+#endif
 
 #define COFFEE_TIME 120
 #define COFFEE_MAKER_APP_SEC 1000
