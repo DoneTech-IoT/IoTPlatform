@@ -32,7 +32,7 @@ typedef struct CoffeeMakerApp
     char State[18];
 } CoffeeMakerJson_str;
 
-void RunMQTTAndTestJson();
+void CoffeeMakerApplication();
 
 #ifdef COFFEE_MAKER_APP_TEST
 void PublishJsonForTest(char *CoffeeMakerJsonOutPut);

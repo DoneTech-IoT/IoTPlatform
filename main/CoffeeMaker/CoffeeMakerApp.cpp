@@ -159,7 +159,7 @@ void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
         ESP_LOGE(TAG, "Failed to start the timer\n");
 }
 
-void RunMQTTAndTestJson()
+void CoffeeMakerApplication()
 {
     xTimer = xTimerCreate("Coffee Maker Timer", pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC), pdTRUE, (void *)0, CoffeeMakerTimerCallBack);
     MQTT_DefaultConfig(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
