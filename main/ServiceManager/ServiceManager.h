@@ -23,13 +23,12 @@
 #endif
 #ifdef CONFIG_DONE_COMPONENT_MATTER
 #include "MatterInterface.h"
+#else
+#include "esp_netif.h"
+#include "protocol_examples_common.h"
 #endif
 #ifdef CONFIG_DONE_LOG
 #include "Custom_Log.h"
-#endif
-#ifndef CONFIG_DONE_COMPONENT_MATTER
-#include "esp_netif.h"
-#include "protocol_examples_common.h"
 #endif
 
 #define LVGL_STACK 100 * 1000 // in word not byte

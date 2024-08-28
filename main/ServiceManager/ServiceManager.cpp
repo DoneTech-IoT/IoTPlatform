@@ -124,12 +124,6 @@ void ServiceMangerTaskInit()
 void ServiceMangerInit()
 {
     nvsFlashInit();
-#ifndef CONFIG_DONE_COMPONENT_MATTER
-    ESP_LOGE(TAG, "connect to wifi");
-    ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
-    ESP_ERROR_CHECK(example_connect());
-#endif
 #ifdef CONFIG_DONE_COMPONENT_LVGL
     GUI_TaskCreator();
     ESP_LOGI(TAG, "GUI Created !");
@@ -142,6 +136,11 @@ void ServiceMangerInit()
 #ifdef CONFIG_DONE_COMPONENT_MATTER
     MatterServiceRunner();
     ESP_LOGI(TAG, "Matter interface called !");
+#else
+    ESP_LOGE(TAG, "connect to wifi");
+    ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
+    ESP_ERROR_CHECK(example_connect());
 #endif
 }
 
