@@ -3,8 +3,8 @@
 
 static const char *TAG = "coffeeMakerApp";
 
-static uint8_t TimerCounter;
-TimerHandle_t xTimer;
+static uint8_t CoffeeMakerApp_TimerCounter;
+TimerHandle_t CoffeeMakerApp_xTimer;
 
 /**
  * @brief Resets the coffee maker GUI to its default state.
@@ -13,7 +13,7 @@ TimerHandle_t xTimer;
  */
 void CoffeeMakerGUIReset()
 {
-    TimerCounter = 0;
+    CoffeeMakerApp_TimerCounter = 0;
     GUI_DisplayUpdateCoffeeMakerTimer(0);
     GUI_DisplayUpdateCupsCounts(0);
     GUI_DisplayShowCoffeeBeansIcon(false);
@@ -27,12 +27,12 @@ void CoffeeMakerGUIReset()
 /**
  * @brief Stops the coffee maker timer.
  * This function attempts to stop the timer and resets the GUI upon success or logs an error if it fails.
- * @param xTimer Pointer to the timer handle to be stopped.
+ * @param CoffeeMakerApp_xTimer Pointer to the timer handle to be stopped.
  * @return void
  */
-void CoffeeMakerStopTimer(TimerHandle_t *xTimer)
+void CoffeeMakerStopTimer(TimerHandle_t *CoffeeMakerApp_xTimer)
 {
-    if (xTimerStop(*xTimer, 0) == pdPASS)
+    if (xTimerStop(*CoffeeMakerApp_xTimer, 0) == pdPASS)
     {
         ESP_LOGI(TAG, "Timer successfully stopped.\n");
         CoffeeMakerGUIReset();
@@ -45,18 +45,18 @@ void CoffeeMakerStopTimer(TimerHandle_t *xTimer)
 /**
  * @brief Timer callback function for the coffee maker.
  * This function is called when the timer expires, updates the timer counter, and stops the timer when the coffee time is reached.
- * @param xTimer Timer handle.
+ * @param CoffeeMakerApp_xTimer Timer handle.
  * @return void
  */
-void CoffeeMakerTimerCallBack(TimerHandle_t xTimer)
+void CoffeeMakerTimerCallBack(TimerHandle_t CoffeeMakerApp_xTimer)
 {
-    if (TimerCounter == COFFEE_TIME)
+    if (CoffeeMakerApp_TimerCounter == COFFEE_TIME)
     {
-        TimerCounter = 0;
-        CoffeeMakerStopTimer(&xTimer);
+        CoffeeMakerApp_TimerCounter = 0;
+        CoffeeMakerStopTimer(&CoffeeMakerApp_xTimer);
     }
-    GUI_DisplayUpdateCoffeeMakerTimer(COFFEE_MAKER_APP_SEC * TimerCounter);
-    TimerCounter++;
+    GUI_DisplayUpdateCoffeeMakerTimer(COFFEE_MAKER_APP_SEC * CoffeeMakerApp_TimerCounter);
+    CoffeeMakerApp_TimerCounter++;
 }
 
 /**
@@ -190,7 +190,7 @@ void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
     {
         GUI_DisplayShowTeaLeafIcon(true);
     }
-    if (xTimerStart(xTimer, 0) != pdPASS)
+    if (xTimerStart(CoffeeMakerApp_xTimer, 0) != pdPASS)
         ESP_LOGE(TAG, "Failed to start the timer\n");
 }
 
@@ -209,7 +209,7 @@ void CoffeeMakerApplication(
     SemaphoreHandle_t *MQTTErrorOrDisconnectSemaphore)
 {
     CoffeeMakerGUIReset();
-    xTimer = xTimerCreate("Coffee Maker Timer", pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC), pdTRUE, (void *)0, CoffeeMakerTimerCallBack);
+    CoffeeMakerApp_xTimer = xTimerCreate("Coffee Maker Timer", pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC), pdTRUE, (void *)0, CoffeeMakerTimerCallBack);
     char CoffeeMakerJsonOutPut[2500];
     while (true)
     {
