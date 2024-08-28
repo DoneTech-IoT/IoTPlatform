@@ -11,7 +11,7 @@ TimerHandle_t xTimer;
  * This function resets the timer counter and clears all display indicators for the coffee maker.
  * @return void
  */
-void CoffeeMakerGUIRest()
+void CoffeeMakerGUIReset()
 {
     TimerCounter = 0;
     GUI_DisplayUpdateCoffeeMakerTimer(0);
@@ -35,7 +35,7 @@ void CoffeeMakerStopTimer(TimerHandle_t *xTimer)
     if (xTimerStop(*xTimer, 0) == pdPASS)
     {
         ESP_LOGI(TAG, "Timer successfully stopped.\n");
-        CoffeeMakerGUIRest();
+        CoffeeMakerGUIReset();
         return;
     }
     ESP_LOGE(TAG, "Timer unsuccessfully stopped please restart this task.\n");
@@ -169,6 +169,7 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
  */
 void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
 {
+    ESP_LOGE(TAG, "apply on screen");
     GUI_DisplayUpdateCupsCounts(CoffeeMakerJson->Cups);
     if (CoffeeMakerJson->CoffeeFlag == true && CoffeeMakerJson->TeaFlag == false)
     {
@@ -203,11 +204,12 @@ void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
  * @param MQTTErrorOrDisconnectSemaphore Pointer to the semaphore handle indicating an MQTT error *or disconnection.
  * @return void
  */
-void CoffeeMakerApplication( 
+void CoffeeMakerApplication(
     QueueHandle_t *MQTTDataFromBrokerQueue,
     SemaphoreHandle_t *MQTTConnectedSemaphore,
     SemaphoreHandle_t *MQTTErrorOrDisconnectSemaphore)
 {
+    CoffeeMakerGUIReset();
     xTimer = xTimerCreate("Coffee Maker Timer", pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC), pdTRUE, (void *)0, CoffeeMakerTimerCallBack);
     char CoffeeMakerJsonOutPut[2500];
     while (true)
@@ -226,9 +228,10 @@ void CoffeeMakerApplication(
         }
         if (xQueueReceive(*MQTTDataFromBrokerQueue, CoffeeMakerJsonOutPut, pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
         {
+            ESP_LOGE(TAG, "receive data in coffee maker app");
             CoffeeMakerJson_str CoffeeMakerJson;
             CoffeeMakerJsonParser(&CoffeeMakerJson, CoffeeMakerJsonOutPut);
-            CoffeeMakerGUIRest();
+            CoffeeMakerGUIReset();
             ApplyOnScreen(&CoffeeMakerJson);
         }
     }
@@ -270,6 +273,6 @@ void PublishJsonForTest(char *CoffeeMakerJsonOutPut)
     CoffeeMakerJsonCreator(CoffeeMakerJson, CoffeeMakerJsonOutPut);
     ESP_LOGI("json ", " CoffeeMakerJsonOutPut: %s\n", CoffeeMakerJsonOutPut);
     MQTT_Publish("Device", CoffeeMakerJsonOutPut);
-    memset(CoffeeMakerJsonOutPut, 0x0, sizeof(CoffeeMakerJsonOutPut));
+    // memset(CoffeeMakerJsonOutPut, 0x0, sizeof(CoffeeMakerJsonOutPut));
 }
 #endif

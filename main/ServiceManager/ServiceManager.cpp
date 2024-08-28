@@ -1,5 +1,6 @@
 #include "ServiceManager.h"
 #include "CoffeeMakerApp.hpp"
+
 static const char *TAG = "Service_Manager";
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
@@ -160,12 +161,16 @@ void ServiceMangerInit()
 void ServiceMangerTask(void *pvParameter)
 {
     ServiceMangerInit();
-#ifdef DONE_APLLICAION_COFFEE_MAKER
+#ifdef CONFIG_DONE_APLLICAION_COFFEE_MAKER
     bool WifiFlag = CheckWifiStatus();
     if (WifiFlag)
+    {
         bool InternetFlag = CheckInternetConnection();
-    if (InternetFlag)
-        CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
+        if (InternetFlag)
+        {
+            CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
+        }
+    }
 #endif
     char pcTaskList[TASK_LIST_BUFFER_SIZE];
     while (true)

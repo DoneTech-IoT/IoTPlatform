@@ -15,9 +15,7 @@
 #include <esp_system.h>
 #include "esp_log.h"
 
-#ifdef COFFEE_MAKER_APP_TEST
 #include "MQTT_Interface.h"
-#endif
 
 #define COFFEE_TIME 120
 #define COFFEE_MAKER_APP_SEC 1000
@@ -49,11 +47,12 @@ typedef struct CoffeeMakerApp
  * @param MQTTErrorOrDisconnectSemaphore Pointer to the semaphore handle indicating an MQTT error *or disconnection.
  * @return void
  */
-void CoffeeMakerApplication( 
+void CoffeeMakerApplication(
     QueueHandle_t *MQTTDataFromBrokerQueue,
     SemaphoreHandle_t *MQTTConnectedSemaphore,
-    SemaphoreHandle_t *MQTTErrorOrDisconnectSemaphore)
+    SemaphoreHandle_t *MQTTErrorOrDisconnectSemaphore);
 
+// #define COFFEE_MAKER_APP_TEST
 #ifdef COFFEE_MAKER_APP_TEST
 void PublishJsonForTest(char *CoffeeMakerJsonOutPut);
 void JSON_TEST(CoffeeMakerJson_str *CoffeeMakerJson);
