@@ -19,6 +19,12 @@
 
 #define COFFEE_TIME 120
 #define COFFEE_MAKER_APP_SEC 1000
+
+/**
+ * @brief Structure to hold coffee maker application settings.
+ * This structure contains various fields representing the settings and state of a coffee maker application,
+ * including the grinder level, cup count, beverage flags, temperature, update time, and device credentials.
+ */
 typedef struct CoffeeMakerApp
 {
     uint8_t GinderLevel;
