@@ -5,17 +5,22 @@
 #include "ServiceManger.h"
 #include "Custom_Log.h"
 #include "SharedBus.h"
+#include "MQTT_Interface.h"
 //#include "MatterInterface.h"
 //#include "DoneCoffeeMaker.h"
 
 #define CONFIG_DONE_COMPONENT_MQTT
 #define TIMER_TIME pdMS_TO_TICKS(500) // in millis
+#define TaskStack 5000
+
+QueueHandle_t QueueHandle;
+EventGroupHandle_t EventGroupHandle;
 
 // QueueHandle_t MatterBufQueue;
 // SemaphoreHandle_t MatterSemaphore = NULL;
 // MatterInterfaceHandler_t MatterInterfaceHandler;
 // ****************************** GLobal Variables ****************************** //
-static const char *TAG = "Main";       
+static const char *TAG = "Main";   
 // ****************************** GLobal Functions ****************************** //
 
 // void MatterAttributeUpdateCBMain(callback_type_t type,
@@ -39,17 +44,92 @@ void MatterNetworkConnected()
 /**
  * @brief Function to change colors based on a timer callback
  */
+
+void vTaskCode1( void * pvParameters )
+{
+    configASSERT( ( ( uint32_t ) pvParameters ) == 1 );
+    for( ;; )
+    {
+        /* TODO recieve here. */
+    SharedBusPacket_t recievePacket;
+    SharedBusRecieve(QueueHandle, recievePacket);
+    ESP_LOGE(TAG, "task1-%d", recievePacket.SourceID);
+    }
+}
+
+void vTaskCode2( void * pvParameters )
+{
+    configASSERT( ( ( uint32_t ) pvParameters ) == 1 );
+    for( ;; )
+    {
+        /* TODO recieve here. */
+    SharedBusPacket_t recievePacket;
+    SharedBusRecieve(QueueHandle, recievePacket);
+    ESP_LOGE(TAG, "task2-%d", recievePacket.SourceID);
+    }
+}
+
+void vTaskCode3( void * pvParameters )
+{
+    configASSERT( ( ( uint32_t ) pvParameters ) == 1 );
+    for( ;; )
+    {
+        /* TODO recieve here. */
+    SharedBusPacket_t recievePacket;
+    SharedBusRecieve(QueueHandle, recievePacket);
+    ESP_LOGE(TAG, "task3-%d", recievePacket.SourceID);
+    }
+}
+
 extern "C" void app_main()
 {
-
     Log_RamOccupy("main", "service manager");
-
     ServiceMangerTaskInit();
     nvsFlashInit();
-
     Log_RamOccupy("main", "service manager");
 
-    //SharedBusRecieve(QueueHandler);
+    char *msg = "HI";
+    SharedBusInit(&EventGroupHandle, &QueueHandle);
+    SharedBusPacket_t sendPacket = {
+        .SourceID = MQTT_INTERFACE_ID,
+        .PacketID = 1,
+        .data = msg
+    };
+
+    SharedBusSend(QueueHandle, sendPacket);
+//     SharedBusPacket_t recievePacket;
+//     SharedBusRecieve(QueueHandle, recievePacket); //FIXME uncomment here and comment tasks in main to tets 1to1 mode
+//     ESP_LOGE(TAG, "5-%d", recievePacket.SourceID);
+//     ESP_LOGE(TAG, "6-%d", recievePacket.PacketID);
+//     ESP_LOGE(TAG, "7-%s", (char*)recievePacket.data);
+
+    BaseType_t xReturned;
+    TaskHandle_t xHandle1 = NULL;
+    TaskHandle_t xHandle2 = NULL;
+    TaskHandle_t xHandle3 = NULL;
+
+    /* Create the task, storing the handle. */
+    xReturned = xTaskCreate(
+                    vTaskCode1,       /* Function that implements the task. */
+                    "num1",          /* Text name for the task. */
+                    TaskStack,      /* Stack size in words, not bytes. */
+                    ( void * ) 1,    /* Parameter passed into the task. */
+                    tskIDLE_PRIORITY,/* Priority at which the task is created. */
+                    &xHandle1 );      /* Used to pass out the created task's handle. */
+    xReturned = xTaskCreate(
+                    vTaskCode2,       /* Function that implements the task. */
+                    "num2",          /* Text name for the task. */
+                    TaskStack,      /* Stack size in words, not bytes. */
+                    ( void * ) 1,    /* Parameter passed into the task. */
+                    tskIDLE_PRIORITY,/* Priority at which the task is created. */
+                    &xHandle2 );      /* Used to pass out the created task's handle. */
+    xReturned = xTaskCreate(
+                    vTaskCode3,       /* Function that implements the task. */
+                    "num3",          /* Text name for the task. */
+                    TaskStack,      /* Stack size in words, not bytes. */
+                    ( void * ) 1,    /* Parameter passed into the task. */
+                    tskIDLE_PRIORITY,/* Priority at which the task is created. */
+                    &xHandle3 );      /* Used to pass out the created task's handle. */
 
     // Log_RamOccupy("main", "Matter usage");
     // MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
