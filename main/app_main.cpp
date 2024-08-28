@@ -2,7 +2,6 @@
 #include "freertos/task.h"
 #include "ServiceManager.h"
 #include "Custom_Log.h"
-#include "CoffeeMakerApp.hpp"
 
 static const char *TAG = "Main";
 
