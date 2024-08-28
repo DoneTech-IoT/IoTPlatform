@@ -7,14 +7,15 @@
 #define BIT_23	( 1 << 23 )
 
 static EventBits_t EventBits;
-static EventGroupHandle_t *EventGroupHandleLocal;
+static EventGroupHandle_t EventGroupHandleLocal;
 
 const TickType_t xTicksToWait = 1 ;// portTICK_PERIOD_MS;
 
 esp_err_t SharedBusInit(void)    
 {
-    EventGroupHandleLocal = EventGroupHandle;
-    *EventGroupHandleLocal = xEventGroupCreate();            
+    //EventGroupHandleLocal = EventGroupHandle;
+    EventGroupHandleLocal = xEventGroupCreate();   
+    return 0;         
 }
 
 esp_err_t SharedBusSend(        
@@ -23,7 +24,7 @@ esp_err_t SharedBusSend(
 {    
     EventBits = xEventGroupWaitBits(
                     EventGroupHandleLocal,   /* The event group being tested. */
-                    BIT_23         /* The bits within the event group to wait for. */
+                    BIT_23,         /* The bits within the event group to wait for. */
                     pdTRUE,        /* BIT_23 should be cleared before returning. */
                     pdTRUE,        /* Wait for 23th bit, either bit will do. */
                     portMAX_DELAY);/* Wait a maximum of 100ms for either bit to be set. */
@@ -36,6 +37,7 @@ esp_err_t SharedBusSend(
 
     xQueueSend(*QueueHandle, SharedBusPacket, 1); 
     
+    return 0;
     // TODO: manage all sync bits
     // EventBits = xEventGroupWaitBits(
     //                 EventGroupHandleLocal,   /* The event group being tested. */
@@ -46,17 +48,17 @@ esp_err_t SharedBusSend(
 }
 
 esp_err_t SharedBusRecieve(    
-    QueueHandle_t *QueueHandle)
+    QueueHandle_t QueueHandle)
 {
     SharedBusPacket_t *recievedPacket;
     
     xQueuePeek(QueueHandle, recievedPacket, 1);
 
-    if (recievedPacket->SourceID == currentTaskID)
+    if (recievedPacket->SourceID == MQTT_INTERFACE_ID)
     {
         EventBits = xEventGroupWaitBits(
                     EventGroupHandleLocal,   /* The event group being tested. */
-                    BIT_23         /* The bits within the event group to wait for. */
+                    BIT_23,         /* The bits within the event group to wait for. */
                     pdTRUE,        /* BIT_23 should be cleared before returning. */
                     pdTRUE,        /* Wait for 23th bit, either bit will do. */
                     portMAX_DELAY);/* Wait a maximum of 100ms for either bit to be set. */
@@ -67,7 +69,7 @@ esp_err_t SharedBusRecieve(
 
     EventBits = xEventGroupWaitBits(
                     EventGroupHandleLocal,   /* The event group being tested. */
-                    BIT_23         /* The bits within the event group to wait for. */
+                    BIT_23,         /* The bits within the event group to wait for. */
                     pdTRUE,        /* BIT_23 should be cleared before returning. */
                     pdTRUE,        /* Wait for 23th bit, either bit will do. */
                     portMAX_DELAY);/* Wait a maximum of 100ms for either bit to be set. */
