@@ -41,11 +41,18 @@ typedef struct CoffeeMakerApp
 } CoffeeMakerJson_str;
 
 /**
- * @brief Main function for the coffee maker application.
- * This function initializes the coffee maker timer, handles MQTT communication, and processes coffee maker settings.
+ * @brief Main application function for managing the coffee maker's MQTT communication and user interface.
+ * This function initializes the timer for the coffee maker application and handles MQTT subscriptions and messages.
+ * It processes incoming data to update the coffee maker's state and display, as well as manages connection status.
+ * @param MQTTDataFromBrokerQueue Pointer to the queue handle for receiving MQTT data from the *broker.
+ * @param MQTTConnectedSemaphore Pointer to the semaphore handle indicating successful MQTT connection.
+ * @param MQTTErrorOrDisconnectSemaphore Pointer to the semaphore handle indicating an MQTT error *or disconnection.
  * @return void
  */
-void CoffeeMakerApplication();
+void CoffeeMakerApplication( 
+    QueueHandle_t *MQTTDataFromBrokerQueue,
+    SemaphoreHandle_t *MQTTConnectedSemaphore,
+    SemaphoreHandle_t *MQTTErrorOrDisconnectSemaphore)
 
 #ifdef COFFEE_MAKER_APP_TEST
 void PublishJsonForTest(char *CoffeeMakerJsonOutPut);

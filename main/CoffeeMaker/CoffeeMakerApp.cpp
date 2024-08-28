@@ -195,29 +195,36 @@ void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
 }
 
 /**
- * @brief Main function for the coffee maker application.
- * This function initializes the coffee maker timer, handles MQTT communication, and processes coffee maker settings.
+ * @brief Main application function for managing the coffee maker's MQTT communication and user interface.
+ * This function initializes the timer for the coffee maker application and handles MQTT subscriptions and messages.
+ * It processes incoming data to update the coffee maker's state and display, as well as manages connection status.
+ * @param MQTTDataFromBrokerQueue Pointer to the queue handle for receiving MQTT data from the *broker.
+ * @param MQTTConnectedSemaphore Pointer to the semaphore handle indicating successful MQTT connection.
+ * @param MQTTErrorOrDisconnectSemaphore Pointer to the semaphore handle indicating an MQTT error *or disconnection.
  * @return void
  */
-void CoffeeMakerApplication()
+void CoffeeMakerApplication( 
+    QueueHandle_t *MQTTDataFromBrokerQueue,
+    SemaphoreHandle_t *MQTTConnectedSemaphore,
+    SemaphoreHandle_t *MQTTErrorOrDisconnectSemaphore)
 {
     xTimer = xTimerCreate("Coffee Maker Timer", pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC), pdTRUE, (void *)0, CoffeeMakerTimerCallBack);
     char CoffeeMakerJsonOutPut[2500];
     while (true)
     {
-        if (xSemaphoreTake(MQTTConnectedSemaphore, pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
+        if (xSemaphoreTake(*MQTTConnectedSemaphore, pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
         {
             MQTT_Subscribe("AndroidApp/TV");
 #ifdef COFFEE_MAKER_APP_TEST
             PublishJsonForTest(CoffeeMakerJsonOutPut);
 #endif
         }
-        if (xSemaphoreTake(MQTTErrorOrDisconnectSemaphore, pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
+        if (xSemaphoreTake(*MQTTErrorOrDisconnectSemaphore, pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
         {
             ESP_LOGE(TAG, "we lose Mqtt");
             break;
         }
-        if (xQueueReceive(MQTTDataFromBrokerQueue, CoffeeMakerJsonOutPut, pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
+        if (xQueueReceive(*MQTTDataFromBrokerQueue, CoffeeMakerJsonOutPut, pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
         {
             CoffeeMakerJson_str CoffeeMakerJson;
             CoffeeMakerJsonParser(&CoffeeMakerJson, CoffeeMakerJsonOutPut);

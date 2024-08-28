@@ -165,7 +165,7 @@ void ServiceMangerTask(void *pvParameter)
     if (WifiFlag)
         bool InternetFlag = CheckInternetConnection();
     if (InternetFlag)
-        CoffeeMakerApplication();
+        CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
 #endif
     char pcTaskList[TASK_LIST_BUFFER_SIZE];
     while (true)
