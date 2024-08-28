@@ -3,13 +3,14 @@
 
 static const char *TAG = "coffeeMakerApp";
 
-static QueueHandle_t MQTTDataFromBrokerQueue;
-static SemaphoreHandle_t MQTTConnectedSemaphore;
-static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
-
 static uint8_t TimerCounter;
 TimerHandle_t xTimer;
 
+/**
+ * @brief Resets the coffee maker GUI to its default state.
+ * This function resets the timer counter and clears all display indicators for the coffee maker.
+ * @return void
+ */
 void CoffeeMakerGUIRest()
 {
     TimerCounter = 0;
@@ -22,6 +23,13 @@ void CoffeeMakerGUIRest()
     GUI_DisplayShowMediumGrindIcon(false);
     GUI_DisplayShowCourseGrindIcon(false);
 }
+
+/**
+ * @brief Stops the coffee maker timer.
+ * This function attempts to stop the timer and resets the GUI upon success or logs an error if it fails.
+ * @param xTimer Pointer to the timer handle to be stopped.
+ * @return void
+ */
 void CoffeeMakerStopTimer(TimerHandle_t *xTimer)
 {
     if (xTimerStop(*xTimer, 0) == pdPASS)
@@ -33,6 +41,13 @@ void CoffeeMakerStopTimer(TimerHandle_t *xTimer)
     ESP_LOGE(TAG, "Timer unsuccessfully stopped please restart this task.\n");
     return;
 }
+
+/**
+ * @brief Timer callback function for the coffee maker.
+ * This function is called when the timer expires, updates the timer counter, and stops the timer when the coffee time is reached.
+ * @param xTimer Timer handle.
+ * @return void
+ */
 void CoffeeMakerTimerCallBack(TimerHandle_t xTimer)
 {
     if (TimerCounter == COFFEE_TIME)
@@ -44,6 +59,13 @@ void CoffeeMakerTimerCallBack(TimerHandle_t xTimer)
     TimerCounter++;
 }
 
+/**
+ * @brief Creates a JSON string for coffee maker settings.
+ * This function constructs a JSON string based on the given coffee maker settings and outputs it.
+ * @param CoffeeMakerJson Structure containing coffee maker settings.
+ * @param CoffeeMakerJsonOutPut Pointer to the output string buffer for the generated JSON.
+ * @return void
+ */
 void CoffeeMakerJsonCreator(CoffeeMakerJson_str CoffeeMakerJson, char *CoffeeMakerJsonOutPut)
 {
 
@@ -74,6 +96,13 @@ void CoffeeMakerJsonCreator(CoffeeMakerJson_str CoffeeMakerJson, char *CoffeeMak
     cJSON_Delete(root);
 }
 
+/**
+ * @brief Parses a JSON string into coffee maker settings.
+ * This function reads a JSON input string and populates the provided structure with the parsed data.
+ * @param CoffeeMakerJson Pointer to the structure to be filled with parsed data.
+ * @param CoffeeMakerJsonInput Input string containing JSON data.
+ * @return void
+ */
 void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMakerJsonInput)
 {
     cJSON *root = cJSON_Parse(CoffeeMakerJsonInput);
@@ -132,6 +161,12 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
     cJSON_Delete(root);
 }
 
+/**
+ * @brief Applies coffee maker settings to the screen.
+ * This function updates the GUI based on the current coffee maker settings.
+ * @param CoffeeMakerJson Pointer to the structure containing the coffee maker settings.
+ * @return void
+ */
 void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
 {
     GUI_DisplayUpdateCupsCounts(CoffeeMakerJson->Cups);
@@ -159,10 +194,14 @@ void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
         ESP_LOGE(TAG, "Failed to start the timer\n");
 }
 
+/**
+ * @brief Main function for the coffee maker application.
+ * This function initializes the coffee maker timer, handles MQTT communication, and processes coffee maker settings.
+ * @return void
+ */
 void CoffeeMakerApplication()
 {
     xTimer = xTimerCreate("Coffee Maker Timer", pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC), pdTRUE, (void *)0, CoffeeMakerTimerCallBack);
-    MQTT_DefaultConfig(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
     char CoffeeMakerJsonOutPut[2500];
     while (true)
     {

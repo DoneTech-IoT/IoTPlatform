@@ -40,9 +40,14 @@ menu "Done Main Config"
             default y  
 
         config DONE_COMPONENT_MQTT
-             bool "MQTT"        
+             bool "MQTT component"        
              default y   
 
+        config DONE_COMPONENT_MQTT_DEFAULT
+                bool "MQTTS defalut settup"        
+                depends on DONE_COMPONENT_MQTT
+                default y  
+                
         config DONE_APLLICAION_COFFEE_MAKER
             bool "Coffee Maker Application"        
             default y 

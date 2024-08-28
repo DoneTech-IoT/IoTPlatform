@@ -7,9 +7,13 @@ QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
 MatterInterfaceHandler_t MatterInterfaceHandler;
 #endif
-#ifdef CONFIG_DONE_COMPONENT_MQTT
 
+#ifdef CONFIG_DONE_COMPONENT_MQTT
+static QueueHandle_t MQTTDataFromBrokerQueue;
+static SemaphoreHandle_t MQTTConnectedSemaphore;
+static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
 #endif
+
 #define TASK_LIST_BUFFER_SIZE 512
 // #define MONITORING
 /**
@@ -141,6 +145,9 @@ void ServiceMangerInit()
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     ESP_ERROR_CHECK(example_connect());
+#endif
+#ifdef DONE_COMPONENT_MQTT_DEFAULT
+    MQTT_DefaultConfig(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
 #endif
 }
 

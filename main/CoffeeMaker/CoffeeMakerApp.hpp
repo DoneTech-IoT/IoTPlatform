@@ -32,6 +32,11 @@ typedef struct CoffeeMakerApp
     char State[18];
 } CoffeeMakerJson_str;
 
+/**
+ * @brief Main function for the coffee maker application.
+ * This function initializes the coffee maker timer, handles MQTT communication, and processes coffee maker settings.
+ * @return void
+ */
 void CoffeeMakerApplication();
 
 #ifdef COFFEE_MAKER_APP_TEST
