@@ -169,7 +169,6 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
  */
 void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
 {
-    ESP_LOGE(TAG, "apply on screen");
     GUI_DisplayUpdateCupsCounts(CoffeeMakerJson->Cups);
     if (CoffeeMakerJson->CoffeeFlag == true && CoffeeMakerJson->TeaFlag == false)
     {
