@@ -20,7 +20,7 @@ bool CheckWifiStatus()
     }
     else
     {
-        ESP_LOGI(TAG, "Not connected to any Wi-Fi");
+        ESP_LOGE(TAG, "Not connected to any Wi-Fi");
         return false;
     }
 }
@@ -60,7 +60,7 @@ bool CheckInternetConnection()
     }
     else
     {
-        ESP_LOGI(TAG, "No internet connection");
+        ESP_LOGE(TAG, "No internet connection");
         esp_http_client_cleanup(client);
         return false;
     }

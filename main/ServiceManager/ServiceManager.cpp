@@ -153,6 +153,10 @@ void ServiceMangerInit()
 void ServiceMangerTask(void *pvParameter)
 {
     ServiceMangerInit();
+    bool WifiFlag = CheckWifiStatus();
+    if (WifiFlag)
+        if (CheckInternetConnection())
+            CoffeeMakerApplication();
     char pcTaskList[TASK_LIST_BUFFER_SIZE];
     while (true)
     {

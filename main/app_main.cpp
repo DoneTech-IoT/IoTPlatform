@@ -15,8 +15,4 @@ extern "C" void app_main()
     Log_RamOccupy("main", "service manager");
     ServiceMangerTaskInit();
     Log_RamOccupy("main", "service manager");
-    bool WifiFlag = CheckWifiStatus();
-    if (WifiFlag)
-        if (CheckInternetConnection())
-            CoffeeMakerApplication();
 }

@@ -21,15 +21,15 @@ extern "C"
      * If connected, it logs the SSID; otherwise, it indicates no connection.
      * @return bool Returns true if connected to a Wi-Fi network, false otherwise.
      */
-    bool CheckWifiStatus()
+    bool CheckWifiStatus();
 
-        /**
-         * @brief Checks the internet connection status.
-         * This function attempts to connect to a specified URL to verify if the device has an active internet connection.
-         * Logs the connection status and cleans up HTTP client resources.
-         * @return bool Returns true if connected to the internet, false otherwise.
-         */
-        bool CheckInternetConnection();
+    /**
+     * @brief Checks the internet connection status.
+     * This function attempts to connect to a specified URL to verify if the device has an active internet connection.
+     * Logs the connection status and cleans up HTTP client resources.
+     * @return bool Returns true if connected to the internet, false otherwise.
+     */
+    bool CheckInternetConnection();
 #endif
 #ifdef __cplusplus
 }
