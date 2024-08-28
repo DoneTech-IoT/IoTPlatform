@@ -17,6 +17,7 @@
 #include "esp_system.h"
 #include <sys/param.h>
 
+#include "NetworkChecker.h"
 #include "nvsFlash.h"
 #ifdef CONFIG_DONE_COMPONENT_LVGL
 #include "GUI.h"

@@ -1,5 +1,5 @@
 #include "ServiceManager.h"
-
+#include "CoffeeMakerApp.hpp"
 static const char *TAG = "Service_Manager";
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
