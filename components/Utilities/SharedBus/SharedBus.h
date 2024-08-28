@@ -16,16 +16,16 @@ typedef enum {
 typedef struct {
     uint8_t SourceID;
     uint8_t PacketID;    
-    void * data;
+    void *data;
 } SharedBusPacket_t;
 
-esp_err_t SharedBusInit(void);
+esp_err_t SharedBusInit(EventGroupHandle_t *EventGroupHandle,QueueHandle_t *QueueHandle);
 
 esp_err_t SharedBusSend(    
-    QueueHandle_t *QueueHandle, SharedBusPacket_t *SharedBusPacket);
+    QueueHandle_t QueueHandle, SharedBusPacket_t SharedBusPacket);
 
 esp_err_t SharedBusRecieve(    
-    QueueHandle_t QueueHandle);    
+    QueueHandle_t QueueHandle, SharedBusPacket_t SharedBusPacket);    
 
 // esp_err_t SharedBusTransaction(    
 //     QueueHandle_t *QueueHandle);    
