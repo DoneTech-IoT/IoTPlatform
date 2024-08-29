@@ -71,7 +71,7 @@ void CoffeeMakerJsonCreator(CoffeeMakerJson_str CoffeeMakerJson, char *CoffeeMak
     cJSON *root = cJSON_CreateObject();
     cJSON_AddBoolToObject(root, "Coffee", CoffeeMakerJson.CoffeeFlag); // true
     cJSON *coffeeProperty = cJSON_CreateObject();
-    cJSON_AddNumberToObject(coffeeProperty, "GrinderLevel", CoffeeMakerJson.GrinderLevel);
+    cJSON_AddNumberToObject(coffeeProperty, "GinderLevel", CoffeeMakerJson.GrinderLevel);
     cJSON_AddNumberToObject(coffeeProperty, "Cup", CoffeeMakerJson.Cups);
     cJSON_AddItemToObject(root, "CoffeeProperty", coffeeProperty);
 
@@ -117,7 +117,7 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
     cJSON *coffee_property = cJSON_GetObjectItem(root, "CoffeeProperty");
     if (cJSON_IsObject(coffee_property))
     {
-        cJSON *ginder_level = cJSON_GetObjectItem(coffee_property, "GrinderLevel");
+        cJSON *ginder_level = cJSON_GetObjectItem(coffee_property, "GinderLevel");
         if (cJSON_IsNumber(ginder_level))
             CoffeeMakerJson->GrinderLevel = (uint8_t)ginder_level->valueint;
     }
