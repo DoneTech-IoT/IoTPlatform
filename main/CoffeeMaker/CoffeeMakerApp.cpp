@@ -211,14 +211,14 @@ void CoffeeMakerApplication(
 {
     CoffeeMakerGUIReset();
     CoffeeMakerApp_xTimer = xTimerCreate("Coffee Maker Timer",
-     pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC),
+                                         pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC),
                                          pdTRUE, (void *)0,
                                          CoffeeMakerTimerCallBack);
     char CoffeeMakerJsonOutPut[2500];
     while (true)
     {
         if (xSemaphoreTake(*MQTTConnectedSemaphore,
-         pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
+                           pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
         {
             MQTT_Subscribe("AndroidApp/TV");
 #ifdef COFFEE_MAKER_APP_TEST
@@ -226,14 +226,14 @@ void CoffeeMakerApplication(
 #endif
         }
         if (xSemaphoreTake(*MQTTErrorOrDisconnectSemaphore,
-         pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
+                           pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
         {
             ESP_LOGE(TAG, "we lose Mqtt");
             break;
         }
         if (xQueueReceive(*MQTTDataFromBrokerQueue,
-         CoffeeMakerJsonOutPut,
-          pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
+                          CoffeeMakerJsonOutPut,
+                          pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
         {
             ESP_LOGE(TAG, "receive data in coffee maker app");
             CoffeeMakerJson_str CoffeeMakerJson;
