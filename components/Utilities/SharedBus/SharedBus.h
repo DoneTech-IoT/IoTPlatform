@@ -27,8 +27,4 @@ esp_err_t SharedBusSend(
 esp_err_t SharedBusRecieve(    
     QueueHandle_t QueueHandle, SharedBusPacket_t SharedBusPacket);    
 
-// esp_err_t SharedBusTransaction(    
-//     QueueHandle_t *QueueHandle);    
-
-
 #endif //SHARED_BUS_H

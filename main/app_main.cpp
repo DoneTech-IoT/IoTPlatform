@@ -52,8 +52,8 @@ void vTaskCode1( void * pvParameters )
     for( ;; )
     {
         /* TODO recieve here. */
-        SharedBusRecieve(QueueHandle, recievePacket);
-        ESP_LOGE(TAG, "task1-%d", recievePacket.SourceID);
+        if(!SharedBusRecieve(QueueHandle, recievePacket))
+            ESP_LOGE(TAG, "task1-%d", recievePacket.SourceID);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
@@ -65,8 +65,8 @@ void vTaskCode2( void * pvParameters )
     for( ;; )
     {
         /* TODO recieve here. */
-        SharedBusRecieve(QueueHandle, recievePacket);
-        ESP_LOGE(TAG, "task2-%d", recievePacket.SourceID);
+        if(!SharedBusRecieve(QueueHandle, recievePacket))
+            ESP_LOGE(TAG, "task2-%d", recievePacket.SourceID);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
@@ -81,8 +81,8 @@ void vTaskCode3( void * pvParameters )
     for( ;; )
     {
         /* TODO recieve here. */
-        SharedBusRecieve(QueueHandle, recievePacket);
-        ESP_LOGE(TAG, "task3-%d", recievePacket.SourceID);
+        if(!SharedBusRecieve(QueueHandle, recievePacket))
+            ESP_LOGE(TAG, "task3-%d", recievePacket.SourceID);
         vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }
