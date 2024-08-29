@@ -27,7 +27,7 @@
  */
 typedef struct CoffeeMakerApp
 {
-    uint8_t GinderLevel;
+    uint8_t GrinderLevel;
     uint8_t Cups;
     uint8_t TeaFlag;
     uint8_t CoffeeFlag;

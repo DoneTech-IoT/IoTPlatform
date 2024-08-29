@@ -71,7 +71,7 @@ void CoffeeMakerJsonCreator(CoffeeMakerJson_str CoffeeMakerJson, char *CoffeeMak
     cJSON *root = cJSON_CreateObject();
     cJSON_AddBoolToObject(root, "Coffee", CoffeeMakerJson.CoffeeFlag); // true
     cJSON *coffeeProperty = cJSON_CreateObject();
-    cJSON_AddNumberToObject(coffeeProperty, "GinderLevel", CoffeeMakerJson.GinderLevel);
+    cJSON_AddNumberToObject(coffeeProperty, "GrinderLevel", CoffeeMakerJson.GrinderLevel);
     cJSON_AddNumberToObject(coffeeProperty, "Cup", CoffeeMakerJson.Cups);
     cJSON_AddItemToObject(root, "CoffeeProperty", coffeeProperty);
 
@@ -117,9 +117,9 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
     cJSON *coffee_property = cJSON_GetObjectItem(root, "CoffeeProperty");
     if (cJSON_IsObject(coffee_property))
     {
-        cJSON *ginder_level = cJSON_GetObjectItem(coffee_property, "GinderLevel");
+        cJSON *ginder_level = cJSON_GetObjectItem(coffee_property, "GrinderLevel");
         if (cJSON_IsNumber(ginder_level))
-            CoffeeMakerJson->GinderLevel = (uint8_t)ginder_level->valueint;
+            CoffeeMakerJson->GrinderLevel = (uint8_t)ginder_level->valueint;
     }
 
     cJSON *security = cJSON_GetObjectItem(root, "Security");
@@ -172,7 +172,7 @@ void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
     if (CoffeeMakerJson->CoffeeFlag == true && CoffeeMakerJson->TeaFlag == false)
     {
         GUI_DisplayShowCoffeeBeansIcon(true);
-        switch (CoffeeMakerJson->GinderLevel)
+        switch (CoffeeMakerJson->GrinderLevel)
         {
         case 1:
             GUI_DisplayShowCourseGrindIcon(true);
@@ -252,7 +252,7 @@ void parserTEST(char *temp)
     CoffeeMakerJsonParser(&CoffeeMakerJson, temp);
     ESP_LOGI(TAG, "Coffee Flag: %u\n", CoffeeMakerJson.CoffeeFlag);
     ESP_LOGI(TAG, "Tea Flag: %u\n", CoffeeMakerJson.TeaFlag);
-    ESP_LOGI(TAG, "GinderLevel: %u\n", CoffeeMakerJson.GinderLevel);
+    ESP_LOGI(TAG, "GrinderLevel: %u\n", CoffeeMakerJson.GrinderLevel);
     ESP_LOGI(TAG, "Cups: %u\n", CoffeeMakerJson.Cups);
     ESP_LOGI(TAG, "Temp: %u\n", CoffeeMakerJson.Temp);
     ESP_LOGI(TAG, "UpdateTime: %u\n", CoffeeMakerJson.UpdateTime);
@@ -266,7 +266,7 @@ void JSON_TEST(CoffeeMakerJson_str *CoffeeMakerJson)
     CoffeeMakerJson->Cups = 4;
     strcpy(CoffeeMakerJson->DeviceMACAddress, "EE:EE:EE:EE:EE:EE");
     strcpy(CoffeeMakerJson->Pass, "12345");
-    CoffeeMakerJson->GinderLevel = 1;
+    CoffeeMakerJson->GrinderLevel = 1;
     CoffeeMakerJson->TeaFlag = false;
     CoffeeMakerJson->Temp = 60;
     CoffeeMakerJson->UpdateTime = 60;
