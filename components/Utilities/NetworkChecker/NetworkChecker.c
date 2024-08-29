@@ -8,7 +8,7 @@ static const char *TAG = "Utility_Wifi";
  * If connected, it logs the SSID; otherwise, it indicates no connection.
  * @return bool Returns true if connected to a Wi-Fi network, false otherwise.
  */
-bool CheckWifiStatus()
+bool IsWifiConnected()
 {
     wifi_ap_record_t ap_info;
     esp_err_t status = esp_wifi_sta_get_ap_info(&ap_info);
