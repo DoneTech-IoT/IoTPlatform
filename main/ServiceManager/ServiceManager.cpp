@@ -162,7 +162,7 @@ void ServiceMangerTask(void *pvParameter)
 {
     ServiceMangerInit();
 #ifdef CONFIG_DONE_APLLICAION_COFFEE_MAKER
-    bool WifiFlag = CheckWifiStatus();
+    bool WifiFlag = IsWifiConnected();
     if (WifiFlag)
     {
         bool InternetFlag = CheckInternetConnection();

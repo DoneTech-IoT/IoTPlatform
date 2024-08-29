@@ -21,7 +21,7 @@ extern "C"
      * If connected, it logs the SSID; otherwise, it indicates no connection.
      * @return bool Returns true if connected to a Wi-Fi network, false otherwise.
      */
-    bool CheckWifiStatus();
+    bool IsWifiConnected();
 
     /**
      * @brief Checks the internet connection status.
