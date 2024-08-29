@@ -32,14 +32,13 @@ void CoffeeMakerGUIReset()
  */
 void CoffeeMakerStopTimer(TimerHandle_t *CoffeeMakerApp_xTimer)
 {
-    if (xTimerStop(*CoffeeMakerApp_xTimer, 0) == pdPASS)
+    if (xTimerStop(*CoffeeMakerApp_xTimer, 0) != pdPASS)
     {
-        ESP_LOGI(TAG, "Timer successfully stopped.\n");
-        CoffeeMakerGUIReset();
+        ESP_LOGE(TAG, "Timer unsuccessfully stopped please restart this task.\n");
         return;
     }
-    ESP_LOGE(TAG, "Timer unsuccessfully stopped please restart this task.\n");
-    return;
+    ESP_LOGI(TAG, "Timer successfully stopped.\n");
+    CoffeeMakerGUIReset();
 }
 
 /**
