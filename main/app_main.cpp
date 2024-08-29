@@ -47,37 +47,43 @@ void MatterNetworkConnected()
 
 void vTaskCode1( void * pvParameters )
 {
+    SharedBusPacket_t recievePacket;
     configASSERT( ( ( uint32_t ) pvParameters ) == 1 );
     for( ;; )
     {
         /* TODO recieve here. */
-    SharedBusPacket_t recievePacket;
-    SharedBusRecieve(QueueHandle, recievePacket);
-    ESP_LOGE(TAG, "task1-%d", recievePacket.SourceID);
+        SharedBusRecieve(QueueHandle, recievePacket);
+        ESP_LOGE(TAG, "task1-%d", recievePacket.SourceID);
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
 void vTaskCode2( void * pvParameters )
 {
+    SharedBusPacket_t recievePacket;
     configASSERT( ( ( uint32_t ) pvParameters ) == 1 );
     for( ;; )
     {
         /* TODO recieve here. */
-    SharedBusPacket_t recievePacket;
-    SharedBusRecieve(QueueHandle, recievePacket);
-    ESP_LOGE(TAG, "task2-%d", recievePacket.SourceID);
+        SharedBusRecieve(QueueHandle, recievePacket);
+        ESP_LOGE(TAG, "task2-%d", recievePacket.SourceID);
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
 void vTaskCode3( void * pvParameters )
 {
+    SharedBusPacket_t recievePacket = {
+        .SourceID = LOG_INTERFACE_ID
+    };
+
     configASSERT( ( ( uint32_t ) pvParameters ) == 1 );
     for( ;; )
     {
         /* TODO recieve here. */
-    SharedBusPacket_t recievePacket;
-    SharedBusRecieve(QueueHandle, recievePacket);
-    ESP_LOGE(TAG, "task3-%d", recievePacket.SourceID);
+        SharedBusRecieve(QueueHandle, recievePacket);
+        ESP_LOGE(TAG, "task3-%d", recievePacket.SourceID);
+        vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }
 
