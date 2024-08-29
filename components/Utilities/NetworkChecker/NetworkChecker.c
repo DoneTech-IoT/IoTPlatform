@@ -12,17 +12,13 @@ bool CheckWifiStatus()
 {
     wifi_ap_record_t ap_info;
     esp_err_t status = esp_wifi_sta_get_ap_info(&ap_info);
-
-    if (status == ESP_OK)
-    {
-        ESP_LOGI(TAG, "Connected to SSID: %s", ap_info.ssid);
-        return true;
-    }
-    else
+    if (status != ESP_OK)
     {
         ESP_LOGE(TAG, "Not connected to any Wi-Fi");
         return false;
     }
+    ESP_LOGI(TAG, "Connected to SSID: %s", ap_info.ssid);
+    return true;
 }
 
 /**
@@ -52,16 +48,13 @@ bool CheckInternetConnection()
     esp_http_client_handle_t client = esp_http_client_init(&config);
 
     esp_err_t err = esp_http_client_perform(client);
-    if (err == ESP_OK)
-    {
-        ESP_LOGI(TAG, "Connected to the internet");
-        esp_http_client_cleanup(client);
-        return true;
-    }
-    else
+    if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "No internet connection");
         esp_http_client_cleanup(client);
         return false;
     }
+    ESP_LOGI(TAG, "Connected to the internet");
+    esp_http_client_cleanup(client);
+    return true;
 }
