@@ -47,12 +47,12 @@ void MatterNetworkConnected()
 
 void vTaskCode1( void * pvParameters )
 {
-    SharedBusPacket_t recievePacket;
+    SharedBusPacket_t recievePacket;   
     configASSERT( ( ( uint32_t ) pvParameters ) == 1 );
     for( ;; )
     {
         /* TODO recieve here. */
-        if(!SharedBusRecieve(QueueHandle, recievePacket))
+        SharedBusRecieve(QueueHandle, recievePacket);
             ESP_LOGE(TAG, "task1-%d", recievePacket.SourceID);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
@@ -60,12 +60,12 @@ void vTaskCode1( void * pvParameters )
 
 void vTaskCode2( void * pvParameters )
 {
-    SharedBusPacket_t recievePacket;
+    SharedBusPacket_t recievePacket;        
     configASSERT( ( ( uint32_t ) pvParameters ) == 1 );
     for( ;; )
     {
         /* TODO recieve here. */
-        if(!SharedBusRecieve(QueueHandle, recievePacket))
+        SharedBusRecieve(QueueHandle, recievePacket);
             ESP_LOGE(TAG, "task2-%d", recievePacket.SourceID);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
@@ -73,17 +73,14 @@ void vTaskCode2( void * pvParameters )
 
 void vTaskCode3( void * pvParameters )
 {
-    SharedBusPacket_t recievePacket = {
-        .SourceID = LOG_INTERFACE_ID
-    };
-
+    SharedBusPacket_t recievePacket;
     configASSERT( ( ( uint32_t ) pvParameters ) == 1 );
     for( ;; )
     {
         /* TODO recieve here. */
-        if(!SharedBusRecieve(QueueHandle, recievePacket))
+        SharedBusRecieve(QueueHandle, recievePacket);
             ESP_LOGE(TAG, "task3-%d", recievePacket.SourceID);
-        vTaskDelay(pdMS_TO_TICKS(10000));
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
@@ -94,15 +91,14 @@ extern "C" void app_main()
     nvsFlashInit();
     Log_RamOccupy("main", "service manager");
 
-    char *msg = "HI";
+    char *msg = "HI every one";
     SharedBusInit(&EventGroupHandle, &QueueHandle);
     SharedBusPacket_t sendPacket = {
-        .SourceID = MQTT_INTERFACE_ID,
+        .SourceID = LOG_INTERFACE_ID,
         .PacketID = 1,
         .data = msg
     };
-
-    SharedBusSend(QueueHandle, sendPacket);
+    
 //     SharedBusPacket_t recievePacket;
 //     SharedBusRecieve(QueueHandle, recievePacket); //FIXME uncomment here and comment tasks in main to tets 1to1 mode
 //     ESP_LOGE(TAG, "5-%d", recievePacket.SourceID);
@@ -137,6 +133,8 @@ extern "C" void app_main()
                     tskIDLE_PRIORITY,/* Priority at which the task is created. */
                     &xHandle3 );      /* Used to pass out the created task's handle. */
 
+    SharedBusSend(QueueHandle, sendPacket);
+
     // Log_RamOccupy("main", "Matter usage");
     // MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
     // MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
@@ -146,14 +144,15 @@ extern "C" void app_main()
 
     //KeyStatePair_t pKeyStatePair;
 
-    // while (true)
-    // {
-    //     if(xQueueReceive(
-    //         *(MatterInterfaceHandler.SharedBufQueue), 
-    //         &pKeyStatePair, pdMS_TO_TICKS(1)) == pdTRUE)
-    //     {
-    //         ESP_LOGW(TAG, "pKeyStatePair-> Key: %d, State: %d\n", 
-    //         pKeyStatePair.Key, pKeyStatePair.State);        
-    //     }
-    // }        
+    while (true)
+    {
+        // if(xQueueReceive(
+        //     *(MatterInterfaceHandler.SharedBufQueue), 
+        //     &pKeyStatePair, pdMS_TO_TICKS(1)) == pdTRUE)
+        // {
+        //     ESP_LOGW(TAG, "pKeyStatePair-> Key: %d, State: %d\n", 
+        //     pKeyStatePair.Key, pKeyStatePair.State);        
+        // }
+        vTaskDelay(100);
+    }        
 }
