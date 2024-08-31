@@ -161,14 +161,15 @@ void ServiceMangerInit()
 void ServiceMangerTask(void *pvParameter)
 {
     ServiceMangerInit();
-    CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
+    CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore, &MatterBufQueue);
     char pcTaskList[TASK_LIST_BUFFER_SIZE];
     while (true)
     {
 #ifdef MONITORING
+
 // vTaskList(pcTaskList);
 // ESP_LOGI(TAG, "Task List:\n%s\n", pcTaskList);
 #endif
-        vTaskDelay(pdMS_TO_TICKS(500));
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }

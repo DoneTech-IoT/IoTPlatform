@@ -207,8 +207,10 @@ void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
 void CoffeeMakerApplication(
     QueueHandle_t *MQTTDataFromBrokerQueue,
     SemaphoreHandle_t *MQTTConnectedSemaphore,
-    SemaphoreHandle_t *MQTTErrorOrDisconnectSemaphore)
+    SemaphoreHandle_t *MQTTErrorOrDisconnectSemaphore,
+    QueueHandle_t *MatterBusQueue)
 {
+    CoffeeMakerMatter_str CoffeeMakerMatter;
     CoffeeMakerGUIReset();
     CoffeeMakerApp_xTimer = xTimerCreate("Coffee Maker Timer",
                                          pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC),
@@ -240,6 +242,15 @@ void CoffeeMakerApplication(
             CoffeeMakerJsonParser(&CoffeeMakerJson, CoffeeMakerJsonOutPut);
             CoffeeMakerGUIReset();
             ApplyOnScreen(&CoffeeMakerJson);
+        }
+        if (xQueueReceive(*MatterBusQueue,
+                          &CoffeeMakerMatter,
+                          pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
+        {
+            ESP_LOGE(TAG, "Coffee Flag: %u\n", CoffeeMakerMatter.CoffeeFlag);
+            ESP_LOGE(TAG, "Tea Flag: %u\n", CoffeeMakerMatter.TeaFlag);
+            ESP_LOGE(TAG, "GrinderLevel: %u\n", CoffeeMakerMatter.GrinderLevel);
+            ESP_LOGE(TAG, "Cups: %u\n", CoffeeMakerMatter.Cups);
         }
     }
 }

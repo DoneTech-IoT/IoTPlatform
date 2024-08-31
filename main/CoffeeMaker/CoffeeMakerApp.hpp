@@ -17,6 +17,7 @@
 
 #include "MQTT_Interface.h"
 
+#include"Global.h"
 #define COFFEE_TIME 120
 #define COFFEE_MAKER_APP_SEC 1000
 
@@ -38,6 +39,8 @@ typedef struct CoffeeMakerApp
     char State[18];
 } CoffeeMakerJson_str;
 
+
+
 /**
  * @brief Main application function for managing the coffee maker's MQTT communication and user interface.
  * This function initializes the timer for the coffee maker application and handles MQTT subscriptions and messages.
@@ -50,7 +53,8 @@ typedef struct CoffeeMakerApp
 void CoffeeMakerApplication(
     QueueHandle_t *MQTTDataFromBrokerQueue,
     SemaphoreHandle_t *MQTTConnectedSemaphore,
-    SemaphoreHandle_t *MQTTErrorOrDisconnectSemaphore);
+    SemaphoreHandle_t *MQTTErrorOrDisconnectSemaphore,
+    QueueHandle_t *MatterBusQueue);
 
 // #define COFFEE_MAKER_APP_TEST
 #ifdef COFFEE_MAKER_APP_TEST
