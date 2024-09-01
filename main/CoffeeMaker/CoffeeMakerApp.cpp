@@ -169,6 +169,11 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
 void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
 {
     GUI_DisplayUpdateCupsCounts(CoffeeMakerJson->Cups);
+    if (CoffeeMakerJson->Cups == 0)
+    {
+        ESP_LOGE(TAG, "Cup count is zero");
+        return;
+    }
     if (CoffeeMakerJson->CoffeeFlag == true && CoffeeMakerJson->TeaFlag == false)
     {
         GUI_DisplayShowCoffeeBeansIcon(true);
@@ -210,32 +215,37 @@ void CoffeeMakerApplication(
     SemaphoreHandle_t *MQTTErrorOrDisconnectSemaphore,
     QueueHandle_t *MatterBusQueue)
 {
-    CoffeeMakerMatter_str CoffeeMakerMatter;
+    CoffeeMakerMatter_str_ CoffeeMakerMatter;
     CoffeeMakerGUIReset();
     CoffeeMakerApp_xTimer = xTimerCreate("Coffee Maker Timer",
                                          pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC),
                                          pdTRUE, (void *)0,
                                          CoffeeMakerTimerCallBack);
     char CoffeeMakerJsonOutPut[2500];
+
+
+
     while (true)
     {
         if (xSemaphoreTake(*MQTTConnectedSemaphore,
-                           pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
+                           pdMS_TO_TICKS(300)) == pdTRUE)
         {
             MQTT_Subscribe("AndroidApp/TV");
 #ifdef COFFEE_MAKER_APP_TEST
             PublishJsonForTest(CoffeeMakerJsonOutPut);
 #endif
-        }
-        if (xSemaphoreTake(*MQTTErrorOrDisconnectSemaphore,
-                           pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
-        {
-            ESP_LOGE(TAG, "we lose Mqtt");
             break;
         }
+        if (xSemaphoreTake(*MQTTErrorOrDisconnectSemaphore,
+                           pdMS_TO_TICKS(300)) == pdTRUE)
+        {
+            ESP_LOGE(TAG, "we lose Mqtt");
+            // break;
+        }
+    
         if (xQueueReceive(*MQTTDataFromBrokerQueue,
                           CoffeeMakerJsonOutPut,
-                          pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
+                          pdMS_TO_TICKS(300)) == pdTRUE)
         {
             ESP_LOGE(TAG, "receive data in coffee maker app");
             CoffeeMakerJson_str CoffeeMakerJson;
@@ -245,12 +255,30 @@ void CoffeeMakerApplication(
         }
         if (xQueueReceive(*MatterBusQueue,
                           &CoffeeMakerMatter,
-                          pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
+                          pdMS_TO_TICKS(300)) == pdTRUE)
         {
-            ESP_LOGE(TAG, "Coffee Flag: %u\n", CoffeeMakerMatter.CoffeeFlag);
-            ESP_LOGE(TAG, "Tea Flag: %u\n", CoffeeMakerMatter.TeaFlag);
-            ESP_LOGE(TAG, "GrinderLevel: %u\n", CoffeeMakerMatter.GrinderLevel);
-            ESP_LOGE(TAG, "Cups: %u\n", CoffeeMakerMatter.Cups);
+            char CoffeeMakerJsonOutPut_t[2500];
+            ESP_LOGE(TAG, "Coffee Flag: %u", CoffeeMakerMatter.CoffeeFlag);
+            ESP_LOGE(TAG, "Tea Flag: %u", CoffeeMakerMatter.TeaFlag);
+            ESP_LOGE(TAG, "GrinderLevel: %u", CoffeeMakerMatter.GrinderLevel);
+            ESP_LOGE(TAG, "Cups: %u", CoffeeMakerMatter.Cups);
+            CoffeeMakerJson_str CoffeeMakerJson;
+            CoffeeMakerJson.TeaFlag = CoffeeMakerMatter.CoffeeFlag;
+            CoffeeMakerJson.CoffeeFlag = CoffeeMakerMatter.TeaFlag;
+            CoffeeMakerJson.Cups = CoffeeMakerMatter.Cups;
+            CoffeeMakerJson.GrinderLevel = CoffeeMakerMatter.GrinderLevel;
+            strcpy(CoffeeMakerJson.DeviceMACAddress, "EE:EE:EE:EE:EE:EE");
+            strcpy(CoffeeMakerJson.Pass, "12345");
+            CoffeeMakerJson.Temp = 60;
+            CoffeeMakerJson.UpdateTime = 60;
+            strcpy(CoffeeMakerJson.State, "Ready");
+            CoffeeMakerGUIReset();
+            ApplyOnScreen(&CoffeeMakerJson);
+            memset(CoffeeMakerJsonOutPut_t, 0x0, sizeof(CoffeeMakerJsonOutPut_t));
+            CoffeeMakerJsonCreator(CoffeeMakerJson, CoffeeMakerJsonOutPut_t);
+            // ESP_LOGI("json ", " CoffeeMakerJsonOutPut_t: %s\n", CoffeeMakerJsonOutPut_t);
+            MQTT_Publish("Device", CoffeeMakerJsonOutPut_t);
+            memset(CoffeeMakerJsonOutPut_t, 0x0, sizeof(CoffeeMakerJsonOutPut_t));
         }
     }
 }

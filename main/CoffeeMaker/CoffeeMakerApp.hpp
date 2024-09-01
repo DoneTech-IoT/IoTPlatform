@@ -17,7 +17,7 @@
 
 #include "MQTT_Interface.h"
 
-#include"Global.h"
+
 #define COFFEE_TIME 120
 #define COFFEE_MAKER_APP_SEC 1000
 
@@ -41,6 +41,14 @@ typedef struct CoffeeMakerApp
 
 
 
+typedef struct CoffeeMakerAppMatterVariable_
+{
+    uint8_t GrinderLevel;
+    uint8_t Cups;
+    uint8_t TeaFlag;
+    uint8_t CoffeeFlag;
+    uint16_t UpdateTime;
+} CoffeeMakerMatter_str_;
 /**
  * @brief Main application function for managing the coffee maker's MQTT communication and user interface.
  * This function initializes the timer for the coffee maker application and handles MQTT subscriptions and messages.
