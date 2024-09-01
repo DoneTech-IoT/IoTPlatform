@@ -16,6 +16,12 @@
 QueueHandle_t QueueHandle;
 EventGroupHandle_t EventGroupHandle;
 
+char *msg = "HI every one. I'm blackboard";
+ SharedBusPacket_t recievePacket; //= {
+//     .SourceID = LOG_INTERFACE_ID,
+//     .PacketID = 1,
+//     .data = msg
+// };
 // QueueHandle_t MatterBufQueue;
 // SemaphoreHandle_t MatterSemaphore = NULL;
 // MatterInterfaceHandler_t MatterInterfaceHandler;
@@ -46,40 +52,37 @@ void MatterNetworkConnected()
  */
 
 void vTaskCode1( void * pvParameters )
-{
-    SharedBusPacket_t recievePacket;   
+{    
     configASSERT( ( ( uint32_t ) pvParameters ) == 1 );
     for( ;; )
     {
         /* TODO recieve here. */
-        SharedBusRecieve(QueueHandle, recievePacket);
-            ESP_LOGE(TAG, "task1-%d", recievePacket.SourceID);
+        if(SharedBusRecieve(QueueHandle, recievePacket, MATTER_INTERFACE_ID))
+            ESP_LOGE(TAG, "task1-%s", (char*) recievePacket.data);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
 void vTaskCode2( void * pvParameters )
-{
-    SharedBusPacket_t recievePacket;        
+{    
     configASSERT( ( ( uint32_t ) pvParameters ) == 1 );
     for( ;; )
     {
         /* TODO recieve here. */
-        SharedBusRecieve(QueueHandle, recievePacket);
-            ESP_LOGE(TAG, "task2-%d", recievePacket.SourceID);
+        if(SharedBusRecieve(QueueHandle, recievePacket, MQTT_INTERFACE_ID))
+            ESP_LOGE(TAG, "task2-%s", (char*) recievePacket.data);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
 void vTaskCode3( void * pvParameters )
-{
-    SharedBusPacket_t recievePacket;
+{    
     configASSERT( ( ( uint32_t ) pvParameters ) == 1 );
     for( ;; )
     {
         /* TODO recieve here. */
-        SharedBusRecieve(QueueHandle, recievePacket);
-            ESP_LOGE(TAG, "task3-%d", recievePacket.SourceID);
+        if(SharedBusRecieve(QueueHandle, recievePacket, LOG_INTERFACE_ID))
+            ESP_LOGE(TAG, "task3-%s", (char*) recievePacket.data);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
@@ -91,24 +94,14 @@ extern "C" void app_main()
     nvsFlashInit();
     Log_RamOccupy("main", "service manager");
 
-    char *msg = "HI every one";
-    SharedBusInit(&EventGroupHandle, &QueueHandle);
-    SharedBusPacket_t sendPacket = {
-        .SourceID = LOG_INTERFACE_ID,
-        .PacketID = 1,
-        .data = msg
-    };
-    
-//     SharedBusPacket_t recievePacket;
-//     SharedBusRecieve(QueueHandle, recievePacket); //FIXME uncomment here and comment tasks in main to tets 1to1 mode
-//     ESP_LOGE(TAG, "5-%d", recievePacket.SourceID);
-//     ESP_LOGE(TAG, "6-%d", recievePacket.PacketID);
-//     ESP_LOGE(TAG, "7-%s", (char*)recievePacket.data);
-
     BaseType_t xReturned;
     TaskHandle_t xHandle1 = NULL;
     TaskHandle_t xHandle2 = NULL;
     TaskHandle_t xHandle3 = NULL;
+
+    SharedBusInit(&EventGroupHandle, &QueueHandle);
+
+vTaskDelay (pdMS_TO_TICKS(5000));
 
     /* Create the task, storing the handle. */
     xReturned = xTaskCreate(
@@ -133,7 +126,11 @@ extern "C" void app_main()
                     tskIDLE_PRIORITY,/* Priority at which the task is created. */
                     &xHandle3 );      /* Used to pass out the created task's handle. */
 
-    SharedBusSend(QueueHandle, sendPacket);
+    recievePacket.SourceID = LOG_INTERFACE_ID;
+    recievePacket.PacketID = 1;
+    recievePacket.data = msg;
+
+    SharedBusSend(QueueHandle, recievePacket);
 
     // Log_RamOccupy("main", "Matter usage");
     // MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
