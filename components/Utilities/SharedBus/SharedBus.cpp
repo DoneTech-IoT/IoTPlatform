@@ -5,8 +5,8 @@
 #define UI_EVENT_FLAG	( 1 << UI_INTERFACE_ID )
 #define UI_EVENT_FLAG	( 1 << UI_INTERFACE_ID )
 
-#define BIT_23	( 1 << 23 )
-#define BIT_22	( 1 << 22 )
+#define BIT_23	( 1 << 23 ) //prevent overwriting bus for send before one turn of the event loop
+#define BIT_22	( 1 << 22 ) //peek to receive switch flag 
 
 static const char *TAG = "SharedBus";
 
