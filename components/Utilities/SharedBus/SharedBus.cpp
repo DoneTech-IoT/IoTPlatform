@@ -57,6 +57,15 @@ esp_err_t SharedBusRecieve(
     {
         if(xQueueReceive(QueueHandle, &SharedBusPacket, 1) == pdTRUE)
             ESP_LOGE(TAG, "Recieved-%d", SharedBusPacket.SourceID);
+
+        //release bus when all Component get packet
+        EventBits = xEventGroupClearBits(
+                    EventGroupHandleLocal, 
+                    BIT_23);               
+        //clear xQueueReceive flag
+        EventBits = xEventGroupClearBits(
+                    EventGroupHandleLocal, 
+                    BIT_22);                                 
         ret = false;
     }        
     else //default state
@@ -67,7 +76,7 @@ esp_err_t SharedBusRecieve(
         if (SharedBusPacket.SourceID == interfaceID)
         {                
             EventBits = xEventGroupSetBits(
-                        EventGroupHandleLocal, /* The event group being updated. */
+                        EventGroupHandleLocal,
                         BIT_22);                    
         }
         ret = true;
