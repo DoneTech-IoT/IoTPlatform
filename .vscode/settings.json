@@ -95,6 +95,6 @@
     "peacock.color": "#dd0531",
     "C_Cpp.dimInactiveRegions": false,
     "editor.minimap.maxColumn": 80,
-    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrap": "off",
     "editor.wordWrapColumn": 100
 }

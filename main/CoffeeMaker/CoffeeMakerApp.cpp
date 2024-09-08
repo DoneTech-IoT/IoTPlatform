@@ -222,40 +222,31 @@ void CoffeeMakerApplication(
                                          pdTRUE, (void *)0,
                                          CoffeeMakerTimerCallBack);
     char CoffeeMakerJsonOutPut[2500];
-
-
-
     while (true)
     {
-        if (xSemaphoreTake(*MQTTConnectedSemaphore,
-                           pdMS_TO_TICKS(300)) == pdTRUE)
+        if (xSemaphoreTake(*MQTTConnectedSemaphore, 0) == pdTRUE)
         {
             MQTT_Subscribe("AndroidApp/TV");
-#ifdef COFFEE_MAKER_APP_TEST
-            PublishJsonForTest(CoffeeMakerJsonOutPut);
-#endif
-            break;
+            // #ifdef COFFEE_MAKER_APP_TEST
+            //             PublishJsonForTest(CoffeeMakerJsonOutPut);
+            // #endif
+            //             break;
         }
-        if (xSemaphoreTake(*MQTTErrorOrDisconnectSemaphore,
-                           pdMS_TO_TICKS(300)) == pdTRUE)
+        if (xSemaphoreTake(*MQTTErrorOrDisconnectSemaphore, 0) == pdTRUE)
         {
             ESP_LOGE(TAG, "we lose Mqtt");
             // break;
         }
-    
-        if (xQueueReceive(*MQTTDataFromBrokerQueue,
-                          CoffeeMakerJsonOutPut,
-                          pdMS_TO_TICKS(300)) == pdTRUE)
+
+        if (xQueueReceive(*MQTTDataFromBrokerQueue, CoffeeMakerJsonOutPut, 0) == pdTRUE)
         {
-            ESP_LOGE(TAG, "receive data in coffee maker app");
+            ESP_LOGI(TAG, "receive data in coffee maker app");
             CoffeeMakerJson_str CoffeeMakerJson;
             CoffeeMakerJsonParser(&CoffeeMakerJson, CoffeeMakerJsonOutPut);
             CoffeeMakerGUIReset();
             ApplyOnScreen(&CoffeeMakerJson);
         }
-        if (xQueueReceive(*MatterBusQueue,
-                          &CoffeeMakerMatter,
-                          pdMS_TO_TICKS(300)) == pdTRUE)
+        if (xQueueReceive(*MatterBusQueue, &CoffeeMakerMatter, 0) == pdTRUE)
         {
             char CoffeeMakerJsonOutPut_t[2500];
             ESP_LOGE(TAG, "Coffee Flag: %u", CoffeeMakerMatter.CoffeeFlag);
