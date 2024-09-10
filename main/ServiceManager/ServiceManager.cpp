@@ -7,6 +7,9 @@ static const char *TAG = "Service_Manager";
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
 MatterInterfaceHandler_t MatterInterfaceHandler;
+TaskHandle_t MatterHandle;
+UBaseType_t MatterPriority = tskIDLE_PRIORITY + 1;
+uint32_t MatterStack;
 #endif
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
@@ -56,7 +59,10 @@ void MatterServiceRunner()
     MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
     MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
     MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
-    Matter_TaskInit(&MatterInterfaceHandler);
+    Matter_TaskInit(&MatterInterfaceHandler, 
+                    &MatterHandle,
+                    MatterPriority,
+                    MatterTask);
 }
 #endif
 #ifdef CONFIG_DONE_COMPONENT_LVGL
