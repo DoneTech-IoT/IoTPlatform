@@ -7,9 +7,8 @@ static const char *TAG = "Service_Manager";
 QueueHandle_t MatterBufQueue;
 SemaphoreHandle_t MatterSemaphore = NULL;
 MatterInterfaceHandler_t MatterInterfaceHandler;
-TaskHandle_t MatterHandle;
+TaskHandle_t MatterHandle = NULL;
 UBaseType_t MatterPriority = tskIDLE_PRIORITY + 1;
-uint32_t MatterStack;
 #endif
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
@@ -62,7 +61,7 @@ void MatterServiceRunner()
     Matter_TaskInit(&MatterInterfaceHandler, 
                     &MatterHandle,
                     MatterPriority,
-                    MatterTask);
+                    MATTER_STACK_SIZE);
 }
 #endif
 #ifdef CONFIG_DONE_COMPONENT_LVGL
