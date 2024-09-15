@@ -82,31 +82,39 @@ esp_err_t SharedBusRecieve(
     {     
         return false;
     }   
-    
-    if(xQueuePeek(QueueHandle, SharedBusPacket, 1) == pdTRUE)
-    {
-        if (SharedBusPacket->SourceID == interfaceID)
+    else
+    {   
+        if(xQueuePeek(QueueHandle, SharedBusPacket, 1) != pdTRUE)
         {
-            if((EventBits & BIT_21))
+            if (SharedBusPacket->SourceID == interfaceID)
             {
-                EventBits = xEventGroupClearBits(
-                            EventGroupHandleLocal, /* The event group being updated. */
-                            BIT_22);  
+                if((EventBits & BIT_21))
+                {
+                    EventBits = xEventGroupClearBits(
+                                EventGroupHandleLocal, /* The event group being updated. */
+                                BIT_22);  
 
-                EventBits = xEventGroupClearBits(
-                            EventGroupHandleLocal, /* The event group being updated. */
-                            BIT_23);   
-            }
+                    EventBits = xEventGroupClearBits(
+                                EventGroupHandleLocal, /* The event group being updated. */
+                                BIT_23);   
+                }
+                else
+                {
+                    //permission to itself
+                    EventBits = xEventGroupSetBits(
+                                    EventGroupHandleLocal, /* The event group being updated. */
+                                    BIT_21);     
+                }
+                return false;
+            }  
             else
             {
-                //permission to itself
-                EventBits = xEventGroupSetBits(
-                                EventGroupHandleLocal, /* The event group being updated. */
-                                BIT_21);     
+                return true;
             }
-            return false;
-        }  
-        return true;
-    } 
-    return true;
+        }
+        else 
+        {
+        return true; 
+        }      
+    }
 }
