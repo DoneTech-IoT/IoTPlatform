@@ -26,18 +26,22 @@ typedef struct {
 
 /**
  * @brief Initialize the SharedBus.
+ * @param void This function have no parameter.
  * @return Always true.
  */
-esp_err_t SharedBusInit();
+esp_err_t SharedBusInit(void);
 
 /**
  * @brief Prepare needed Bits and send the Packet.
+ * @param SahredBusPacket The Packet to publish on Bus.
  * @return True if queue is available, False if queue is busy.
  */
 esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket);
 
 /**
  * @brief Check needed Bits to receive the Packet.
+ * @param SharedBusPacket The received Packet.
+ * @param interfaceID The ID of receiver component.
  * @return True if successfully received, false if receiver and sender are the same component.
  */
 esp_err_t SharedBusRecieve(

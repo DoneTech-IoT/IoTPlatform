@@ -2,12 +2,9 @@
 #include "SharedBus.h"
 #include "Custom_Log.h"
 
-#define UI_EVENT_FLAG	( 1 << UI_INTERFACE_ID )
-#define UI_EVENT_FLAG	( 1 << UI_INTERFACE_ID )
-
-#define BIT_23	( 1 << 23 ) //prevent overwriting bus for send before one turn of the event loop
-#define BIT_22	( 1 << 22 ) //peek to receive switch flag 
-#define BIT_21	( 1 << 21 ) //peek to receive switch flag 
+#define BIT_23	( 1 << 23 ) //prevent overwriting bus for send 
+#define BIT_22	( 1 << 22 ) //permisson for all components to peek from SharedBus 
+#define BIT_21	( 1 << 21 ) //check if received the packet ones
 
 static const char *TAG = "SharedBus";
 
@@ -17,9 +14,10 @@ QueueHandle_t QueueHandle;
 
 /**
  * @brief Initialize the SharedBus.
+ * @param void This function have no parameter.
  * @return Always true.
  */
-esp_err_t SharedBusInit()    
+esp_err_t SharedBusInit(void)    
 {
     EventBits = 0;
     EventGroupHandleLocal = xEventGroupCreate();  
@@ -29,6 +27,7 @@ esp_err_t SharedBusInit()
 
 /**
  * @brief Prepare needed Bits and send the Packet.
+ * @param SahredBusPacket The Packet to publish on Bus.
  * @return True if queue is available, False if queue is busy.
  */
 esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket)    
@@ -38,7 +37,7 @@ esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket)
                     BIT_23,         /* The bits within the event group to wait for. */
                     pdTRUE,        /* BIT_23 should be cleared before returning. */
                     pdFALSE,        /* Wait for 23th bit, either bit will do. */
-                    1);/* Wait a maximum of 100ms for either bit to be set. */
+                    1);/* Wait a maximum of 1ms for either bit to be set. */
     if(!(EventBits & BIT_23))
     {
         EventBits = xEventGroupSetBits(
@@ -64,6 +63,8 @@ esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket)
 
 /**
  * @brief Check needed Bits to receive the Packet.
+ * @param SharedBusPacket The received Packet.
+ * @param interfaceID The ID of receiver component.
  * @return True if successfully received, false if receiver and sender are the same component.
  */
 esp_err_t SharedBusRecieve(
@@ -74,9 +75,9 @@ esp_err_t SharedBusRecieve(
     EventBits = xEventGroupWaitBits(
                     EventGroupHandleLocal,   /* The event group being tested. */
                     BIT_22 | BIT_21,         /* The bits within the event group to wait for. */
-                    pdFALSE,        /* BIT_22 should NOT be cleared before returning. */
-                    pdFALSE,         /* Wait for 22th bit, either bit will do. */
-                    1);/*           Wait a maximum of 100ms for either bit to be set. */    
+                    pdFALSE,        /* BIT 21 or 22 should NOT be cleared before returning. */
+                    pdFALSE,         /* Wait for 21 or 22th bit, either bit will do. */
+                    1);/*           Wait a maximum of 1ms for either bit to be set. */    
 
     if((EventBits & BIT_22)) //default state
     {           
