@@ -36,6 +36,10 @@ esp_err_t SharedBusInit();
  */
 esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket);
 
+/**
+ * @brief Check needed Bits to receive the Packet.
+ * @return True if successfully received, false if receiver and sender are the same component.
+ */
 esp_err_t SharedBusRecieve(
     SharedBusPacket_t *SharedBusPacket, 
     TaskInterfaceID_t interfaceID);    
