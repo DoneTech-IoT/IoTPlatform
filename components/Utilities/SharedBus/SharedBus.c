@@ -52,6 +52,7 @@ esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket)
         
     return false;    
 }
+
 esp_err_t SharedBusRecieve(
     SharedBusPacket_t *SharedBusPacket,
     TaskInterfaceID_t interfaceID)
