@@ -71,7 +71,6 @@ esp_err_t SharedBusRecieve(
     SharedBusPacket_t *SharedBusPacket,
     TaskInterfaceID_t interfaceID)
 {   
-    esp_err_t ret = false;
     EventBits = xEventGroupWaitBits(
                     EventGroupHandleLocal,   /* The event group being tested. */
                     BIT_22 | BIT_21,         /* The bits within the event group to wait for. */
@@ -79,33 +78,35 @@ esp_err_t SharedBusRecieve(
                     pdFALSE,         /* Wait for 21 or 22th bit, either bit will do. */
                     1);/*           Wait a maximum of 1ms for either bit to be set. */    
 
-    if((EventBits & BIT_22)) //default state
-    {           
-        ret = true;    
-        if(xQueuePeek(QueueHandle, SharedBusPacket, 1) == pdTRUE)
+    if((EventBits & BIT_22) == 0) //default state
+    {     
+        return false;
+    }   
+    
+    if(xQueuePeek(QueueHandle, SharedBusPacket, 1) == pdTRUE)
+    {
+        if (SharedBusPacket->SourceID == interfaceID)
         {
-            if (SharedBusPacket->SourceID == interfaceID)
+            if((EventBits & BIT_21))
             {
-                if((EventBits & BIT_21))
-                {
-                    EventBits = xEventGroupClearBits(
-                                EventGroupHandleLocal, /* The event group being updated. */
-                                BIT_22);  
+                EventBits = xEventGroupClearBits(
+                            EventGroupHandleLocal, /* The event group being updated. */
+                            BIT_22);  
 
-                    EventBits = xEventGroupClearBits(
+                EventBits = xEventGroupClearBits(
+                            EventGroupHandleLocal, /* The event group being updated. */
+                            BIT_23);   
+            }
+            else
+            {
+                //permission to itself
+                EventBits = xEventGroupSetBits(
                                 EventGroupHandleLocal, /* The event group being updated. */
-                                BIT_23);              
-                }
-                else
-                {
-                    //permission to itself
-                    EventBits = xEventGroupSetBits(
-                                    EventGroupHandleLocal, /* The event group being updated. */
-                                    BIT_21);       
-                }
-                ret = false;    
-            }  
-        }          
-    }         
-    return ret;
+                                BIT_21);     
+            }
+            return false;
+        }  
+        return true;
+    } 
+    return true;
 }
