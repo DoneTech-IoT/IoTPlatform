@@ -133,11 +133,11 @@ void ServiceMangerInit()
 
     if (SharedBusInit())
     {
-            ESP_LOGE(TAG, "Failed to Initialize SharedBus.");
+        ESP_LOGI(TAG, "initialized SharedBus successfully");
     }
     else
     {
-        ESP_LOGI(TAG, "initialized SharedBus successfully");
+        ESP_LOGE(TAG, "Failed to Initialize SharedBus.");
     }
 
 #ifdef CONFIG_DONE_COMPONENT_LVGL

@@ -24,8 +24,16 @@ typedef struct {
     void *data;
 } SharedBusPacket_t;
 
+/**
+ * @brief Initialize the SharedBus.
+ * @return Always true.
+ */
 esp_err_t SharedBusInit();
 
+/**
+ * @brief Prepare needed Bits and send the Packet.
+ * @return True if queue is available, False if queue is busy.
+ */
 esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket);
 
 esp_err_t SharedBusRecieve(

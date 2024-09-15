@@ -15,14 +15,22 @@ static EventBits_t EventBits;
 static EventGroupHandle_t EventGroupHandleLocal;
 QueueHandle_t QueueHandle;
 
+/**
+ * @brief Initialize the SharedBus.
+ * @return Always true.
+ */
 esp_err_t SharedBusInit()    
 {
     EventBits = 0;
     EventGroupHandleLocal = xEventGroupCreate();  
     QueueHandle = xQueueCreate(1, sizeof(SharedBusPacket_t));     
-    return 0;         
+    return true;         
 }
 
+/**
+ * @brief Prepare needed Bits and send the Packet.
+ * @return True if queue is available, False if queue is busy.
+ */
 esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket)    
 {    
     EventBits = xEventGroupWaitBits(
@@ -37,7 +45,6 @@ esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket)
                         EventGroupHandleLocal, /* The event group being updated. */
                         BIT_23);               /* The bits being set. */
 
-        //xQueueSend(QueueHandle, &SharedBusPacket, 1);
         xQueueOverwrite(QueueHandle, &SharedBusPacket);        
 
         EventBits = xEventGroupClearBits(
@@ -47,7 +54,9 @@ esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket)
         //permission to all task to peek
         EventBits = xEventGroupSetBits(
                         EventGroupHandleLocal, /* The event group being updated. */
-                        BIT_22);                               
+                        BIT_22);
+
+        return true;                               
     }
         
     return false;    
