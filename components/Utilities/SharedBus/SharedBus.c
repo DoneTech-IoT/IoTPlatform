@@ -85,9 +85,8 @@ esp_err_t SharedBusRecieve(
     }   
 
     if(xQueuePeek(QueueHandle, SharedBusPacket, 1) != pdTRUE)
-    {
-        //TODO log for error 
-        return -1; 
+    { 
+        return false; 
     } 
 
     if (SharedBusPacket->SourceID != interfaceID)
