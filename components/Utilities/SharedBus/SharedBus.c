@@ -38,27 +38,27 @@ esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket)
                     pdTRUE,        /* BIT_23 should be cleared before returning. */
                     pdFALSE,        /* Wait for 23th bit, either bit will do. */
                     1);/* Wait a maximum of 1ms for either bit to be set. */
-    if(!(EventBits & BIT_23))
+    if((EventBits & BIT_23))
     {
-        EventBits = xEventGroupSetBits(
-                        EventGroupHandleLocal, /* The event group being updated. */
-                        BIT_23);               /* The bits being set. */
-
-        xQueueOverwrite(QueueHandle, &SharedBusPacket);        
-
-        EventBits = xEventGroupClearBits(
-                        EventGroupHandleLocal,
-                        BIT_21);         
-
-        //permission to all task to peek
-        EventBits = xEventGroupSetBits(
-                        EventGroupHandleLocal, /* The event group being updated. */
-                        BIT_22);
-
-        return true;                               
+        return false;
     }
-        
-    return false;    
+    
+    EventBits = xEventGroupSetBits(
+                    EventGroupHandleLocal, /* The event group being updated. */
+                    BIT_23);               /* The bits being set. */
+
+    xQueueOverwrite(QueueHandle, &SharedBusPacket);        
+
+    EventBits = xEventGroupClearBits(
+                    EventGroupHandleLocal,
+                    BIT_21);         
+
+    //permission to all task to peek
+    EventBits = xEventGroupSetBits(
+                    EventGroupHandleLocal, /* The event group being updated. */
+                    BIT_22);
+
+    return true;                                   
 }
 
 /**
@@ -84,34 +84,33 @@ esp_err_t SharedBusRecieve(
         return false;
     }   
 
-    if( xQueuePeek(QueueHandle, SharedBusPacket, 1) != pdTRUE)
+    if(xQueuePeek(QueueHandle, SharedBusPacket, 1) != pdTRUE)
     {
-        return true; 
-    }
+        //TODO log for error 
+        return -1; 
+    } 
 
-    if (SharedBusPacket->SourceID == interfaceID)
-    {
-        if((EventBits & BIT_21))
-        {
-            EventBits = xEventGroupClearBits(
-                    EventGroupHandleLocal, /* The event group being updated. */
-                    BIT_22);  
-
-            EventBits = xEventGroupClearBits(
-                    EventGroupHandleLocal, /* The event group being updated. */
-                    BIT_23);   
-        }
-        else
-        {
-            //permission to itself
-            EventBits = xEventGroupSetBits(
-                    EventGroupHandleLocal, /* The event group being updated. */
-                    BIT_21);     
-        }
-        return false;
-    }  
-    else
+    if (SharedBusPacket->SourceID != interfaceID)
     {
         return true;
     }
+
+    if(!(EventBits & BIT_21))
+    {
+        //permission to itself
+        EventBits = xEventGroupSetBits(
+                EventGroupHandleLocal, /* The event group being updated. */
+                BIT_21);
+        return false;
+    }
+
+    EventBits = xEventGroupClearBits(
+            EventGroupHandleLocal, /* The event group being updated. */
+            BIT_22);  
+
+    EventBits = xEventGroupClearBits(
+            EventGroupHandleLocal, /* The event group being updated. */
+            BIT_23);
+
+    return false;
 }
