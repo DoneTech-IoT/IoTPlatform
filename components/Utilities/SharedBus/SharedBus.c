@@ -84,7 +84,7 @@ esp_err_t SharedBusRecieve(
     }   
     else
     {   
-        if(xQueuePeek(QueueHandle, SharedBusPacket, 1) != pdTRUE)
+        if(xQueuePeek(QueueHandle, SharedBusPacket, 1) == pdTRUE)
         {
             if (SharedBusPacket->SourceID == interfaceID)
             {
