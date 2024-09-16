@@ -73,7 +73,7 @@ static void BuzzerBiz(uint8_t count)
  * @brief play Buzzer with an effect
  * @param[in] effectNo effect that define in BuzzerEffect_t
  */
-void BuzzerPlay(BuzzerEffect_t effectNo)
+void BuzzerPlay(BuzzerEffect effectNo)
 {
 	switch (effectNo)
 	{
