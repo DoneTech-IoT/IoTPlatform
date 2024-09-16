@@ -85,37 +85,40 @@ esp_err_t SharedBusRecieve(
         return false;
     }   
 
-    error = xQueuePeek(QueueHandle, SharedBusPacket, 1);
-    if( error != pdTRUE)
-    {
-        return true; 
-    }
     else
     {
-        if (SharedBusPacket->SourceID == interfaceID)
+        error = xQueuePeek(QueueHandle, SharedBusPacket, 1);
+        if( error != pdTRUE)
         {
-            if((EventBits & BIT_21))
+            return true; 
+        }
+        else
+        {
+            if (SharedBusPacket->SourceID == interfaceID)
             {
-                EventBits = xEventGroupClearBits(
-                        EventGroupHandleLocal, /* The event group being updated. */
-                        BIT_22);  
+                if((EventBits & BIT_21))
+                {
+                    EventBits = xEventGroupClearBits(
+                            EventGroupHandleLocal, /* The event group being updated. */
+                            BIT_22);  
 
-                EventBits = xEventGroupClearBits(
-                        EventGroupHandleLocal, /* The event group being updated. */
-                        BIT_23);   
-           }
-           else
-           {
-                //permission to itself
-                EventBits = xEventGroupSetBits(
-                        EventGroupHandleLocal, /* The event group being updated. */
-                        BIT_21);     
-           }
-            return false;
-       }  
-       else
-       {
-            return true;
-       }
+                    EventBits = xEventGroupClearBits(
+                            EventGroupHandleLocal, /* The event group being updated. */
+                            BIT_23);   
+                }
+                else
+                {
+                    //permission to itself
+                    EventBits = xEventGroupSetBits(
+                            EventGroupHandleLocal, /* The event group being updated. */
+                            BIT_21);     
+                }
+                return false;
+            }  
+            else
+            {
+                return true;
+            }
+        }
     }
 }
