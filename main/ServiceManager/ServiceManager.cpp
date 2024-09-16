@@ -129,9 +129,12 @@ void ServiceMangerTaskInit()
  */
 void ServiceMangerInit()
 {
+    uint8_t init_retval;
+
     nvsFlashInit();
 
-    if (SharedBusInit())
+    init_retval = SharedBusInit();
+    if (init_retval)
     {
         ESP_LOGI(TAG, "initialized SharedBus successfully");
     }
