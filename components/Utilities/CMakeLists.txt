@@ -15,5 +15,5 @@ idf_component_register(
 "nvsFlash/include"
 "Buzzer"
 "NetworkChecker"
-"SharedBus"
+"SharedBus/include"
      REQUIRES spiffs nvs_flash esp_timer esp_event nvs_flash driver json esp_http_client esp_wifi) 

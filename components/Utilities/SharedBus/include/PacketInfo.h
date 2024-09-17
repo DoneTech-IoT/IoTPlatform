@@ -9,7 +9,7 @@ extern "C"
 #include "CoffeeMakerInfo.h"
 
 typedef enum {
-    COFFEE_MAKER_PACKET = 1
+    COFFEE_MAKER_PACKET_ID = 1
 
 } PacketIDs;
 

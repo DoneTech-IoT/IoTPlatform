@@ -10,6 +10,7 @@ extern "C"
 #include <freertos/queue.h>
 #include <freertos/task.h>
 #include <freertos/event_groups.h>
+#include "PacketInfo.h"
 
 typedef enum {
     UI_INTERFACE_ID = 1,
