@@ -11,13 +11,13 @@ typedef enum {
     ONE_BIZ = 1,
     DOUBLE_BIZ = 2,
     TRIPLE_BIZ = 3,
-} BuzzerEffect_t;
+} BuzzerEffect;
 
 /** 
  * @brief play Buzzer with an effect
  * @param[in] effectNo effect that define in BuzzerEffect_t
  */
-void BuzzerPlay(BuzzerEffect_t effectNo);
+void BuzzerPlay(BuzzerEffect effectNo);
 
 #ifdef __cplusplus
 }
