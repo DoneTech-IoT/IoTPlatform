@@ -1,5 +1,5 @@
-#ifndef COFFEE_MAKER_IFO_H
-#define COFFEE_MAKER_IFO_H
+#ifndef PACKET_IFO_H
+#define PACKET_IFO_H
 
 #ifdef __cplusplus
 extern "C"
@@ -17,4 +17,4 @@ typedef enum {
 }
 #endif
 
-#endif //COFFEE_MAKER_IFO_H
+#endif //PACKET_IFO_H
