@@ -235,7 +235,7 @@ void CoffeeMakerApplication(
                           CoffeeMakerJsonOutPut,
                           pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
         {
-            ESP_LOGE(TAG, "receive data in coffee maker app");
+            ESP_LOGI(TAG, "receive data in coffee maker app");
             CoffeeMakerJson_str CoffeeMakerJson;
             CoffeeMakerJsonParser(&CoffeeMakerJson, CoffeeMakerJsonOutPut);
             CoffeeMakerGUIReset();
