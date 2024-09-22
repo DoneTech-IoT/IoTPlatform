@@ -168,14 +168,12 @@ void ServiceMangerInit()
     ESP_ERROR_CHECK(example_connect());
 #endif
 
-// #ifdef CONFIG_DONE_COMPONENT_MQTT_DEFAULT
-    
+#ifdef CONFIG_DONE_COMPONENT_MQTT_DEFAULT
     MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
     MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
     MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
     MQTT_TaskInit(&MQTT_InterfaceHandler); 
-    
-// #endif
+#endif
 }
 
 /**
