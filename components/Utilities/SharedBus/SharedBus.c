@@ -83,12 +83,12 @@ esp_err_t SharedBusRecieve(
     {     
         return false;
     }   
-
+ ESP_LOGE(TAG, "data size before peek = %d", sizeof(SharedBusPacket->data));
     if(xQueuePeek(QueueHandle, SharedBusPacket, 1) != pdTRUE)
     { 
         return false; 
     } 
-
+ ESP_LOGE(TAG, "data size after peek = %d", sizeof(SharedBusPacket->data));
     if (SharedBusPacket->SourceID != interfaceID)
     {
         return true;
