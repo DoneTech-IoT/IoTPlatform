@@ -11,7 +11,7 @@ TimerHandle_t CoffeeMakerApp_xTimer;
  * This function resets the timer counter and clears all display indicators for the coffee maker.
  * @return void
  */
-void CoffeeMakerGUIReset()
+static void CoffeeMakerGUIReset()
 {
     CoffeeMakerApp_TimerCounter = 0;
     GUI_DisplayUpdateCoffeeMakerTimer(0);
@@ -166,7 +166,7 @@ void CoffeeMakerJsonParser(CoffeeMakerJson_str *CoffeeMakerJson, char *CoffeeMak
  * @param CoffeeMakerJson Pointer to the structure containing the coffee maker settings.
  * @return void
  */
-void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
+static void ApplyOnScreen(CoffeeMakerJson_str *CoffeeMakerJson)
 {
     GUI_DisplayUpdateCupsCounts(CoffeeMakerJson->Cups);
     if (CoffeeMakerJson->CoffeeFlag == true && CoffeeMakerJson->TeaFlag == false)
