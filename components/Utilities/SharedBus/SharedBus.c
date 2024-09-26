@@ -71,7 +71,6 @@ esp_err_t SharedBusRecieve(
     SharedBusPacket_t *SharedBusPacket,
     TaskInterfaceID_t interfaceID)
 { 
-
     EventBits = xEventGroupWaitBits(
                     EventGroupHandleLocal,   /* The event group being tested. */
                     BIT_22 | BIT_21,         /* The bits within the event group to wait for. */
@@ -79,19 +78,22 @@ esp_err_t SharedBusRecieve(
                     pdFALSE,         /* Wait for 21 or 22th bit, either bit will do. */
                     1);             /* Wait a maximum of 1ms for either bit to be set. */    
 
+    // return false if permission is not granted
     if((EventBits & BIT_22) == 0) //default state
     {     
         return false;
     }   
 
+    // return false if queue is empty
     if(xQueuePeek(QueueHandle, SharedBusPacket, 1) != pdTRUE)
     { 
         return false; 
     } 
 
-    if (SharedBusPacket->SourceID != interfaceID)
+    // return false if receiver and transmitter was the same component
+    if (SharedBusPacket->SourceID == interfaceID)
     {
-        return true;
+        return false;
     }
 
     if(!(EventBits & BIT_21))
@@ -111,5 +113,5 @@ esp_err_t SharedBusRecieve(
             EventGroupHandleLocal, /* The event group being updated. */
             BIT_23);
 
-    return false;
+    return true;
 }
