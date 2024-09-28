@@ -12,6 +12,8 @@ static EventBits_t EventBits;
 static EventGroupHandle_t EventGroupHandleLocal;
 QueueHandle_t QueueHandle;
 
+SharedBusPacket_t SharedBusPacket;
+
 /**
  * @brief Initialize the SharedBus.
  * @param void This function have no parameter.
@@ -22,6 +24,7 @@ esp_err_t SharedBusInit(void)
     EventBits = 0;
     EventGroupHandleLocal = xEventGroupCreate();  
     QueueHandle = xQueueCreate(1, sizeof(SharedBusPacket_t));     
+    SharedBusPacket.data =  malloc(1000);
     return true;         
 }
 
