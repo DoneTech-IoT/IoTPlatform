@@ -13,6 +13,10 @@ UBaseType_t MatterPriority = tskIDLE_PRIORITY + 1;
 #endif
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
+// Structure holding MQTT interface configurations and state
+    MQTT_InterfaceHandler_t MQTT_InterfaceHandler;
+
+
 static QueueHandle_t MQTTDataFromBrokerQueue;
 static SemaphoreHandle_t MQTTConnectedSemaphore;
 static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
@@ -163,8 +167,14 @@ void ServiceMangerInit()
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     ESP_ERROR_CHECK(example_connect());
 #endif
+
 #ifdef CONFIG_DONE_COMPONENT_MQTT_DEFAULT
-    MQTT_DefaultConfig(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
+    MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
+    MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
+    MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
+    MQTT_TaskInit(&MQTT_InterfaceHandler); 
+    vTaskDelay(pdMS_TO_TICKS(100));
+    MQTT_Start();
 #endif
 }
 
