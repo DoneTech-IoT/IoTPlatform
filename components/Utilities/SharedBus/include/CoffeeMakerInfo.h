@@ -36,9 +36,9 @@ typedef enum
 typedef struct 
 {
     bool PowerKey;
-    PowerKeyMode busPowerKeyMode;
-    CookingMode busCookingMode;
-    MicroSwitchMode busMicroSwitchMode;
+    PowerKeyMode PowerKeyMode;
+    CookingMode CookingMode;
+    MicroSwitchMode MicroSwitchMode;
     uint8_t GrinderLevel;
     uint8_t CupCounter;
 } CoffeeMakerPacket;
