@@ -6,25 +6,6 @@ extern "C"
 {
 #endif
 
-//#include ""
-
-typedef enum
-{
-    INCREMENT_MODE = 0,
-    DECREMENT_MODE = 1,
-    EXPLICIT_MODE = 2
-} LevelControlCurrentValueMode;
-
-typedef enum
-{
-    POWER_KEY = 0,
-    GRINDER_KEY = 1,
-    COFFEE_KEY = 2,
-    TEA_KEY = 3,
-    CUP_COUNTER_KEY = 4,
-    MICRO_SWITCH_KEY = 5
-} DeviceKeys;
-
 typedef enum
 {
     DONT_CARE = 0,
@@ -45,13 +26,6 @@ typedef enum
     ERROR_MODE = 0,
     NORMAL_MODE = 1
 } MicroSwitchMode;
-
-typedef enum
-{
-    MICRO_SWITCH = 0,
-    AUTO_TURN_OFF = 1,
-    TIMER_COUNT
-} TimerID;
 
 typedef enum
 {
