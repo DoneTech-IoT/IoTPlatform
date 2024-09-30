@@ -172,7 +172,9 @@ void ServiceMangerInit()
     MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
     MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
     MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
-    MQTT_TaskInit(&MQTT_InterfaceHandler);
+    MQTT_TaskInit(&MQTT_InterfaceHandler); 
+    vTaskDelay(pdMS_TO_TICKS(100));
+    MQTT_Start();
 #endif
 }
 
