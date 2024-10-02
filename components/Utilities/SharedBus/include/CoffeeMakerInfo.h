@@ -27,12 +27,6 @@ typedef enum
     NORMAL_MODE = 1
 } MicroSwitchMode;
 
-typedef enum
-{
-    AUTO_MODE = 0,
-    MANUAL_MODE = 1    
-} AttributeUpdateMode;
-
 typedef struct 
 {
     bool PowerKey;
