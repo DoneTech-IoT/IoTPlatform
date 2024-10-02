@@ -5,22 +5,22 @@
 static const char *TAG = "Service_Manager";
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
-QueueHandle_t MatterBufQueue;
-SemaphoreHandle_t MatterSemaphore = NULL;
 MatterInterfaceHandler_t MatterInterfaceHandler;
-TaskHandle_t MatterHandle = NULL;
-UBaseType_t MatterPriority = tskIDLE_PRIORITY + 1;
-#endif
+static QueueHandle_t MatterBufQueue;
+static SemaphoreHandle_t MatterSemaphore = NULL;
+static TaskHandle_t MatterHandle = NULL;
+static UBaseType_t MatterPriority = tskIDLE_PRIORITY + 1;
+#endif  //CONFIG_DONE_COMPONENT_MATTER
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
-// Structure holding MQTT interface configurations and state
-    MQTT_InterfaceHandler_t MQTT_InterfaceHandler;
-
-
+MQTT_InterfaceHandler_t MQTT_InterfaceHandler;
 static QueueHandle_t MQTTDataFromBrokerQueue;
 static SemaphoreHandle_t MQTTConnectedSemaphore;
 static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
-#endif
+static TaskHandle_t MQTTHandle = NULL;
+static UBaseType_t MQTTPriority = tskIDLE_PRIORITY + 1;
+
+#endif  //CONFIG_DONE_COMPONENT_MQTT
 
 #define TASK_LIST_BUFFER_SIZE 512
 // #define MONITORING
@@ -31,10 +31,6 @@ static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
  * @return void
  */
 void ServiceMangerTask(void *pvParameter);
-
-// Static variables for Service Manager task
-StaticTask_t *xTaskServiceMangerBuffer;
-StackType_t *xServiceMangerStack;
 
 // Global instance of Service Manager
 ServiceManger_t ServiceManger;
@@ -52,42 +48,6 @@ void MatterAttributeUpdateCBMain(callback_type_t type,
     printf("val: %p\n", val);
     printf("priv_data: %pGlobalInitGlobalInitGlobalInit\n", priv_data);
 }
-
-void MatterNetworkConnected()
-{
-    ESP_LOGI(TAG, "Matter Network Connected\n");
-}
-void MatterServiceRunner()
-{
-    MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
-    MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
-    MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
-    MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
-    Matter_TaskInit(&MatterInterfaceHandler, 
-                    &MatterHandle,
-                    MatterPriority,
-                    MATTER_STACK_SIZE);
-}
-#endif
-#ifdef CONFIG_DONE_COMPONENT_LVGL
-/**
- * @brief Creates the GUI task.
- * This function configures and creates the GUI task.
- * @return void
- */
-void GUI_TaskCreator()
-{
-    ServiceManger.tasks[GUI_Task].maximumRAM_Needed = LVGL_STACK * 2;
-    strcpy(ServiceManger.tasks[GUI_Task].name, "GUI");
-    ServiceManger.tasks[GUI_Task].ramType = PSRAM_;
-    ServiceManger.tasks[GUI_Task].startupRAM = GUI_Task;
-    ServiceManger.tasks[GUI_Task].TaskCreator = GUI_TaskCreator;
-    ServiceManger.tasks[GUI_Task].TaskKiller = GUI_TaskKill;
-    ServiceManger.tasks[GUI_Task].taskStack = LVGL_STACK;
-    ServiceManger.tasks[GUI_Task].priority = tskIDLE_PRIORITY + 1;
-    ServiceManger.tasks[GUI_Task].taskHandler = NULL;
-    GUI_TaskInit(&ServiceManger.tasks[GUI_Task].taskHandler, ServiceManger.tasks[GUI_Task].priority, ServiceManger.tasks[GUI_Task].taskStack);
-}
 #endif
 
 /**
@@ -103,24 +63,14 @@ void TaskKiller(int TaskNumber)
 }
 
 /**
- * @brief Creates the Spotify task.
- * This function configures and creates the Spotify task.
- * @return void
- */
-void SpotifyTaskCreator()
-{
-    ESP_LOGI(TAG, "TO DO");
-}
-
-/**
  * @brief Initializes the Service Manager task.
  * This function initializes the Service Manager task by allocating memory and creating the task.
  * @return void
  */
-void ServiceMangerTaskInit()
+void ServiceManger_Init()
 {
-    xTaskServiceMangerBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
-    xServiceMangerStack = (StackType_t *)malloc(SERVICE_MANGER_STACK * sizeof(StackType_t));
+    StaticTask_t *xTaskServiceMangerBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
+    StackType_t *xServiceMangerStack = (StackType_t *)malloc(SERVICE_MANGER_STACK * sizeof(StackType_t));
     xTaskCreateStatic(
         ServiceMangerTask,         // Task function
         "ServiceMangerTask",       // Task name (for debugging)
@@ -131,12 +81,18 @@ void ServiceMangerTaskInit()
         xTaskServiceMangerBuffer); // Task control block
 }
 
+
+// ServiceManager_RunService(TaskEnum task)
+// {
+//     ServiceManger.tasks[task].TaskCreator();
+// }
+
 /**
  * @brief Initializes the Service Manager.
  * This function initializes the Service Manager by creating necessary tasks.
  * @return void
  */
-void ServiceMangerInit()
+void ServiceManger_RunServices()
 {
     nvsFlashInit();
 
@@ -150,16 +106,29 @@ void ServiceMangerInit()
     }
 
 #ifdef CONFIG_DONE_COMPONENT_LVGL
-    GUI_TaskCreator();
+    ServiceManger.tasks[GUI_Task].maximumRAM_Needed = LVGL_STACK * 2;
+    strcpy(ServiceManger.tasks[GUI_Task].name, "GUI");
+    ServiceManger.tasks[GUI_Task].ramType = PSRAM_;
+    ServiceManger.tasks[GUI_Task].startupRAM = GUI_Task;
+    ServiceManger.tasks[GUI_Task].TaskKiller = GUI_TaskKill;
+    ServiceManger.tasks[GUI_Task].taskStack = LVGL_STACK;
+    ServiceManger.tasks[GUI_Task].priority = tskIDLE_PRIORITY + 1;
+    ServiceManger.tasks[GUI_Task].taskHandler = NULL;
+    
+    GUI_TaskInit(&ServiceManger.tasks[GUI_Task].taskHandler, ServiceManger.tasks[GUI_Task].priority, ServiceManger.tasks[GUI_Task].taskStack);
+
     ESP_LOGI(TAG, "GUI Created !");
     vTaskDelay(SERVICE_MANAGER_SEC * 4);
 #endif
-#ifdef CONFIG_DONE_COMPONENT_SPOTIFY
-    SpotifyTaskCreator();
-    ESP_LOGI(TAG, "Spotify Created !");
-#endif
+
 #ifdef CONFIG_DONE_COMPONENT_MATTER
-    MatterServiceRunner();
+    MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
+    MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
+    MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
+    Matter_TaskInit(&MatterInterfaceHandler, 
+                    &MatterHandle,
+                    MatterPriority,
+                    MATTER_STACK_SIZE);        
     ESP_LOGI(TAG, "Matter interface called !");
 #else
     ESP_LOGE(TAG, "connect to wifi");
@@ -172,7 +141,11 @@ void ServiceMangerInit()
     MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
     MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
     MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
-    MQTT_TaskInit(&MQTT_InterfaceHandler); 
+    
+    MQTT_TaskInit(&MQTT_InterfaceHandler, 
+                  &MQTTHandle,
+                  MQTTPriority,
+                  MQTT_STACK); 
     vTaskDelay(pdMS_TO_TICKS(100));
     MQTT_Start();
 #endif
@@ -186,7 +159,7 @@ void ServiceMangerInit()
  */
 void ServiceMangerTask(void *pvParameter)
 {
-    ServiceMangerInit();
+    ServiceManger_RunServices();
     CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
     char pcTaskList[TASK_LIST_BUFFER_SIZE];
     while (true)

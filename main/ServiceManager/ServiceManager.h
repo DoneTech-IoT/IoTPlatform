@@ -41,11 +41,13 @@
 #define NUMBER_OF_COSTUME_TASK 10
 #define SERVICE_MANAGER_SEC 1000
 #define MATTER_STACK_SIZE 1024 * 4
+#define MQTT_STACK 30 * 1000
+
 typedef enum
 {
     GUI_Task = 0,
-    SpotifyTask,
-    MatterTask
+    MatterTask = 1,
+    MQTTTask = 2,
 } TaskEnum;
 typedef enum
 {
@@ -78,5 +80,5 @@ typedef struct
  * This function initializes the Service Manager task by allocating memory and creating the task.
  * @return void
  */
-void ServiceMangerTaskInit();
+void ServiceManger_Init();
 #endif
