@@ -48,7 +48,7 @@ typedef enum
     GUI_Task = 0,
     MatterTask = 1,
     MQTTTask = 2,
-} TaskEnum;
+} ServiceID;
 typedef enum
 {
     PSRAM_,
@@ -68,11 +68,11 @@ typedef struct
     RAM_Types ramType; // RAM type where task occupies (PSRAM or SRAM)
     uint32_t taskStack;
     uint32_t maximumRAM_Needed; // Maximum SRAM needed by any task
-} Task;
+} ServiceParams_t;
 
 typedef struct
 {
-    Task tasks[NUMBER_OF_COSTUME_TASK]; // Array of tasks (assuming a maximum of 10 tasks)
+    ServiceParams_t Services[NUMBER_OF_COSTUME_TASK]; // Array of tasks (assuming a maximum of 10 tasks)
 } ServiceManger_t;
 
 /**
@@ -81,4 +81,14 @@ typedef struct
  * @return void
  */
 void ServiceManger_Init();
+
+/* 
+    * @brief run given service.
+    * This function runs the given service by initializing the service parameters and creating the task.
+    * @param[in] serviceParams Service parameters
+    * @param[in] service Service to run
+    * @retval ESP_OK if the service is run successfully, otherwise ESP_FAIL
+*/ 
+esp_err_t ServiceManager_RunService(ServiceParams_t serviceParams, ServiceID id);
+
 #endif
