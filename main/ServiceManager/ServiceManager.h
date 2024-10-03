@@ -60,6 +60,7 @@ typedef void (*TaskKillerPtr)(TaskHandle_t *);
 typedef struct
 {
     char name[32];            // Task name
+    void *interfaceHandler;                             // Interface handler
     UBaseType_t priority;     // Priority of the task
     uint32_t startupRAM;      // Amount of RAM needed at startup time
     TaskHandle_t taskHandler; // Pointer to the task handler function
@@ -72,7 +73,8 @@ typedef struct
 
 typedef struct
 {
-    ServiceParams_t Services[NUMBER_OF_COSTUME_TASK]; // Array of tasks (assuming a maximum of 10 tasks)
+    ServiceParams_t Services[NUMBER_OF_COSTUME_TASK];   // Array of tasks (assuming a maximum of 10 tasks)
+    // uint8_t numberOfTasks;                       // Number of tasks
 } ServiceManger_t;
 
 /**
