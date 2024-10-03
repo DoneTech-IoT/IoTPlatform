@@ -13,6 +13,7 @@ typedef enum {
     TRIPLE_BIZ = 3,
 } BuzzerEffect;
 
+void BuzzerInit(int gpio_num, uint32_t freq, uint32_t duration);
 /** 
  * @brief play Buzzer with an effect
  * @param[in] effectNo effect that define in BuzzerEffect_t
