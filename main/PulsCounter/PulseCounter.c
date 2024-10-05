@@ -4,15 +4,15 @@
 
 static const char *TAG = "Pulse COunter";
 
-
 #define PCNT_GPIO_A 2                 // gpio
 #define PCNT_GLITCHE_FILTER_TIME 1000 // nano sec
 #define PCNT_COUNTING_TIME 1000       // mil sec
 #define PCNT_FREQUENCY 100
-#define PCNT_COUNT_HIGH_LIMIT 10000   // reach point
+#define PCNT_COUNT_HIGH_LIMIT 10000 // reach point
 #define PCNT_TIMER_ID 0
 
 static TimerHandle_t PulsCounterTimer;
+static pcnt_unit_handle_t pcntUnitHandler = NULL;
 static int PulseCounter = 0;
 
 void UserCallBack(bool status)
@@ -31,29 +31,25 @@ void PulseCounterStopTimer(TimerHandle_t *pulsCounterTimer)
 }
 void PulseCounterTimerCallBack(TimerHandle_t pulsCounterTimer)
 {
+    ESP_ERROR_CHECK(pcnt_unit_get_count(pcntUnitHandler, &PulseCounter));
     ESP_LOGI(TAG, "PulseCounter = %d", PulseCounter);
     if (PulseCounter > (PCNT_FREQUENCY - PCNT_FREQUENCY * 0.05) &&
         PulseCounter < (PCNT_FREQUENCY + PCNT_FREQUENCY * 0.05))
     {
         PulseCounter = 0;
-        UserCallBack(true);
+        ESP_ERROR_CHECK(pcnt_unit_clear_count(pcntUnitHandler));
         return;
     }
     PulseCounter = 0;
-    UserCallBack(false);
+    ESP_ERROR_CHECK(pcnt_unit_clear_count(pcntUnitHandler));
+    UserCallBack(true);
 }
-void PulseCounterCallBack(pcnt_unit_handle_t unit, const pcnt_watch_event_data_t *edata, void *user_ctx)
-{
-    PulseCounter++;
-}
-
 void PulseCounterUnitConfig()
 {
     static pcnt_unit_config_t pcntUnitConfig;
     pcntUnitConfig.high_limit = PCNT_COUNT_HIGH_LIMIT;
     pcntUnitConfig.low_limit = ((-1) * PCNT_COUNT_HIGH_LIMIT);
 
-    static pcnt_unit_handle_t pcntUnitHandler = NULL;
     ESP_ERROR_CHECK(pcnt_new_unit(&pcntUnitConfig, &pcntUnitHandler));
 
     static pcnt_glitch_filter_config_t pcntFilterConfig;
@@ -67,15 +63,7 @@ void PulseCounterUnitConfig()
     static pcnt_channel_handle_t pcntChanelHandler = NULL;
     ESP_ERROR_CHECK(pcnt_new_channel(pcntUnitHandler, &pcntChanelConfig, &pcntChanelHandler));
 
-    ESP_ERROR_CHECK(pcnt_channel_set_edge_action(pcntChanelHandler, PCNT_CHANNEL_EDGE_ACTION_INCREASE, PCNT_CHANNEL_EDGE_ACTION_DECREASE));
-    int watchPoints[] = {-1, 1};
-    for (size_t i = 0; i < sizeof(watchPoints) / sizeof(watchPoints[0]); i++)
-    {
-        ESP_ERROR_CHECK(pcnt_unit_add_watch_point(pcntUnitHandler, watchPoints[i]));
-    }
-    static pcnt_event_callbacks_t pcntCallBackFunction;
-    pcntCallBackFunction.on_reach = PulseCounterCallBack;
-    ESP_ERROR_CHECK(pcnt_unit_register_event_callbacks(pcntUnitHandler, &pcntCallBackFunction, NULL));
+    ESP_ERROR_CHECK(pcnt_channel_set_edge_action(pcntChanelHandler, PCNT_CHANNEL_EDGE_ACTION_INCREASE, PCNT_CHANNEL_EDGE_ACTION_HOLD));
     ESP_ERROR_CHECK(pcnt_unit_enable(pcntUnitHandler));
     ESP_ERROR_CHECK(pcnt_unit_clear_count(pcntUnitHandler));
     ESP_ERROR_CHECK(pcnt_unit_start(pcntUnitHandler));
