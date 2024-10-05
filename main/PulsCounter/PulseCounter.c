@@ -4,11 +4,12 @@
 
 static const char *TAG = "Pulse COunter";
 
-#define PCNT_COUNT_HIGH_LIMIT 10000   // reach point
+
 #define PCNT_GPIO_A 2                 // gpio
 #define PCNT_GLITCHE_FILTER_TIME 1000 // nano sec
-#define PERIOD_OF_COUNTING 1000       // mil sec
+#define PCNT_COUNTING_TIME 1000       // mil sec
 #define PCNT_FREQUENCY 100
+#define PCNT_COUNT_HIGH_LIMIT 10000   // reach point
 #define PCNT_TIMER_ID 0
 
 static TimerHandle_t PulsCounterTimer;
@@ -80,7 +81,7 @@ void PulseCounterUnitConfig()
     ESP_ERROR_CHECK(pcnt_unit_start(pcntUnitHandler));
 
     PulsCounterTimer = xTimerCreate("Pulse Counter Timer",
-                                    pdMS_TO_TICKS(PERIOD_OF_COUNTING),
+                                    pdMS_TO_TICKS(PCNT_COUNTING_TIME),
                                     pdTRUE, (void *)PCNT_TIMER_ID,
                                     PulseCounterTimerCallBack);
     if (xTimerStart(PulsCounterTimer, (TickType_t)0) != pdPASS)
