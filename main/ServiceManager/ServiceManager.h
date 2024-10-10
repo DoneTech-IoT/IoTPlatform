@@ -57,6 +57,10 @@ typedef enum
 
 typedef void (*TaskCreatorPtr)(void);
 typedef void (*TaskKillerPtr)(TaskHandle_t *);
+typedef esp_err_t (*TaskInitPtr)(void*, 
+                            TaskHandle_t *taskHandler,
+                            UBaseType_t taskPriority,
+                            uint32_t taskStack);
 typedef struct
 {
     char name[32];            // Task name
@@ -66,6 +70,7 @@ typedef struct
     TaskHandle_t taskHandler; // Pointer to the task handler function
     TaskCreatorPtr TaskCreator;
     TaskKillerPtr TaskKiller;
+    TaskInitPtr TaskInit;
     RAM_Types ramType; // RAM type where task occupies (PSRAM or SRAM)
     uint32_t taskStack;
     uint32_t maximumRAM_Needed; // Maximum SRAM needed by any task
@@ -91,6 +96,5 @@ void ServiceManger_Init();
     * @param[in] service Service to run
     * @retval ESP_OK if the service is run successfully, otherwise ESP_FAIL
 */ 
-esp_err_t ServiceManager_RunService(ServiceParams_t serviceParams, ServiceID id);
-
+esp_err_t ServiceManager_RunService(ServiceParams_t serviceParams);
 #endif

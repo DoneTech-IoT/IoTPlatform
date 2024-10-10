@@ -9,7 +9,6 @@ MatterInterfaceHandler_t MatterInterfaceHandler;
 static QueueHandle_t MatterBufQueue;
 static SemaphoreHandle_t MatterSemaphore = NULL;
 static TaskHandle_t MatterHandle = NULL;
-static UBaseType_t MatterPriority = tskIDLE_PRIORITY + 1;
 #endif  //CONFIG_DONE_COMPONENT_MATTER
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
@@ -18,7 +17,6 @@ static QueueHandle_t MQTTDataFromBrokerQueue;
 static SemaphoreHandle_t MQTTConnectedSemaphore;
 static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
 static TaskHandle_t MQTTHandle = NULL;
-static UBaseType_t MQTTPriority = tskIDLE_PRIORITY + 1;
 
 #endif  //CONFIG_DONE_COMPONENT_MQTT
 
@@ -88,53 +86,21 @@ void ServiceManger_Init()
     * @param[in] id Service to run
     * @retval ESP_OK if the service is run successfully, otherwise ESP_FAIL
 */ 
-esp_err_t ServiceManager_RunService(ServiceParams_t serviceParams, ServiceID id)
+esp_err_t ServiceManager_RunService(ServiceParams_t serviceParams)
 {
     esp_err_t err = ESP_OK;
-    ServiceManger.Services[id] = serviceParams;
-    // ServiceManger.numberOfTasks++;
-    
-    switch (id)
-    {
-        case GUI_Task:
-            GUI_TaskInit(&ServiceManger.Services[id].taskHandler, 
-                         ServiceManger.Services[id].priority, 
-                         ServiceManger.Services[id].taskStack);
-            ESP_LOGI(TAG, "GUI Created !");
-            vTaskDelay(SERVICE_MANAGER_SEC * 1);
-            break;
 
-        case MatterTask:
-            err = Matter_TaskInit((MatterInterfaceHandler_t*)ServiceManger.Services[id].interfaceHandler, 
-                                   &ServiceManger.Services[id].taskHandler, 
-                                   ServiceManger.Services[id].priority, 
-                                   ServiceManger.Services[id].taskStack);  
-            if (err)
-            {
-                ESP_LOGE(TAG, "Failed to create Matter !");
-                return err;
-            }      
-            ESP_LOGI(TAG, "Matter interface called !");
-            vTaskDelay(SERVICE_MANAGER_SEC * 1);
-            break;
-
-        case MQTTTask:            
-            err = MQTT_TaskInit((MQTT_InterfaceHandler_t*)ServiceManger.Services[id].interfaceHandler, 
-                                 &ServiceManger.Services[id].taskHandler, 
-                                 ServiceManger.Services[id].priority, 
-                                 ServiceManger.Services[id].taskStack); 
-            if (err)
-            {
-                ESP_LOGE(TAG, "Failed to create MQTT !");
-                return err;
-            }
-                ESP_LOGI(TAG, "MQTT interface called !");
-            vTaskDelay(SERVICE_MANAGER_SEC * 1);
-            break;
-        default:
-            break;
-
+    // Call the function pointer (init_func) with proper arguments
+    TaskInitPtr init_func = serviceParams.TaskInit;
+    err = init_func(serviceParams.interfaceHandler, 
+                    &serviceParams.taskHandler, 
+                    serviceParams.priority, 
+                    serviceParams.taskStack);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Failed to create MQTT!");
+        return err;
     }
+
     return ESP_OK;
 }
 
@@ -146,10 +112,7 @@ esp_err_t ServiceManager_RunService(ServiceParams_t serviceParams, ServiceID id)
  */
 void ServiceMangerTask(void *pvParameter)
 {
-#ifdef CONFIG_DONE_COMPONENT_MQTT
     esp_err_t err;
-
-
     nvsFlashInit();
     
     if (SharedBusInit())
@@ -167,9 +130,10 @@ void ServiceMangerTask(void *pvParameter)
     GUIParams.ramType = PSRAM_;
     GUIParams.TaskKiller = GUI_TaskKill;
     GUIParams.taskStack = LVGL_STACK;
-    GUIParams.priority = tskIDLE_PRIORITY + 1;
+    GUIParams.priority = tskIDLE_PRIORITY + 3;
     GUIParams.taskHandler = NULL;
-    err = ServiceManager_RunService(GUIParams, GUI_Task);
+    GUIParams.TaskInit = GUI_TaskInit;
+    err = ServiceManager_RunService(GUIParams);
     if (err)
     {
         ESP_LOGI(TAG, "GUI Created !");
@@ -178,7 +142,7 @@ void ServiceMangerTask(void *pvParameter)
     {
         ESP_LOGE(TAG, "Failed to create GUI!");
     }
-#endif
+    vTaskDelay(pdMS_TO_TICKS(500));
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
     // Config and Run Matter
@@ -195,7 +159,8 @@ void ServiceMangerTask(void *pvParameter)
     MatterParams.taskStack = MATTER_STACK_SIZE;
     MatterParams.priority = tskIDLE_PRIORITY + 1;
     MatterParams.taskHandler = MatterHandle;
-    err = ServiceManager_RunService(MatterParams, MatterTask);
+    MatterParams.TaskInit = Matter_TaskInit;
+    err = ServiceManager_RunService(MatterParams);
     if (err)
     {
         ESP_LOGE(TAG, "Failed to create Matter !");
@@ -205,6 +170,8 @@ void ServiceMangerTask(void *pvParameter)
         ESP_LOGI(TAG, "Matter Created !");
     }
 #endif
+
+    vTaskDelay(pdMS_TO_TICKS(500));
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
     // Config and Run MQTT
@@ -221,7 +188,8 @@ void ServiceMangerTask(void *pvParameter)
     MQTTParams.taskStack = MQTT_STACK;
     MQTTParams.priority = tskIDLE_PRIORITY + 2;
     MQTTParams.taskHandler = MQTTHandle;
-    err = ServiceManager_RunService (MQTTParams, MQTTTask);
+    MQTTParams.TaskInit = MQTT_TaskInit;
+    err = ServiceManager_RunService (MQTTParams);
     if (!err)
     {
         ESP_LOGI(TAG, "MQTT Created !");
