@@ -169,11 +169,11 @@ void ServiceMangerInit()
 #endif
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT_DEFAULT
-    MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
-    MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
-    MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
-    MQTT_TaskInit(&MQTT_InterfaceHandler); 
-    vTaskDelay(pdMS_TO_TICKS(100));
+    // MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
+    // MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
+    // MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
+    // MQTT_TaskInit(&MQTT_InterfaceHandler); 
+    // vTaskDelay(pdMS_TO_TICKS(100));
     MQTT_Start();
 #endif
 }
@@ -187,7 +187,7 @@ void ServiceMangerInit()
 void ServiceMangerTask(void *pvParameter)
 {
     ServiceMangerInit();
-    CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
+    // CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
     char pcTaskList[TASK_LIST_BUFFER_SIZE];
     while (true)
     {
