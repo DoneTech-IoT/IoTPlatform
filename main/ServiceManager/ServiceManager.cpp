@@ -136,11 +136,12 @@ void ServiceMangerTask(void *pvParameter)
     err = ServiceManager_RunService(GUIParams);
     if (err)
     {
-        ESP_LOGI(TAG, "GUI Created !");
+        ESP_LOGE(TAG, "Failed to create GUI!");
+        
     }
     else
     {
-        ESP_LOGE(TAG, "Failed to create GUI!");
+        ESP_LOGI(TAG, "GUI Created !");        
     }
     vTaskDelay(pdMS_TO_TICKS(500));
 
