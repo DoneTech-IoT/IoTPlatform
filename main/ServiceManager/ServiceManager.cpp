@@ -172,7 +172,7 @@ void ServiceMangerTask(void *pvParameter)
     }
 #endif
 
-    vTaskDelay(pdMS_TO_TICKS(500));
+    vTaskDelay(pdMS_TO_TICKS(100));
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
     // Config and Run MQTT
@@ -187,15 +187,16 @@ void ServiceMangerTask(void *pvParameter)
     MQTTParams.ramType = SRAM_;
     MQTTParams.TaskKiller = MQTT_TaskKill;
     MQTTParams.taskStack = MQTT_STACK;
-    MQTTParams.priority = tskIDLE_PRIORITY + 2;
+    MQTTParams.priority = tskIDLE_PRIORITY + 1;
     MQTTParams.taskHandler = MQTTHandle;
     MQTTParams.TaskInit = MQTT_TaskInit;
     err = ServiceManager_RunService (MQTTParams);
     if (!err)
     {
         ESP_LOGI(TAG, "MQTT Created !");
-        vTaskDelay(pdMS_TO_TICKS(500));
+        vTaskDelay(pdMS_TO_TICKS(100));
         MQTT_Start();
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
     else
     {
@@ -204,7 +205,7 @@ void ServiceMangerTask(void *pvParameter)
 #endif  //CONFIG_DONE_COMPONENT_MQTT
 
     CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
-    char pcTaskList[TASK_LIST_BUFFER_SIZE];
+    // char pcTaskList[TASK_LIST_BUFFER_SIZE];
     while (true)
     {
 #ifdef MONITORING
