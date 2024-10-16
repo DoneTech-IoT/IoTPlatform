@@ -131,7 +131,7 @@ void ServiceMangerTask(void *pvParameter)
     GUIParams.ramType = PSRAM_;
     GUIParams.TaskKiller = GUI_TaskKill;
     GUIParams.taskStack = LVGL_STACK;
-    GUIParams.priority = tskIDLE_PRIORITY + 3;
+    GUIParams.priority = tskIDLE_PRIORITY + 1;
     GUIParams.taskHandler = NULL;
     GUIParams.TaskInit = GUI_TaskInit;
     err = ServiceManager_RunService(GUIParams);
@@ -198,9 +198,9 @@ void ServiceMangerTask(void *pvParameter)
     else
     {
         ESP_LOGI(TAG, "MQTT Created !");
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(500));
         MQTT_Start();
-        vTaskDelay(pdMS_TO_TICKS(100));   
+        vTaskDelay(pdMS_TO_TICKS(500));   
     }
 #endif  //CONFIG_DONE_COMPONENT_MQTT
 
