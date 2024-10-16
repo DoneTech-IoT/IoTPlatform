@@ -96,7 +96,8 @@ esp_err_t ServiceManager_RunService(ServiceParams_t serviceParams)
                     &serviceParams.taskHandler, 
                     serviceParams.priority, 
                     serviceParams.taskStack);
-    if (err != ESP_OK) {
+    if (err != ESP_OK) 
+    {
         ESP_LOGE(TAG, "Failed to create MQTT!");
         return err;
     }
@@ -137,7 +138,6 @@ void ServiceMangerTask(void *pvParameter)
     if (err)
     {
         ESP_LOGE(TAG, "Failed to create GUI!");
-        
     }
     else
     {
@@ -191,16 +191,16 @@ void ServiceMangerTask(void *pvParameter)
     MQTTParams.taskHandler = MQTTHandle;
     MQTTParams.TaskInit = MQTT_TaskInit;
     err = ServiceManager_RunService (MQTTParams);
-    if (!err)
+    if (err)
+    {
+        ESP_LOGE(TAG, "Failed to create MQTT !");
+    }
+    else
     {
         ESP_LOGI(TAG, "MQTT Created !");
         vTaskDelay(pdMS_TO_TICKS(100));
         MQTT_Start();
-        vTaskDelay(pdMS_TO_TICKS(100));
-    }
-    else
-    {
-        ESP_LOGE(TAG, "Failed to create MQTT !");
+        vTaskDelay(pdMS_TO_TICKS(100));   
     }
 #endif  //CONFIG_DONE_COMPONENT_MQTT
 
