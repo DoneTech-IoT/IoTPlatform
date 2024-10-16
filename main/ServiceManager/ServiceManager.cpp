@@ -5,22 +5,20 @@
 static const char *TAG = "Service_Manager";
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
-QueueHandle_t MatterBufQueue;
-SemaphoreHandle_t MatterSemaphore = NULL;
 MatterInterfaceHandler_t MatterInterfaceHandler;
-TaskHandle_t MatterHandle = NULL;
-UBaseType_t MatterPriority = tskIDLE_PRIORITY + 1;
-#endif
+static QueueHandle_t MatterBufQueue;
+static SemaphoreHandle_t MatterSemaphore = NULL;
+static TaskHandle_t MatterHandle = NULL;
+#endif  //CONFIG_DONE_COMPONENT_MATTER
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
-// Structure holding MQTT interface configurations and state
-    MQTT_InterfaceHandler_t MQTT_InterfaceHandler;
-
-
+MQTT_InterfaceHandler_t MQTT_InterfaceHandler;
 static QueueHandle_t MQTTDataFromBrokerQueue;
 static SemaphoreHandle_t MQTTConnectedSemaphore;
 static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
-#endif
+static TaskHandle_t MQTTHandle = NULL;
+
+#endif  //CONFIG_DONE_COMPONENT_MQTT
 
 #define TASK_LIST_BUFFER_SIZE 512
 // #define MONITORING
@@ -31,10 +29,6 @@ static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
  * @return void
  */
 void ServiceMangerTask(void *pvParameter);
-
-// Static variables for Service Manager task
-StaticTask_t *xTaskServiceMangerBuffer;
-StackType_t *xServiceMangerStack;
 
 // Global instance of Service Manager
 ServiceManger_t ServiceManger;
@@ -52,42 +46,6 @@ void MatterAttributeUpdateCBMain(callback_type_t type,
     printf("val: %p\n", val);
     printf("priv_data: %pGlobalInitGlobalInitGlobalInit\n", priv_data);
 }
-
-void MatterNetworkConnected()
-{
-    ESP_LOGI(TAG, "Matter Network Connected\n");
-}
-void MatterServiceRunner()
-{
-    MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
-    MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
-    MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
-    MatterInterfaceHandler.ConnectToMatterNetwork = MatterNetworkConnected;
-    Matter_TaskInit(&MatterInterfaceHandler, 
-                    &MatterHandle,
-                    MatterPriority,
-                    MATTER_STACK_SIZE);
-}
-#endif
-#ifdef CONFIG_DONE_COMPONENT_LVGL
-/**
- * @brief Creates the GUI task.
- * This function configures and creates the GUI task.
- * @return void
- */
-void GUI_TaskCreator()
-{
-    ServiceManger.tasks[GUI_Task].maximumRAM_Needed = LVGL_STACK * 2;
-    strcpy(ServiceManger.tasks[GUI_Task].name, "GUI");
-    ServiceManger.tasks[GUI_Task].ramType = PSRAM_;
-    ServiceManger.tasks[GUI_Task].startupRAM = GUI_Task;
-    ServiceManger.tasks[GUI_Task].TaskCreator = GUI_TaskCreator;
-    ServiceManger.tasks[GUI_Task].TaskKiller = GUI_TaskKill;
-    ServiceManger.tasks[GUI_Task].taskStack = LVGL_STACK;
-    ServiceManger.tasks[GUI_Task].priority = tskIDLE_PRIORITY + 1;
-    ServiceManger.tasks[GUI_Task].taskHandler = NULL;
-    GUI_TaskInit(&ServiceManger.tasks[GUI_Task].taskHandler, ServiceManger.tasks[GUI_Task].priority, ServiceManger.tasks[GUI_Task].taskStack);
-}
 #endif
 
 /**
@@ -98,18 +56,8 @@ void GUI_TaskCreator()
  */
 void TaskKiller(int TaskNumber)
 {
-    ServiceManger.tasks[TaskNumber].TaskKiller(&ServiceManger.tasks[TaskNumber].taskHandler);
+    ServiceManger.Services[TaskNumber].TaskKiller(&ServiceManger.Services[TaskNumber].taskHandler);
     ESP_LOGI(TAG, "Task %d Deleted !", TaskNumber);
-}
-
-/**
- * @brief Creates the Spotify task.
- * This function configures and creates the Spotify task.
- * @return void
- */
-void SpotifyTaskCreator()
-{
-    ESP_LOGI(TAG, "TO DO");
 }
 
 /**
@@ -117,10 +65,10 @@ void SpotifyTaskCreator()
  * This function initializes the Service Manager task by allocating memory and creating the task.
  * @return void
  */
-void ServiceMangerTaskInit()
+void ServiceManger_Init()
 {
-    xTaskServiceMangerBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
-    xServiceMangerStack = (StackType_t *)malloc(SERVICE_MANGER_STACK * sizeof(StackType_t));
+    StaticTask_t *xTaskServiceMangerBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
+    StackType_t *xServiceMangerStack = (StackType_t *)malloc(SERVICE_MANGER_STACK * sizeof(StackType_t));
     xTaskCreateStatic(
         ServiceMangerTask,         // Task function
         "ServiceMangerTask",       // Task name (for debugging)
@@ -131,51 +79,30 @@ void ServiceMangerTaskInit()
         xTaskServiceMangerBuffer); // Task control block
 }
 
-/**
- * @brief Initializes the Service Manager.
- * This function initializes the Service Manager by creating necessary tasks.
- * @return void
- */
-void ServiceMangerInit()
+/* 
+    * @brief run given service.
+    * This function runs the given service by initializing the service parameters and creating the task.
+    * @param[in] serviceParams Service parameters
+    * @param[in] id Service to run
+    * @retval ESP_OK if the service is run successfully, otherwise ESP_FAIL
+*/ 
+esp_err_t ServiceManager_RunService(ServiceParams_t serviceParams)
 {
-    nvsFlashInit();
+    esp_err_t err = ESP_OK;
 
-    if (SharedBusInit())
+    // Call the function pointer (init_func) with proper arguments
+    TaskInitPtr init_func = serviceParams.TaskInit;
+    err = init_func(serviceParams.interfaceHandler, 
+                    &serviceParams.taskHandler, 
+                    serviceParams.priority, 
+                    serviceParams.taskStack);
+    if (err != ESP_OK) 
     {
-        ESP_LOGI(TAG, "initialized SharedBus successfully");
-    }
-    else
-    {
-        ESP_LOGE(TAG, "Failed to Initialize SharedBus.");
+        ESP_LOGE(TAG, "Failed to create MQTT!");
+        return err;
     }
 
-#ifdef CONFIG_DONE_COMPONENT_LVGL
-    GUI_TaskCreator();
-    ESP_LOGI(TAG, "GUI Created !");
-    vTaskDelay(SERVICE_MANAGER_SEC * 4);
-#endif
-#ifdef CONFIG_DONE_COMPONENT_SPOTIFY
-    SpotifyTaskCreator();
-    ESP_LOGI(TAG, "Spotify Created !");
-#endif
-#ifdef CONFIG_DONE_COMPONENT_MATTER
-    MatterServiceRunner();
-    ESP_LOGI(TAG, "Matter interface called !");
-#else
-    ESP_LOGE(TAG, "connect to wifi");
-    ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
-    ESP_ERROR_CHECK(example_connect());
-#endif
-
-#ifdef CONFIG_DONE_COMPONENT_MQTT_DEFAULT
-    // MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
-    // MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
-    // MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
-    // MQTT_TaskInit(&MQTT_InterfaceHandler); 
-    // vTaskDelay(pdMS_TO_TICKS(100));
-    MQTT_Start();
-#endif
+    return ESP_OK;
 }
 
 /**
@@ -186,9 +113,99 @@ void ServiceMangerInit()
  */
 void ServiceMangerTask(void *pvParameter)
 {
-    ServiceMangerInit();
-    // CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
-    char pcTaskList[TASK_LIST_BUFFER_SIZE];
+    esp_err_t err;
+    nvsFlashInit();
+    
+    if (SharedBusInit())
+    {
+        ESP_LOGI(TAG, "initialized SharedBus successfully");
+    }
+    else
+    {
+        ESP_LOGE(TAG, "Failed to Initialize SharedBus.");
+    }
+
+    ServiceParams_t GUIParams;
+    GUIParams.maximumRAM_Needed = LVGL_STACK * 2;
+    strcpy(GUIParams.name, "GUI");
+    GUIParams.ramType = PSRAM_;
+    GUIParams.TaskKiller = GUI_TaskKill;
+    GUIParams.taskStack = LVGL_STACK;
+    GUIParams.priority = tskIDLE_PRIORITY + 1;
+    GUIParams.taskHandler = NULL;
+    GUIParams.TaskInit = GUI_TaskInit;
+    err = ServiceManager_RunService(GUIParams);
+    if (err)
+    {
+        ESP_LOGE(TAG, "Failed to create GUI!");
+    }
+    else
+    {
+        ESP_LOGI(TAG, "GUI Created !");        
+    }
+    vTaskDelay(pdMS_TO_TICKS(500));
+
+#ifdef CONFIG_DONE_COMPONENT_MATTER
+    // Config and Run Matter
+    MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
+    MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
+    MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
+    
+    ServiceParams_t MatterParams;
+    strcpy(MatterParams.name, "Matter");
+    MatterParams.interfaceHandler = &MatterInterfaceHandler;
+    MatterParams.maximumRAM_Needed = 0;
+    MatterParams.ramType = SRAM_;
+    MatterParams.TaskKiller = Matter_TaskKill;
+    MatterParams.taskStack = MATTER_STACK_SIZE;
+    MatterParams.priority = tskIDLE_PRIORITY + 1;
+    MatterParams.taskHandler = MatterHandle;
+    MatterParams.TaskInit = Matter_TaskInit;
+    err = ServiceManager_RunService(MatterParams);
+    if (err)
+    {
+        ESP_LOGE(TAG, "Failed to create Matter !");
+    }
+    else 
+    {
+        ESP_LOGI(TAG, "Matter Created !");
+    }
+#endif
+
+    vTaskDelay(pdMS_TO_TICKS(100));
+
+#ifdef CONFIG_DONE_COMPONENT_MQTT
+    // Config and Run MQTT
+    MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
+    MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
+    MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
+
+    ServiceParams_t MQTTParams;
+    strcpy(MQTTParams.name, "MQTT");
+    MQTTParams.maximumRAM_Needed = 0;
+    MQTTParams.interfaceHandler = &MQTT_InterfaceHandler;
+    MQTTParams.ramType = SRAM_;
+    MQTTParams.TaskKiller = MQTT_TaskKill;
+    MQTTParams.taskStack = MQTT_STACK;
+    MQTTParams.priority = tskIDLE_PRIORITY + 1;
+    MQTTParams.taskHandler = MQTTHandle;
+    MQTTParams.TaskInit = MQTT_TaskInit;
+    err = ServiceManager_RunService (MQTTParams);
+    if (err)
+    {
+        ESP_LOGE(TAG, "Failed to create MQTT !");
+    }
+    else
+    {
+        ESP_LOGI(TAG, "MQTT Created !");
+        vTaskDelay(pdMS_TO_TICKS(500));
+        MQTT_Start();
+        vTaskDelay(pdMS_TO_TICKS(500));   
+    }
+#endif  //CONFIG_DONE_COMPONENT_MQTT
+
+    CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
+    // char pcTaskList[TASK_LIST_BUFFER_SIZE];
     while (true)
     {
 #ifdef MONITORING

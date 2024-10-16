@@ -36,17 +36,19 @@
 #include "MQTT_Interface.h"
 #endif
 
-#define LVGL_STACK 100 * 1000 // in word not byte
-#define SERVICE_MANGER_STACK 30 * 1000
+
+#define LVGL_STACK 100 * 1024 // in word not byte
+#define SERVICE_MANGER_STACK 30 * 1024
 #define NUMBER_OF_COSTUME_TASK 10
-#define SERVICE_MANAGER_SEC 1000
-#define MATTER_STACK_SIZE 1024 * 4
+#define MATTER_STACK_SIZE 4 * 1024
+#define MQTT_STACK 30 * 1024
+
 typedef enum
 {
     GUI_Task = 0,
-    SpotifyTask,
-    MatterTask
-} TaskEnum;
+    MatterTask = 1,
+    MQTTTask = 2,
+} ServiceID;
 typedef enum
 {
     PSRAM_,
@@ -55,22 +57,29 @@ typedef enum
 
 typedef void (*TaskCreatorPtr)(void);
 typedef void (*TaskKillerPtr)(TaskHandle_t *);
+typedef esp_err_t (*TaskInitPtr)(void*, 
+                            TaskHandle_t *taskHandler,
+                            UBaseType_t taskPriority,
+                            uint32_t taskStack);
 typedef struct
 {
     char name[32];            // Task name
+    void *interfaceHandler;                             // Interface handler
     UBaseType_t priority;     // Priority of the task
     uint32_t startupRAM;      // Amount of RAM needed at startup time
     TaskHandle_t taskHandler; // Pointer to the task handler function
     TaskCreatorPtr TaskCreator;
     TaskKillerPtr TaskKiller;
+    TaskInitPtr TaskInit;
     RAM_Types ramType; // RAM type where task occupies (PSRAM or SRAM)
     uint32_t taskStack;
     uint32_t maximumRAM_Needed; // Maximum SRAM needed by any task
-} Task;
+} ServiceParams_t;
 
 typedef struct
 {
-    Task tasks[NUMBER_OF_COSTUME_TASK]; // Array of tasks (assuming a maximum of 10 tasks)
+    ServiceParams_t Services[NUMBER_OF_COSTUME_TASK];   // Array of tasks (assuming a maximum of 10 tasks)
+    // uint8_t numberOfTasks;                       // Number of tasks
 } ServiceManger_t;
 
 /**
@@ -78,5 +87,14 @@ typedef struct
  * This function initializes the Service Manager task by allocating memory and creating the task.
  * @return void
  */
-void ServiceMangerTaskInit();
+void ServiceManger_Init();
+
+/* 
+    * @brief run given service.
+    * This function runs the given service by initializing the service parameters and creating the task.
+    * @param[in] serviceParams Service parameters
+    * @param[in] service Service to run
+    * @retval ESP_OK if the service is run successfully, otherwise ESP_FAIL
+*/ 
+esp_err_t ServiceManager_RunService(ServiceParams_t serviceParams);
 #endif

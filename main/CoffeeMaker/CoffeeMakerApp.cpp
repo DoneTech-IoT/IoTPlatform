@@ -228,7 +228,7 @@ void CoffeeMakerApplication(
         if (xSemaphoreTake(*MQTTErrorOrDisconnectSemaphore,
                            pdMS_TO_TICKS(COFFEE_MAKER_APP_SEC)) == pdTRUE)
         {
-            ESP_LOGE(TAG, "we lose Mqtt");
+            ESP_LOGE(TAG, "MQTT connection lost");
             break;
         }
         if (xQueueReceive(*MQTTDataFromBrokerQueue,
