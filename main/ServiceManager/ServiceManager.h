@@ -19,9 +19,6 @@
 
 #include "NetworkChecker.h"
 #include "nvsFlash.h"
-#ifdef CONFIG_DONE_COMPONENT_LVGL
-#include "GUI.h"
-#endif
 #ifdef CONFIG_DONE_COMPONENT_MATTER
 #include "MatterInterface.h"
 #else
