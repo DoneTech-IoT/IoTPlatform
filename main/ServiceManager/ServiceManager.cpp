@@ -1,6 +1,7 @@
 #include "ServiceManager.h"
 #include "CoffeeMakerApp.hpp"
 #include "SharedBus.h"
+#include "GUI.h"
 
 static const char *TAG = "Service_Manager";
 
