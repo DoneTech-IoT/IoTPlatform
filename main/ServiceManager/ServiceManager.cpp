@@ -144,7 +144,7 @@ void ServiceMangerTask(void *pvParameter)
     {
         ESP_LOGI(TAG, "GUI Created !");        
     }
-    vTaskDelay(pdMS_TO_TICKS(500));
+    vTaskDelay(pdMS_TO_TICKS(1000));
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
     // Config and Run Matter
