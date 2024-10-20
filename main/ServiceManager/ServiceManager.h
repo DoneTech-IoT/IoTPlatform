@@ -37,7 +37,7 @@
 #define LVGL_STACK 100 * 1024 // in word not byte
 #define SERVICE_MANGER_STACK 30 * 1024
 #define NUMBER_OF_COSTUME_TASK 10
-#define MATTER_STACK_SIZE 4 * 1024
+#define MATTER_STACK_SIZE 30 * 1024
 #define MQTT_STACK 30 * 1024
 
 typedef enum
