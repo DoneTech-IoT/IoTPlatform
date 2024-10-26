@@ -7,8 +7,6 @@ static const char *TAG = "Service_Manager";
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
 MatterInterfaceHandler_t MatterInterfaceHandler;
-static QueueHandle_t MatterBufQueue;
-static SemaphoreHandle_t MatterSemaphore = NULL;
 static TaskHandle_t MatterHandle = NULL;
 #endif  //CONFIG_DONE_COMPONENT_MATTER
 
@@ -33,21 +31,6 @@ void ServiceMangerTask(void *pvParameter);
 
 // Global instance of Service Manager
 ServiceManger_t ServiceManger;
-
-#ifdef CONFIG_DONE_COMPONENT_MATTER
-void MatterAttributeUpdateCBMain(callback_type_t type,
-                                 uint16_t endpoint_id, uint32_t cluster_id,
-                                 uint32_t attribute_id, esp_matter_attr_val_t *val,
-                                 void *priv_data)
-{
-    printf("callback_type_t: %u\n", type);
-    printf("endpoint_id: %u\n", endpoint_id);
-    printf("cluster_id: %lu\n", cluster_id);
-    printf("attribute_id: %lu\n", attribute_id);
-    printf("val: %p\n", val);
-    printf("priv_data: %pGlobalInitGlobalInitGlobalInit\n", priv_data);
-}
-#endif
 
 /**
  * @brief Deletes a task.
@@ -147,11 +130,7 @@ void ServiceMangerTask(void *pvParameter)
     vTaskDelay(pdMS_TO_TICKS(1000));
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
-    // Config and Run Matter
-    MatterInterfaceHandler.SharedBufQueue = &MatterBufQueue;
-    MatterInterfaceHandler.SharedSemaphore = &MatterSemaphore;
-    MatterInterfaceHandler.MatterAttributeUpdateCB = MatterAttributeUpdateCBMain;
-    
+    // Config and Run Matter        
     ServiceParams_t MatterParams;
     strcpy(MatterParams.name, "Matter");
     MatterParams.interfaceHandler = &MatterInterfaceHandler;
