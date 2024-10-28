@@ -152,7 +152,7 @@ void ServiceMangerTask(void *pvParameter)
     }
 #endif
 
-    vTaskDelay(pdMS_TO_TICKS(100));
+    vTaskDelay(pdMS_TO_TICKS(1000));
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
     // Config and Run MQTT
