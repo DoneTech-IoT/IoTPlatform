@@ -154,40 +154,55 @@ void ServiceMangerTask(void *pvParameter)
 
     vTaskDelay(pdMS_TO_TICKS(1000));
 
-#ifdef CONFIG_DONE_COMPONENT_MQTT
-    // Config and Run MQTT
-    MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
-    MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
-    MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
 
-    ServiceParams_t MQTTParams;
-    strcpy(MQTTParams.name, "MQTT");
-    MQTTParams.maximumRAM_Needed = 0;
-    MQTTParams.interfaceHandler = &MQTT_InterfaceHandler;
-    MQTTParams.ramType = SRAM_;
-    MQTTParams.TaskKiller = MQTT_TaskKill;
-    MQTTParams.taskStack = MQTT_STACK;
-    MQTTParams.priority = tskIDLE_PRIORITY + 1;
-    MQTTParams.taskHandler = MQTTHandle;
-    MQTTParams.TaskInit = MQTT_TaskInit;
-    err = ServiceManager_RunService (MQTTParams);
-    if (err)
-    {
-        ESP_LOGE(TAG, "Failed to create MQTT !");
-    }
-    else
-    {
-        ESP_LOGI(TAG, "MQTT Created !");
-        vTaskDelay(pdMS_TO_TICKS(500));
-        MQTT_Start();
-        vTaskDelay(pdMS_TO_TICKS(500));   
-    }
-#endif  //CONFIG_DONE_COMPONENT_MQTT
 
     CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
     // char pcTaskList[TASK_LIST_BUFFER_SIZE];
     while (true)
     {
+        if(SharedBusRecieve(&SharedBusPacket, SERVICE_MANAGER_INTERFACE_ID))
+        {
+            ESP_LOGE(TAG, "Packet reveived.");
+            switch (SharedBusPacket.PacketID)
+            {
+            case MATTER_EVENT_PACKET_ID:
+            //TODO convaert shared packet to event struct/ if ip changed then start mqtt
+
+#ifdef CONFIG_DONE_COMPONENT_MQTT
+            // Config and Run MQTT
+            MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
+            MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
+            MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
+
+            ServiceParams_t MQTTParams;
+            strcpy(MQTTParams.name, "MQTT");
+            MQTTParams.maximumRAM_Needed = 0;
+            MQTTParams.interfaceHandler = &MQTT_InterfaceHandler;
+            MQTTParams.ramType = SRAM_;
+            MQTTParams.TaskKiller = MQTT_TaskKill;
+            MQTTParams.taskStack = MQTT_STACK;
+            MQTTParams.priority = tskIDLE_PRIORITY + 1;
+            MQTTParams.taskHandler = MQTTHandle;
+            MQTTParams.TaskInit = MQTT_TaskInit;
+            err = ServiceManager_RunService (MQTTParams);
+            if (err)
+            {
+                ESP_LOGE(TAG, "Failed to create MQTT !");
+            }
+            else
+            {
+            ESP_LOGI(TAG, "MQTT Created !");
+            vTaskDelay(pdMS_TO_TICKS(500));
+            MQTT_Start();
+            vTaskDelay(pdMS_TO_TICKS(500));   
+            }
+#endif  //CONFIG_DONE_COMPONENT_MQTT
+            break;
+            
+            default:
+                break;
+            }
+        }
 #ifdef MONITORING
 // vTaskList(pcTaskList);
 // ESP_LOGI(TAG, "Task List:\n%s\n", pcTaskList);
