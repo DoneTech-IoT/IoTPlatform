@@ -7,10 +7,11 @@ extern "C"
 #endif
 
 #include "CoffeeMakerInfo.h"
+#include "MatterEventInfo.h"
 
 typedef enum {
-    COFFEE_MAKER_PACKET_ID = 1
-
+    COFFEE_MAKER_PACKET_ID = 1,
+    MATTER_EVENT_PACKET_ID = 2,
 } PacketIDs;
 
 #ifdef __cplusplus
