@@ -17,6 +17,7 @@ typedef enum {
     MATTER_INTERFACE_ID = 2,
     MQTT_INTERFACE_ID = 3,  
     LOG_INTERFACE_ID = 4,
+    SERVICE_MANAGER_INTERFACE_ID = 5,
 } TaskInterfaceID_t;
 
 typedef struct {
