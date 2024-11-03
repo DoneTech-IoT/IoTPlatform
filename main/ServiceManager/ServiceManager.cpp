@@ -171,7 +171,7 @@ void ServiceMangerTask(void *pvParameter)
             case MATTER_EVENT_PACKET_ID:
             //TODO convaert shared packet to event struct/ if ip changed then start mqtt
             MatterEventPacketToSend = (MatterEventPacket*) SharedBusPacket.data;
-            if(MatterEventPacketToSend.PublicEventTypes = kInterfaceIpAddressChanged)
+            if(MatterEventPacketToSend->PublicEventTypes == kInterfaceIpAddressChanged)
             {
 #ifdef CONFIG_DONE_COMPONENT_MQTT
                 // Config and Run MQTT
