@@ -12,7 +12,7 @@ extern "C"
 
 typedef struct
 {
-    char Topic[TOPIC_LEN];
+    char CoreTopic[TOPIC_LEN];
     char CoreRawData[MQTT_RAW_DATA_LEN];
 } MqttPacket;
 
