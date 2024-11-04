@@ -6,6 +6,7 @@ extern "C"
 {
 #endif
 
+#define MQTT_RAW_DATA_LEN 2500
 
 typedef struct
 {
