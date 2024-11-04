@@ -7,6 +7,10 @@ extern "C"
 #endif
 
 
+typedef struct
+{
+    char CoreRawData[MQTT_RAW_DATA_LEN];
+} MqttPacket;
 
 #ifdef __cplusplus
 }
