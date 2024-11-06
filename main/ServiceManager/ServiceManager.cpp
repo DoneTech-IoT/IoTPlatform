@@ -1,5 +1,4 @@
 #include "ServiceManager.h"
-#include "CoffeeMakerApp.hpp"
 #include "SharedBus.h"
 #include "GUI.h"
 
@@ -158,7 +157,7 @@ void ServiceMangerTask(void *pvParameter)
     // Config and Run MQTT
     MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
     MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
-    MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
+    //MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
 
     ServiceParams_t MQTTParams;
     strcpy(MQTTParams.name, "MQTT");
@@ -184,7 +183,6 @@ void ServiceMangerTask(void *pvParameter)
     }
 #endif  //CONFIG_DONE_COMPONENT_MQTT
 
-    CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
     // char pcTaskList[TASK_LIST_BUFFER_SIZE];
     while (true)
     {
