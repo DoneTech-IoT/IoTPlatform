@@ -10,10 +10,6 @@ static TaskHandle_t MatterHandle = NULL;
 #endif  //CONFIG_DONE_COMPONENT_MATTER
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
-MQTT_InterfaceHandler_t MQTT_InterfaceHandler;
-static QueueHandle_t MQTTDataFromBrokerQueue;
-static SemaphoreHandle_t MQTTConnectedSemaphore;
-static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
 static TaskHandle_t MQTTHandle = NULL;
 
 #endif  //CONFIG_DONE_COMPONENT_MQTT
@@ -155,14 +151,11 @@ void ServiceMangerTask(void *pvParameter)
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
     // Config and Run MQTT
-    MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
-    MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
-    //MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
 
     ServiceParams_t MQTTParams;
     strcpy(MQTTParams.name, "MQTT");
     MQTTParams.maximumRAM_Needed = 0;
-    MQTTParams.interfaceHandler = &MQTT_InterfaceHandler;
+    MQTTParams.interfaceHandler = NULL;
     MQTTParams.ramType = SRAM_;
     MQTTParams.TaskKiller = MQTT_TaskKill;
     MQTTParams.taskStack = MQTT_STACK;
