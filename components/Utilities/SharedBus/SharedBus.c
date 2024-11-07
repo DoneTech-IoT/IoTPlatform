@@ -6,12 +6,14 @@
 #define BIT_22	( 1 << 22 ) //permission for all components to peek from SharedBus 
 #define BIT_21	( 1 << 21 ) //check if received the packet one time
 #define BIT_20	( 1 << 20 ) //task continuous permission
-#define AllDeamonsIDs   ( 1 << UI_INTERFACE_ID ) |
-                        ( 1 << MATTER_INTERFACE_ID ) |
-                        ( 1 << MQTT_INTERFACE_ID ) |
-                        ( 1 << LOG_INTERFACE_ID ) |
-                        ( 1 << SERVICE_MANAGER_INTERFACE_ID )
 
+#define UI_DAEMON_ID        ( 1 << (24 - UI_INTERFACE_ID) )
+#define MATTER_DAEMON_ID    ( 1 << (24 - MATTER_INTERFACE_ID) )
+#define MQTT_DAEMON_ID      ( 1 << (24 - MQTT_INTERFACE_ID) )
+#define SERVICE_MANAGER_DAEMON_ID   ( 1 << (24 - SERVICE_MANAGER_INTERFACE_ID) )
+#define ALL_DAEMON_IDs (UI_DAEMON_ID    | MATTER_DAEMON_ID | \ 
+                        MQTT_DAEMON_ID  | SERVICE_MANAGER_DAEMON_ID)
+                        
 static const char *TAG = "SharedBus";
 
 static EventBits_t EventBits;
@@ -140,33 +142,31 @@ esp_err_t SharedBusRecieve(
  * @param interfaceID The ID of tasks.
  * @return True if task daemon were ran
  */
-bool SharedBusDaemonRunsConfirmed(    
+esp_err_t SharedBusDaemonRunsConfirmed(    
     TaskInterfaceID_t interfaceID)
 {
     DaemonEventBits = xEventGroupSync( 
                         DeamonEventGroupHandle,
                         interfaceID,
-                        AllDeamonsIDs,
+                        ALL_DAEMON_IDs,
                         1); //tick to wait
 
-    if((DaemonEventBits & AllDeamonsIDs) == AllDeamonsIDs)
-    {
-        EventBits = xEventGroupSetBits(
+    if((DaemonEventBits & ALL_DAEMON_IDs) != ALL_DAEMON_IDs)
+    {        
+        return false;
+    }
+    
+    EventBits = xEventGroupSetBits(
                         EventGroupHandleLocal, /* The event group being updated. */
                         BIT_20);               /* The bits being set. */
-        return true;
-    }
-    else
-    {
-        return false;    
-    }
+    return true;        
 }
 
 /**
  * @brief get permission all task to continue if its daemon was ran before 
  * @return True for permission
  */
-bool SharedBusTaskContinuousPermission()
+esp_err_t SharedBusTaskContinuousPermission()
 {
     EventBits = xEventGroupWaitBits(
                     EventGroupHandleLocal, /* The event group being tested. */
@@ -175,12 +175,10 @@ bool SharedBusTaskContinuousPermission()
                     pdFALSE, /* Wait for 20 bit, either bit will do. */
                     1);      /* Wait a maximum of 1ms for either bit to be set. */    
 
-    if((EventBits & BIT_20) == BIT_20)
+    if((EventBits & BIT_20) != BIT_20)
     {        
-        return true;
+        return false;
     }
-    else
-    {
-        return false;    
-    }                
+    
+    return true;    
 }
