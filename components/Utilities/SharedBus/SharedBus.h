@@ -55,14 +55,14 @@ esp_err_t SharedBusRecieve(
  * @param interfaceID The ID of tasks.
  * @return True if task daemon were ran
  */
-bool SharedBusTaskDaemonRunsConfirmed(    
+esp_err_t SharedBusTaskDaemonRunsConfirmed(    
     TaskInterfaceID_t interfaceID); 
 
 /**
  * @brief get permission all task to continue if its daemon was ran before 
  * @return True for permission
  */
-bool SharedBusTaskContinuousPermission();        
+esp_err_t SharedBusTaskContinuousPermission();
 
 #ifdef __cplusplus
 }
