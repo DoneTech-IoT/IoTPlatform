@@ -6,12 +6,10 @@
 static const char *TAG = "Service_Manager";
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
-MatterInterfaceHandler_t MatterInterfaceHandler;
 static TaskHandle_t MatterHandle = NULL;
 #endif  //CONFIG_DONE_COMPONENT_MATTER
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
-MQTT_InterfaceHandler_t MQTT_InterfaceHandler;
 static QueueHandle_t MQTTDataFromBrokerQueue;
 static SemaphoreHandle_t MQTTConnectedSemaphore;
 static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
@@ -30,7 +28,7 @@ static MatterEventPacket *MatterEventPacketToSend;
  * @param pvParameter Pointer to task parameters.
  * @return void
  */
-void ServiceMangerTask(void *pvParameter);
+static void ServiceMangerTask(void *pvParameter);
 
 // Global instance of Service Manager
 ServiceManger_t ServiceManger;
@@ -57,7 +55,7 @@ void ServiceManger_Init()
     StaticTask_t *xTaskServiceMangerBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
     StackType_t *xServiceMangerStack = (StackType_t *)malloc(SERVICE_MANGER_STACK * sizeof(StackType_t));
     xTaskCreateStatic(
-        ServiceMangerTask,         // Task function
+        ServiceManger_MainTask,         // Task function
         "ServiceMangerTask",       // Task name (for debugging)
         SERVICE_MANGER_STACK,      // Stack size (in words)
         NULL,                      // Task parameters (passed to the task function)
@@ -79,8 +77,7 @@ esp_err_t ServiceManager_RunService(ServiceParams_t serviceParams)
 
     // Call the function pointer (init_func) with proper arguments
     TaskInitPtr init_func = serviceParams.TaskInit;
-    err = init_func(serviceParams.interfaceHandler, 
-                    &serviceParams.taskHandler, 
+    err = init_func(&serviceParams.taskHandler, 
                     serviceParams.priority, 
                     serviceParams.taskStack);
     if (err != ESP_OK) 
@@ -98,9 +95,8 @@ esp_err_t ServiceManager_RunService(ServiceParams_t serviceParams)
  * @param pvParameter Pointer to task parameters.
  * @return void
  */
-void ServiceMangerTask(void *pvParameter)
-{
-    esp_err_t err;
+static void ServiceManger_MainTask(void *pvParameter)
+{    
     nvsFlashInit();
     
     if (SharedBusInit())
@@ -110,7 +106,50 @@ void ServiceMangerTask(void *pvParameter)
     else
     {
         ESP_LOGE(TAG, "Failed to Initialize SharedBus.");
+    }                
+    
+    bool JustRunOneTime = true;
+    while (true)
+    {        
+        if(SharedBusRecieve(&SharedBusPacket, SERVICE_MANAGER_INTERFACE_ID))        
+        {                 
+            switch (SharedBusPacket.PacketID)
+            {
+                case MATTER_EVENT_PACKET_ID:
+                    ESP_LOGE(TAG, "MATTER_EVENT_PACKET_ID received.");         
+                    MatterEventPacketToSend = (MatterEventPacket*) SharedBusPacket.data;
+                    if(MatterEventPacketToSend->PublicEventTypes == kInterfaceIpAddressChanged)
+                    {
+                        
+                    }
+                    break;
+            
+                default:
+                    break;
+            }
+        }
+
+        SharedBusTaskDaemonRunsConfirmed(SERVICE_MANAGER_INTERFACE_ID);
+        ServiceManger_RunAllDaemons();
+        if(SharedBusTaskContinuousPermission())
+        {
+            if(JustRunOneTime)
+            {
+                JustRunOneTime = false;
+                //ServiceManger_TaskCreator();
+            }                    
+        }        
+// char pcTaskList[TASK_LIST_BUFFER_SIZE];
+#ifdef MONITORING
+// vTaskList(pcTaskList);
+// ESP_LOGI(TAG, "Task List:\n%s\n", pcTaskList);
+#endif                
     }
+}
+
+static void ServiceManger_RunAllDaemons()
+{    
+    esp_err_t err;
 
     ServiceParams_t GUIParams;
     GUIParams.maximumRAM_Needed = LVGL_STACK * 2;
@@ -118,8 +157,7 @@ void ServiceMangerTask(void *pvParameter)
     GUIParams.ramType = PSRAM_;
     GUIParams.TaskKiller = GUI_TaskKill;
     GUIParams.taskStack = LVGL_STACK;
-    GUIParams.priority = tskIDLE_PRIORITY + 1;
-    GUIParams.taskHandler = NULL;
+    GUIParams.priority = tskIDLE_PRIORITY + 1;    
     GUIParams.TaskInit = GUI_TaskInit;
     err = ServiceManager_RunService(GUIParams);
     if (err)
@@ -135,8 +173,7 @@ void ServiceMangerTask(void *pvParameter)
 #ifdef CONFIG_DONE_COMPONENT_MATTER
     // Config and Run Matter        
     ServiceParams_t MatterParams;
-    strcpy(MatterParams.name, "Matter");
-    MatterParams.interfaceHandler = &MatterInterfaceHandler;
+    strcpy(MatterParams.name, "Matter");    
     MatterParams.maximumRAM_Needed = 0;
     MatterParams.ramType = SRAM_;
     MatterParams.TaskKiller = Matter_TaskKill;
@@ -155,34 +192,17 @@ void ServiceMangerTask(void *pvParameter)
     }
 #endif
 
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    //vTaskDelay(pdMS_TO_TICKS(1000));
 
-
-
-    CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
-    // char pcTaskList[TASK_LIST_BUFFER_SIZE];
-    while (true)
-    {
-        if(SharedBusRecieve(&SharedBusPacket, SERVICE_MANAGER_INTERFACE_ID))
-        {
-            ESP_LOGE(TAG, "Packet reveived.");
-            switch (SharedBusPacket.PacketID)
-            {
-            case MATTER_EVENT_PACKET_ID:
-            //TODO convaert shared packet to event struct/ if ip changed then start mqtt
-            MatterEventPacketToSend = (MatterEventPacket*) SharedBusPacket.data;
-            if(MatterEventPacketToSend->PublicEventTypes == kInterfaceIpAddressChanged)
-            {
 #ifdef CONFIG_DONE_COMPONENT_MQTT
                 // Config and Run MQTT
-                MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
-                MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
-                MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
+                // MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
+                // MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
+                // MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
 
                 ServiceParams_t MQTTParams;
                 strcpy(MQTTParams.name, "MQTT");
-                MQTTParams.maximumRAM_Needed = 0;
-                MQTTParams.interfaceHandler = &MQTT_InterfaceHandler;
+                MQTTParams.maximumRAM_Needed = 0;                
                 MQTTParams.ramType = SRAM_;
                 MQTTParams.TaskKiller = MQTT_TaskKill;
                 MQTTParams.taskStack = MQTT_STACK;
@@ -196,23 +216,12 @@ void ServiceMangerTask(void *pvParameter)
                 }
                 else
                 {
-                ESP_LOGI(TAG, "MQTT Created !");
-                vTaskDelay(pdMS_TO_TICKS(500));
-                MQTT_Start();
-                vTaskDelay(pdMS_TO_TICKS(500));   
+                    ESP_LOGI(TAG, "MQTT Created !");
+                    vTaskDelay(pdMS_TO_TICKS(500));
+                    MQTT_Start();
+                    vTaskDelay(pdMS_TO_TICKS(500));   
                 }
+                // CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
 #endif  //CONFIG_DONE_COMPONENT_MQTT
-            }
-            break;
-            
-            default:
-                break;
-            }
-        }
-#ifdef MONITORING
-// vTaskList(pcTaskList);
-// ESP_LOGI(TAG, "Task List:\n%s\n", pcTaskList);
-#endif
-        vTaskDelay(pdMS_TO_TICKS(1));
-    }
+
 }
