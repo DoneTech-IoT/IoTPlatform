@@ -142,7 +142,7 @@ esp_err_t SharedBusRecieve(
  * @param interfaceID The ID of tasks.
  * @return True if task daemon were ran
  */
-esp_err_t SharedBusDaemonRunsConfirmed(    
+esp_err_t SharedBusTaskDaemonRunsConfirmed(    
     TaskInterfaceID_t interfaceID)
 {
     DaemonEventBits = xEventGroupSync( 
