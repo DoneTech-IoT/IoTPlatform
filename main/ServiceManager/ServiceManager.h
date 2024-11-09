@@ -83,7 +83,7 @@ typedef struct
  * This function initializes the Service Manager task by allocating memory and creating the task.
  * @return void
  */
-void ServiceManger_Init();
+void ServiceManger_TaskInit();
 
 /* 
     * @brief run given service.
