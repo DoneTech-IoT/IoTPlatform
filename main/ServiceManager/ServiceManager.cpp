@@ -83,7 +83,7 @@ static void ServiceManger_RunAllDaemons()
     {
         ESP_LOGI(TAG, "GUI Created !");        
     }
-    vTaskDelay(pdMS_TO_TICKS(1000));
+    //vTaskDelay(pdMS_TO_TICKS(1000));
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
     // Config and Run Matter        
@@ -115,27 +115,27 @@ static void ServiceManger_RunAllDaemons()
     // MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
     // MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
 
-    ServiceParams_t MQTTParams;
-    strcpy(MQTTParams.name, "MQTT");
-    MQTTParams.maximumRAM_Needed = 0;                
-    MQTTParams.ramType = SRAM_;
-    MQTTParams.TaskKiller = MQTT_TaskKill;
-    MQTTParams.taskStack = MQTT_STACK;
-    MQTTParams.priority = tskIDLE_PRIORITY + 1;
-    MQTTParams.taskHandler = MQTTHandle;
-    MQTTParams.TaskInit = MQTT_TaskInit;
-    err = ServiceManager_RunService (MQTTParams);
-    if (err)
-    {
-        ESP_LOGE(TAG, "Failed to create MQTT !");
-    }
-    else
-    {
-        ESP_LOGI(TAG, "MQTT Created !");
-        vTaskDelay(pdMS_TO_TICKS(500));
-        MQTT_Start();
-        vTaskDelay(pdMS_TO_TICKS(500));   
-    }
+    // ServiceParams_t MQTTParams;
+    // strcpy(MQTTParams.name, "MQTT");
+    // MQTTParams.maximumRAM_Needed = 0;                
+    // MQTTParams.ramType = SRAM_;
+    // MQTTParams.TaskKiller = MQTT_TaskKill;
+    // MQTTParams.taskStack = MQTT_STACK;
+    // MQTTParams.priority = tskIDLE_PRIORITY + 1;
+    // MQTTParams.taskHandler = MQTTHandle;
+    // MQTTParams.TaskInit = MQTT_TaskInit;
+    // err = ServiceManager_RunService (MQTTParams);
+    // if (err)
+    // {
+    //     ESP_LOGE(TAG, "Failed to create MQTT !");
+    // }
+    // else
+    // {
+    //     ESP_LOGI(TAG, "MQTT Created !");
+    //     vTaskDelay(pdMS_TO_TICKS(500));
+    //     MQTT_Start();
+    //     vTaskDelay(pdMS_TO_TICKS(500));   
+    // }
     // CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
 #endif  //CONFIG_DONE_COMPONENT_MQTT
 }
@@ -181,15 +181,12 @@ static void ServiceManger_MainTask(void *pvParameter)
         }
 
         SharedBusTaskDaemonRunsConfirmed(SERVICE_MANAGER_INTERFACE_ID);
-        ServiceManger_RunAllDaemons();
-        if(SharedBusTaskContinuousPermission())
+        if(JustRunOneTime)
         {
-            if(JustRunOneTime)
-            {
-                JustRunOneTime = false;
-                //ServiceManger_TaskCreator();
-            }                    
-        }        
+            JustRunOneTime = false;
+            ServiceManger_RunAllDaemons();
+        }                         
+        
 // char pcTaskList[TASK_LIST_BUFFER_SIZE];
 #ifdef MONITORING
 // vTaskList(pcTaskList);
