@@ -7,12 +7,12 @@
 #define BIT_21	( 1 << 21 ) //check if received the packet one time
 #define BIT_20	( 1 << 20 ) //task continuous permission
 
-#define UI_DAEMON_ID        ( 1 << (24 - UI_INTERFACE_ID) )
-#define MATTER_DAEMON_ID    ( 1 << (24 - MATTER_INTERFACE_ID) )
-#define MQTT_DAEMON_ID      ( 1 << (24 - MQTT_INTERFACE_ID) )
-#define SERVICE_MANAGER_DAEMON_ID   ( 1 << (24 - SERVICE_MANAGER_INTERFACE_ID) )
-#define ALL_DAEMON_IDs (UI_DAEMON_ID    | MATTER_DAEMON_ID | \ 
-                        MQTT_DAEMON_ID  | SERVICE_MANAGER_DAEMON_ID)
+#define UI_DAEMON_ID        ( 1 << UI_INTERFACE_ID )
+#define MATTER_DAEMON_ID    ( 1 << MATTER_INTERFACE_ID ) 
+#define MQTT_DAEMON_ID      ( 1 << MQTT_INTERFACE_ID )
+#define SERVICE_MANAGER_DAEMON_ID   ( 1 << SERVICE_MANAGER_INTERFACE_ID )
+#define ALL_DAEMON_IDs ( UI_DAEMON_ID    | MATTER_DAEMON_ID |\ 
+                        /*MQTT_DAEMON_ID  |*/ SERVICE_MANAGER_DAEMON_ID )
                         
 static const char *TAG = "SharedBus";
 
@@ -55,6 +55,7 @@ esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket)
                     pdTRUE,        /* BIT_23 should be cleared before returning. */
                     pdFALSE,        /* Wait for 23th bit, either bit will do. */
                     1);/* Wait a maximum of 1ms for either bit to be set. */
+                    
     if((EventBits & BIT_23))
     {
         return false;
@@ -97,22 +98,19 @@ esp_err_t SharedBusRecieve(
 
     // return false if permission is not granted
     if((EventBits & BIT_22) == 0) //default state
-    {     
-        ESP_LOGE(TAG, "1, %d", interfaceID);
+    {             
         return false;
     }   
 
     // return false if queue is empty
     if(xQueuePeek(QueueHandle, SharedBusPacket, 1) != pdTRUE)
-    { 
-        ESP_LOGE(TAG, "2");
+    {         
         return false; 
     } 
 
     // return false if receiver and transmitter was the same component
     if (SharedBusPacket->SourceID == interfaceID)
-    {
-        ESP_LOGE(TAG, "3");
+    {        
         return false;
     }
 
@@ -121,8 +119,7 @@ esp_err_t SharedBusRecieve(
         //permission to itself
         EventBits = xEventGroupSetBits(
                 EventGroupHandleLocal, /* The event group being updated. */
-                BIT_21);
-        ESP_LOGE(TAG, "4");        
+                BIT_21);        
         return false;
     }
 
@@ -145,20 +142,35 @@ esp_err_t SharedBusRecieve(
 esp_err_t SharedBusTaskDaemonRunsConfirmed(    
     TaskInterfaceID_t interfaceID)
 {
+    EventBits = xEventGroupWaitBits(
+                    EventGroupHandleLocal, /* The event group being tested. */
+                    BIT_20,  /* The bits within the event group to wait for. */
+                    pdFALSE, /* BIT 20 should NOT be cleared before returning. */
+                    pdTRUE, /* Wait for 20 bit, either bit will do. */
+                    1);      /* Wait a maximum of 1ms for either bit to be set. */    
+
+    if((EventBits & BIT_20) == BIT_20)
+    {        
+        return false;
+    }
+
     DaemonEventBits = xEventGroupSync( 
                         DeamonEventGroupHandle,
-                        interfaceID,
+                        (1 << interfaceID),
                         ALL_DAEMON_IDs,
                         1); //tick to wait
 
     if((DaemonEventBits & ALL_DAEMON_IDs) != ALL_DAEMON_IDs)
-    {        
+    {                
+        //ESP_LOGE(TAG, "1, %d", interfaceID);
+        //ESP_LOGE(TAG, "3, %d", (uint8_t) DaemonEventBits);                    
         return false;
     }
     
     EventBits = xEventGroupSetBits(
                         EventGroupHandleLocal, /* The event group being updated. */
                         BIT_20);               /* The bits being set. */
+        //ESP_LOGE(TAG, "2--------------------------, %d", (uint8_t) DaemonEventBits);                    
     return true;        
 }
 
@@ -172,7 +184,7 @@ esp_err_t SharedBusTaskContinuousPermission()
                     EventGroupHandleLocal, /* The event group being tested. */
                     BIT_20,  /* The bits within the event group to wait for. */
                     pdFALSE, /* BIT 20 should NOT be cleared before returning. */
-                    pdFALSE, /* Wait for 20 bit, either bit will do. */
+                    pdTRUE, /* Wait for 20 bit, either bit will do. */
                     1);      /* Wait a maximum of 1ms for either bit to be set. */    
 
     if((EventBits & BIT_20) != BIT_20)
