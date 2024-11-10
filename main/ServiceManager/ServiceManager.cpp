@@ -82,8 +82,7 @@ static void ServiceManger_RunAllDaemons()
     else
     {
         ESP_LOGI(TAG, "GUI Created !");        
-    }
-    //vTaskDelay(pdMS_TO_TICKS(1000));
+    }    
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
     // Config and Run Matter        
@@ -106,9 +105,7 @@ static void ServiceManger_RunAllDaemons()
         ESP_LOGI(TAG, "Matter Created !");
     }
 #endif
-
-    //vTaskDelay(pdMS_TO_TICKS(1000));
-
+    
 #ifdef CONFIG_DONE_COMPONENT_MQTT
     // Config and Run MQTT
     // MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
@@ -158,7 +155,10 @@ static void ServiceManger_MainTask(void *pvParameter)
     {
         ESP_LOGE(TAG, "Failed to Initialize SharedBus.");
     }                
-    
+
+#ifdef MONITORING
+// char pcTaskList[TASK_LIST_BUFFER_SIZE];
+#endif                
     bool JustRunOneTime = true;
     while (true)
     {        
@@ -181,13 +181,15 @@ static void ServiceManger_MainTask(void *pvParameter)
         }
 
         SharedBusTaskDaemonRunsConfirmed(SERVICE_MANAGER_INTERFACE_ID);
+        SharedBusTaskContinuousPermission();
         if(JustRunOneTime)
         {
             JustRunOneTime = false;
             ServiceManger_RunAllDaemons();
+            SharedBusTaskContinuousConfirm();
         }                         
-        
-// char pcTaskList[TASK_LIST_BUFFER_SIZE];
+        vTaskDelay(pdMS_TO_TICKS(1));
+
 #ifdef MONITORING
 // vTaskList(pcTaskList);
 // ESP_LOGI(TAG, "Task List:\n%s\n", pcTaskList);
