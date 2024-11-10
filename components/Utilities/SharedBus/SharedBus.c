@@ -101,18 +101,21 @@ esp_err_t SharedBusRecieve(
     // return false if permission is not granted
     if((EventBits & BIT_22) == 0) //default state
     {             
+        ESP_LOGE(TAG, "1, %d", interfaceID);
         return false;
     }   
 
     // return false if queue is empty
     if(xQueuePeek(QueueHandle, SharedBusPacket, 1) != pdTRUE)
     {         
+        ESP_LOGE(TAG, "2, %d", interfaceID);
         return false; 
     } 
 
     // return false if receiver and transmitter was the same component
     if (SharedBusPacket->SourceID == interfaceID)
     {        
+        ESP_LOGE(TAG, "3, %d", interfaceID);
         return false;
     }
 
@@ -121,7 +124,8 @@ esp_err_t SharedBusRecieve(
         //permission to itself
         EventBits = xEventGroupSetBits(
                 EventGroupHandleLocal, /* The event group being updated. */
-                BIT_21);        
+                BIT_21);   
+        ESP_LOGE(TAG, "4, %d", interfaceID);             
         return false;
     }
 
