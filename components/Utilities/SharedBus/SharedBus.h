@@ -13,11 +13,13 @@ extern "C"
 #include "PacketInfo.h"
 
 typedef enum {
-    UI_INTERFACE_ID = 1,
-    MATTER_INTERFACE_ID = 2,
-    MQTT_INTERFACE_ID = 3,  
-    LOG_INTERFACE_ID = 4,
-    SERVICE_MANAGER_INTERFACE_ID = 5,
+    NOT_ANY_ID = 0,
+    SERVICE_MANAGER_INTERFACE_ID,
+    UI_INTERFACE_ID,
+    MATTER_INTERFACE_ID,
+    MQTT_INTERFACE_ID,  
+    LOG_INTERFACE_ID,    
+    MAX_TASK_ID
 } TaskInterfaceID_t;
 
 typedef struct {
@@ -60,9 +62,15 @@ esp_err_t SharedBusTaskDaemonRunsConfirmed(
 
 /**
  * @brief get permission all task to continue if its daemon was ran before 
- * @return True for permission
+ * @return task id to run
  */
-esp_err_t SharedBusTaskContinuousPermission();
+uint8_t SharedBusTaskContinuousPermission();
+
+/**
+ * @brief confirm the running of task body
+ * @return nothing
+ */
+void SharedBusTaskContinuousConfirm();
 
 #ifdef __cplusplus
 }
