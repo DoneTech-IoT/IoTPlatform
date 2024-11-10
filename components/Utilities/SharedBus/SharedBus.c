@@ -6,6 +6,7 @@
 #define BIT_22	( 1 << 22 ) //permission for all components to peek from SharedBus 
 #define BIT_21	( 1 << 21 ) //check if received the packet one time
 #define BIT_20	( 1 << 20 ) //task continuous permission
+#define BIT_19	( 1 << 19 ) //task continuous confirm
 
 #define UI_DAEMON_ID        ( 1 << UI_INTERFACE_ID )
 #define MATTER_DAEMON_ID    ( 1 << MATTER_INTERFACE_ID ) 
@@ -18,6 +19,7 @@ static const char *TAG = "SharedBus";
 
 static EventBits_t EventBits;
 static EventGroupHandle_t EventGroupHandleLocal;
+static uint8_t TaskID = 1;//start by service manager id
 QueueHandle_t QueueHandle;
 
 static EventBits_t DaemonEventBits;
@@ -55,7 +57,7 @@ esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket)
                     pdTRUE,        /* BIT_23 should be cleared before returning. */
                     pdFALSE,        /* Wait for 23th bit, either bit will do. */
                     1);/* Wait a maximum of 1ms for either bit to be set. */
-                    
+
     if((EventBits & BIT_23))
     {
         return false;
@@ -162,15 +164,16 @@ esp_err_t SharedBusTaskDaemonRunsConfirmed(
 
     if((DaemonEventBits & ALL_DAEMON_IDs) != ALL_DAEMON_IDs)
     {                
-        //ESP_LOGE(TAG, "1, %d", interfaceID);
-        //ESP_LOGE(TAG, "3, %d", (uint8_t) DaemonEventBits);                    
+        // ESP_LOGE(TAG, "1, %d", interfaceID);
+        // ESP_LOGE(TAG, "3, %d", (uint8_t) DaemonEventBits);                    
         return false;
     }
     
     EventBits = xEventGroupSetBits(
                         EventGroupHandleLocal, /* The event group being updated. */
                         BIT_20);               /* The bits being set. */
-        //ESP_LOGE(TAG, "2--------------------------, %d", (uint8_t) DaemonEventBits);                    
+        // ESP_LOGE(TAG, "2, %d", interfaceID);
+        // ESP_LOGE(TAG, "4--------------------------, %d", (uint8_t) DaemonEventBits);                    
     return true;        
 }
 
@@ -178,7 +181,7 @@ esp_err_t SharedBusTaskDaemonRunsConfirmed(
  * @brief get permission all task to continue if its daemon was ran before 
  * @return True for permission
  */
-esp_err_t SharedBusTaskContinuousPermission()
+uint8_t SharedBusTaskContinuousPermission()
 {
     EventBits = xEventGroupWaitBits(
                     EventGroupHandleLocal, /* The event group being tested. */
@@ -189,8 +192,33 @@ esp_err_t SharedBusTaskContinuousPermission()
 
     if((EventBits & BIT_20) != BIT_20)
     {        
-        return false;
+        return NOT_ANY_ID;
+    }    
+    else
+    {
+        EventBits = xEventGroupWaitBits(
+                    EventGroupHandleLocal, /* The event group being tested. */
+                    BIT_19, /* The bits within the event group to wait for. */
+                    pdFALSE,/* BIT 19 should NOT be cleared before returning. */
+                    pdTRUE, /* Wait for 19 bit, either bit will do. */
+                    1);     /* Wait a maximum of 1ms for either bit to be set.*/                    
+
+        //ESP_LOGE(TAG, "6, %d", TaskID);    
+        return TaskID;                        
     }
-    
-    return true;    
+}
+
+/**
+ * @brief confirm the running of task body
+ * @return nothing
+ */
+void SharedBusTaskContinuousConfirm()
+{    
+    EventBits = xEventGroupSetBits(
+            EventGroupHandleLocal, /* The event group being updated. */
+            BIT_19);  
+
+    TaskID++;      
+    if(TaskID > MAX_TASK_ID - 3)//not NOT_ANY_ID nor mqtt or log
+        TaskID = MAX_TASK_ID;              
 }
