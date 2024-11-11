@@ -162,11 +162,12 @@ static void ServiceManger_MainTask(void *pvParameter)
     bool JustRunOneTime = true;
     while (true)
     {        
-        if(SharedBusRecieve(&SharedBusPacket, SERVICE_MANAGER_INTERFACE_ID))        
-        {                 
+        if(SharedBusReceive(&SharedBusPacket, SERVICE_MANAGER_INTERFACE_ID))        
+        {                             
             switch (SharedBusPacket.PacketID)
             {
                 case MATTER_EVENT_PACKET_ID:
+                    SharedBusReceiveConfirmed(SERVICE_MANAGER_INTERFACE_ID);                    
                     ESP_LOGE(TAG, "MATTER_EVENT_PACKET_ID received.");         
                     MatterEventPacketToSend = (MatterEventPacket*) SharedBusPacket.data;
                     if(MatterEventPacketToSend->PublicEventTypes == kInterfaceIpAddressChanged)
