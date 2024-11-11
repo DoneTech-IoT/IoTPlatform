@@ -48,9 +48,17 @@ esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket);
  * @param interfaceID The ID of receiver component.
  * @return True if successfully received, false if receiver and sender are the same component.
  */
-esp_err_t SharedBusRecieve(
+esp_err_t SharedBusReceive(
     SharedBusPacket_t *SharedBusPacket, 
     TaskInterfaceID_t interfaceID);    
+
+/**
+ * @brief confirm receive
+ * @param interfaceID The ID of tasks.
+ * @return True if task daemon were ran
+ */
+void SharedBusReceiveConfirmed(    
+    TaskInterfaceID_t interfaceID); 
 
 /**
  * @brief Check all deamon run and confirm

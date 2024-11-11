@@ -25,6 +25,12 @@ QueueHandle_t QueueHandle;
 static EventBits_t DaemonEventBits;
 static EventGroupHandle_t DeamonEventGroupHandle;
 
+static EventBits_t DaemonEventBits;
+static EventGroupHandle_t DeamonEventGroupHandle;
+
+static EventBits_t ReceiveEventBits;
+static EventGroupHandle_t ReceiveEventGroupHandle;
+
 SharedBusPacket_t SharedBusPacket;
 
 /**
@@ -41,12 +47,16 @@ esp_err_t SharedBusInit(void)
 
     DaemonEventBits = 0;
     DeamonEventGroupHandle = xEventGroupCreate();  
+
+    ReceiveEventBits = 0;
+    ReceiveEventGroupHandle = xEventGroupCreate();  
+
     return true;         
 }
 
 /**
  * @brief Prepare needed Bits and send the Packet.
- * @param SahredBusPacket The Packet to publish on Bus.
+ * @param SharedBusPacket The Packet to publish on Bus.
  * @return True if queue is available, False if queue is busy.
  */
 esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket)    
@@ -87,7 +97,7 @@ esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket)
  * @param interfaceID The ID of receiver component.
  * @return True if successfully received, false if receiver and sender are the same component.
  */
-esp_err_t SharedBusRecieve(
+esp_err_t SharedBusReceive(
     SharedBusPacket_t *SharedBusPacket,
     TaskInterfaceID_t interfaceID)
 { 
@@ -103,7 +113,7 @@ esp_err_t SharedBusRecieve(
     //return false if permission is not granted
     if((EventBits & BIT_22) == 0) //default state
     {             
-        //ESP_LOGE(TAG, "1, %d", interfaceID);
+        //ESP_LOGE(TAG, "1, %d", interfaceID);        
         return false;
     }   
     
@@ -119,8 +129,14 @@ esp_err_t SharedBusRecieve(
         //permission to itself
         EventBits = xEventGroupClearBits(
                 EventGroupHandleLocal, /* The event group being updated. */
-                BIT_22);   
+                BIT_22);           
 
+        EventBits = xEventGroupClearBits(
+            EventGroupHandleLocal, /* The event group being updated. */
+            BIT_23);
+
+        ReceiveEventBits = 0;
+        
         ESP_LOGE(TAG, "3, %d", interfaceID);             
         return false;
     }    
@@ -135,13 +151,29 @@ esp_err_t SharedBusRecieve(
         ESP_LOGE(TAG, "4, %d", interfaceID);
         return false;
     }    
-    
-    EventBits = xEventGroupClearBits(
-            EventGroupHandleLocal, /* The event group being updated. */
-            BIT_23);
 
-    ESP_LOGE(TAG, "5, %d", interfaceID);             
+    ReceiveEventBits = xEventGroupGetBits(ReceiveEventGroupHandle);
+    if((ReceiveEventBits & (1 << interfaceID)) == (1 << interfaceID))
+    {                
+        ESP_LOGE(TAG, "5, %d", interfaceID);
+        ESP_LOGE(TAG, "6, %d", (uint8_t) ReceiveEventBits);                    
+        return false;
+    }
+
+    ESP_LOGE(TAG, "7, %d", interfaceID);             
     return true;
+}
+
+/**
+ * @brief confirm the running of task body
+ * @return nothing
+ */
+void SharedBusReceiveConfirmed(
+    TaskInterfaceID_t interfaceID)
+{    
+    ReceiveEventBits = xEventGroupSetBits(
+            ReceiveEventGroupHandle, /* The event group being updated. */
+            (1 << interfaceID));      
 }
 
 /**
