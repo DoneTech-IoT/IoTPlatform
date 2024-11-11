@@ -81,7 +81,7 @@ static void ServiceManger_RunAllDaemons()
     }
     else
     {
-        ESP_LOGI(TAG, "GUI Created !");        
+        ESP_LOGI(TAG, "GUI Daemon Created !");        
     }    
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
@@ -102,7 +102,7 @@ static void ServiceManger_RunAllDaemons()
     }
     else 
     {
-        ESP_LOGI(TAG, "Matter Created !");
+        ESP_LOGI(TAG, "Matter Daemon Created !");
     }
 #endif
     
@@ -128,7 +128,7 @@ static void ServiceManger_RunAllDaemons()
     // }
     // else
     // {
-    //     ESP_LOGI(TAG, "MQTT Created !");
+    //     ESP_LOGI(TAG, "MQTT Daemon Created !");
     //     vTaskDelay(pdMS_TO_TICKS(500));
     //     MQTT_Start();
     //     vTaskDelay(pdMS_TO_TICKS(500));   
