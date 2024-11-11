@@ -69,7 +69,7 @@ esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket)
 
     xQueueOverwrite(QueueHandle, &SharedBusPacket);        
 
-    EventBits = xEventGroupClearBits(
+    EventBits = xEventGroupSetBits(
                     EventGroupHandleLocal,
                     BIT_21);         
 
@@ -95,16 +95,18 @@ esp_err_t SharedBusRecieve(
                     EventGroupHandleLocal,   /* The event group being tested. */
                     BIT_22 | BIT_21,         /* The bits within the event group to wait for. */
                     pdFALSE,        /* BIT 21 or 22 should NOT be cleared before returning. */
-                    pdFALSE,         /* Wait for 21 or 22th bit, either bit will do. */
+                    pdTRUE,         /* Wait for 21 or 22th bit, either bit will do. */
                     1);             /* Wait a maximum of 1ms for either bit to be set. */    
 
-    // return false if permission is not granted
+    //every task listen to sharedbus before send
+    //this case always return before send
+    //return false if permission is not granted
     if((EventBits & BIT_22) == 0) //default state
     {             
-        ESP_LOGE(TAG, "1, %d", interfaceID);
+        //ESP_LOGE(TAG, "1, %d", interfaceID);
         return false;
     }   
-
+    
     // return false if queue is empty
     if(xQueuePeek(QueueHandle, SharedBusPacket, 1) != pdTRUE)
     {         
@@ -112,31 +114,33 @@ esp_err_t SharedBusRecieve(
         return false; 
     } 
 
-    // return false if receiver and transmitter was the same component
-    if (SharedBusPacket->SourceID == interfaceID)
-    {        
-        ESP_LOGE(TAG, "3, %d", interfaceID);
-        return false;
-    }
-
-    if(!(EventBits & BIT_21))
+    if((EventBits & BIT_21) == 0)
     {
         //permission to itself
-        EventBits = xEventGroupSetBits(
+        EventBits = xEventGroupClearBits(
                 EventGroupHandleLocal, /* The event group being updated. */
-                BIT_21);   
-        ESP_LOGE(TAG, "4, %d", interfaceID);             
+                BIT_22);   
+
+        ESP_LOGE(TAG, "3, %d", interfaceID);             
         return false;
-    }
+    }    
 
-    EventBits = xEventGroupClearBits(
+    // return false if receiver and transmitter was the same component
+    if (SharedBusPacket->SourceID == interfaceID)
+    {                
+        EventBits = xEventGroupClearBits(
             EventGroupHandleLocal, /* The event group being updated. */
-            BIT_22);  
+            BIT_21);  
 
+        ESP_LOGE(TAG, "4, %d", interfaceID);
+        return false;
+    }    
+    
     EventBits = xEventGroupClearBits(
             EventGroupHandleLocal, /* The event group being updated. */
             BIT_23);
 
+    ESP_LOGE(TAG, "5, %d", interfaceID);             
     return true;
 }
 
