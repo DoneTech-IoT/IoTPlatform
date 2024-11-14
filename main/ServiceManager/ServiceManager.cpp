@@ -159,6 +159,7 @@ static void ServiceManger_MainTask(void *pvParameter)
 #ifdef MONITORING
 // char pcTaskList[TASK_LIST_BUFFER_SIZE];
 #endif                
+    
     bool JustRunOneTime = true;
     while (true)
     {        
@@ -167,7 +168,7 @@ static void ServiceManger_MainTask(void *pvParameter)
             switch (SharedBusPacket.PacketID)
             {
                 case MATTER_EVENT_PACKET_ID:
-                    SharedBusReceiveConfirmed(SERVICE_MANAGER_INTERFACE_ID);                    
+                    //SharedBusReceiveConfirmed(SERVICE_MANAGER_INTERFACE_ID);                    
                     ESP_LOGE(TAG, "MATTER_EVENT_PACKET_ID received.");         
                     MatterEventPacketToSend = (MatterEventPacket*) SharedBusPacket.data;
                     if(MatterEventPacketToSend->PublicEventTypes == kInterfaceIpAddressChanged)
@@ -180,15 +181,16 @@ static void ServiceManger_MainTask(void *pvParameter)
                     break;
             }
         }
-
-        SharedBusTaskDaemonRunsConfirmed(SERVICE_MANAGER_INTERFACE_ID);
-        SharedBusTaskContinuousPermission();
+                
+        SharedBusTaskDaemonRunsConfirmed(SERVICE_MANAGER_INTERFACE_ID);                
         if(JustRunOneTime)
         {
-            JustRunOneTime = false;
-            ServiceManger_RunAllDaemons();
+            JustRunOneTime = false;            
+            ESP_LOGI(TAG, "Service Manager Daemon Created !");            
+            ServiceManger_RunAllDaemons();              
             SharedBusTaskContinuousConfirm();
-        }                         
+        }                                       
+
         vTaskDelay(pdMS_TO_TICKS(1));
 
 #ifdef MONITORING
