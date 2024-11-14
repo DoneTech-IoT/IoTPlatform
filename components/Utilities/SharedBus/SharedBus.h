@@ -53,14 +53,6 @@ esp_err_t SharedBusReceive(
     TaskInterfaceID_t interfaceID);    
 
 /**
- * @brief confirm receive
- * @param interfaceID The ID of tasks.
- * @return True if task daemon were ran
- */
-void SharedBusReceiveConfirmed(    
-    TaskInterfaceID_t interfaceID); 
-
-/**
  * @brief Check all deamon run and confirm
  * @param interfaceID The ID of tasks.
  * @return True if task daemon were ran
