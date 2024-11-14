@@ -5,8 +5,7 @@
 #define BIT_23	( 1 << 23 ) //prevent overwriting bus for send 
 #define BIT_22	( 1 << 22 ) //permission for all components to peek from SharedBus 
 #define BIT_21	( 1 << 21 ) //check if received the packet one time
-#define BIT_20	( 1 << 20 ) //task continuous permission
-#define BIT_19	( 1 << 19 ) //task continuous confirm
+#define BIT_20	( 1 << 20 ) //end of task init permission
 
 #define UI_DAEMON_ID        ( 1 << UI_INTERFACE_ID )
 #define MATTER_DAEMON_ID    ( 1 << MATTER_INTERFACE_ID ) 
@@ -20,10 +19,9 @@ static const char *TAG = "SharedBus";
 static EventBits_t EventBits;
 static EventGroupHandle_t EventGroupHandleLocal;
 static uint8_t TaskID = 1;//start by service manager id
+static uint8_t TaskDaemonCnt = 0;//start by service manager id
+static uint8_t TaskReceiveCnt = 0;//start by service manager id
 QueueHandle_t QueueHandle;
-
-static EventBits_t DaemonEventBits;
-static EventGroupHandle_t DeamonEventGroupHandle;
 
 static EventBits_t DaemonEventBits;
 static EventGroupHandle_t DeamonEventGroupHandle;
@@ -71,23 +69,18 @@ esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket)
     if((EventBits & BIT_23))
     {
         return false;
-    }
-    
+    }    
+
+    ReceiveEventBits = xEventGroupClearBits(
+                            ReceiveEventGroupHandle,
+                            ALL_DAEMON_IDs);      
+
     EventBits = xEventGroupSetBits(
                     EventGroupHandleLocal, /* The event group being updated. */
                     BIT_23);               /* The bits being set. */
 
-    xQueueOverwrite(QueueHandle, &SharedBusPacket);        
-
-    EventBits = xEventGroupSetBits(
-                    EventGroupHandleLocal,
-                    BIT_21);         
-
-    //permission to all task to peek
-    EventBits = xEventGroupSetBits(
-                    EventGroupHandleLocal, /* The event group being updated. */
-                    BIT_22);
-
+    xQueueOverwrite(QueueHandle, &SharedBusPacket);                
+    
     return true;                                   
 }
 
@@ -100,80 +93,25 @@ esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket)
 esp_err_t SharedBusReceive(
     SharedBusPacket_t *SharedBusPacket,
     TaskInterfaceID_t interfaceID)
-{ 
-    EventBits = xEventGroupWaitBits(
-                    EventGroupHandleLocal,   /* The event group being tested. */
-                    BIT_22 | BIT_21,         /* The bits within the event group to wait for. */
-                    pdFALSE,        /* BIT 21 or 22 should NOT be cleared before returning. */
-                    pdTRUE,         /* Wait for 21 or 22th bit, either bit will do. */
-                    1);             /* Wait a maximum of 1ms for either bit to be set. */    
-
-    //every task listen to sharedbus before send
-    //this case always return before send
-    //return false if permission is not granted
-    if((EventBits & BIT_22) == 0) //default state
-    {             
-        //ESP_LOGE(TAG, "1, %d", interfaceID);        
-        return false;
-    }   
-    
-    // return false if queue is empty
-    if(xQueuePeek(QueueHandle, SharedBusPacket, 1) != pdTRUE)
-    {         
-        ESP_LOGE(TAG, "2, %d", interfaceID);
-        return false; 
-    } 
-
-    if((EventBits & BIT_21) == 0)
-    {
-        //permission to itself
-        EventBits = xEventGroupClearBits(
-                EventGroupHandleLocal, /* The event group being updated. */
-                BIT_22);           
-
-        EventBits = xEventGroupClearBits(
-            EventGroupHandleLocal, /* The event group being updated. */
-            BIT_23);
-
-        ReceiveEventBits = 0;
-        
-        ESP_LOGE(TAG, "3, %d", interfaceID);             
-        return false;
-    }    
-
-    // return false if receiver and transmitter was the same component
-    if (SharedBusPacket->SourceID == interfaceID)
-    {                
-        EventBits = xEventGroupClearBits(
-            EventGroupHandleLocal, /* The event group being updated. */
-            BIT_21);  
-
-        ESP_LOGE(TAG, "4, %d", interfaceID);
-        return false;
-    }    
-
+{         
     ReceiveEventBits = xEventGroupGetBits(ReceiveEventGroupHandle);
-    if((ReceiveEventBits & (1 << interfaceID)) == (1 << interfaceID))
-    {                
-        ESP_LOGE(TAG, "5, %d", interfaceID);
-        ESP_LOGE(TAG, "6, %d", (uint8_t) ReceiveEventBits);                    
+    if((ReceiveEventBits & ALL_DAEMON_IDs) == ALL_DAEMON_IDs)
+    {                    
         return false;
     }
+    
+    xQueuePeek(QueueHandle, SharedBusPacket, 1);    
 
-    ESP_LOGE(TAG, "7, %d", interfaceID);             
-    return true;
-}
-
-/**
- * @brief confirm the running of task body
- * @return nothing
- */
-void SharedBusReceiveConfirmed(
-    TaskInterfaceID_t interfaceID)
-{    
     ReceiveEventBits = xEventGroupSetBits(
-            ReceiveEventGroupHandle, /* The event group being updated. */
-            (1 << interfaceID));      
+                            ReceiveEventGroupHandle, /* The event group being updated. */
+                            (1 << interfaceID));            
+   
+    EventBits = xEventGroupClearBits(
+    EventGroupHandleLocal, /* The event group being updated. */
+    BIT_23);
+               
+    //ESP_LOGE(TAG, "1, %d", interfaceID);             
+    return true;
 }
 
 /**
@@ -183,38 +121,19 @@ void SharedBusReceiveConfirmed(
  */
 esp_err_t SharedBusTaskDaemonRunsConfirmed(    
     TaskInterfaceID_t interfaceID)
-{
-    EventBits = xEventGroupWaitBits(
-                    EventGroupHandleLocal, /* The event group being tested. */
-                    BIT_20,  /* The bits within the event group to wait for. */
-                    pdFALSE, /* BIT 20 should NOT be cleared before returning. */
-                    pdTRUE, /* Wait for 20 bit, either bit will do. */
-                    1);      /* Wait a maximum of 1ms for either bit to be set. */    
-
-    if((EventBits & BIT_20) == BIT_20)
-    {        
-        return false;
-    }
-
-    DaemonEventBits = xEventGroupSync( 
-                        DeamonEventGroupHandle,
-                        (1 << interfaceID),
-                        ALL_DAEMON_IDs,
-                        1); //tick to wait
-
+{       
+    DaemonEventBits = xEventGroupGetBits(DeamonEventGroupHandle);
     if((DaemonEventBits & ALL_DAEMON_IDs) != ALL_DAEMON_IDs)
-    {                
-        // ESP_LOGE(TAG, "1, %d", interfaceID);
-        // ESP_LOGE(TAG, "3, %d", (uint8_t) DaemonEventBits);                    
-        return false;
+    {
+        DaemonEventBits = xEventGroupSetBits(
+                            DeamonEventGroupHandle, /* The event group being updated. */
+                            (1 << interfaceID));  
+        TaskDaemonCnt++;
+        //ESP_LOGE(TAG, "1, %d", interfaceID);        
+        return false;                
     }
-    
-    EventBits = xEventGroupSetBits(
-                        EventGroupHandleLocal, /* The event group being updated. */
-                        BIT_20);               /* The bits being set. */
-        // ESP_LOGE(TAG, "2, %d", interfaceID);
-        // ESP_LOGE(TAG, "4--------------------------, %d", (uint8_t) DaemonEventBits);                    
-    return true;        
+
+    return true;                                                                      
 }
 
 /**
@@ -222,30 +141,21 @@ esp_err_t SharedBusTaskDaemonRunsConfirmed(
  * @return True for permission
  */
 uint8_t SharedBusTaskContinuousPermission()
-{
+{          
     EventBits = xEventGroupWaitBits(
-                    EventGroupHandleLocal, /* The event group being tested. */
-                    BIT_20,  /* The bits within the event group to wait for. */
-                    pdFALSE, /* BIT 20 should NOT be cleared before returning. */
-                    pdTRUE, /* Wait for 20 bit, either bit will do. */
-                    1);      /* Wait a maximum of 1ms for either bit to be set. */    
+                EventGroupHandleLocal, /* The event group being tested. */
+                BIT_20, /* The bits within the event group to wait for. */
+                pdFALSE,/* BIT 20 should NOT be cleared before returning. */
+                pdTRUE, /* Wait for 20 bit, either bit will do. */
+                1);     /* Wait a maximum of 1ms for either bit to be set.*/                    
 
-    if((EventBits & BIT_20) != BIT_20)
+    if((EventBits & BIT_20) == BIT_20)
     {        
         return NOT_ANY_ID;
     }    
-    else
-    {
-        EventBits = xEventGroupWaitBits(
-                    EventGroupHandleLocal, /* The event group being tested. */
-                    BIT_19, /* The bits within the event group to wait for. */
-                    pdFALSE,/* BIT 19 should NOT be cleared before returning. */
-                    pdTRUE, /* Wait for 19 bit, either bit will do. */
-                    1);     /* Wait a maximum of 1ms for either bit to be set.*/                    
-
-        //ESP_LOGE(TAG, "6, %d", TaskID);    
-        return TaskID;                        
-    }
+    
+    //ESP_LOGE(TAG, "5, %d", TaskID);    
+    return TaskID;                            
 }
 
 /**
@@ -253,12 +163,12 @@ uint8_t SharedBusTaskContinuousPermission()
  * @return nothing
  */
 void SharedBusTaskContinuousConfirm()
-{    
-    EventBits = xEventGroupSetBits(
-            EventGroupHandleLocal, /* The event group being updated. */
-            BIT_19);  
-
+{        
     TaskID++;      
     if(TaskID > MAX_TASK_ID - 3)//not NOT_ANY_ID nor mqtt or log
-        TaskID = MAX_TASK_ID;              
+    {        
+        EventBits = xEventGroupSetBits(
+            EventGroupHandleLocal, /* The event group being updated. */
+            BIT_20);           
+    }
 }
