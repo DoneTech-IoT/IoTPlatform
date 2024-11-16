@@ -121,8 +121,7 @@ esp_err_t SharedBusReceive(
     ReceiveEventBits = xEventGroupSetBits(
                             ReceiveEventGroupHandle, /* The event group being updated. */
                             (1 << interfaceID));                        
-                       
-    ESP_LOGE(TAG, "1, %d", interfaceID);             
+                           
     return true;
 }
 
@@ -140,8 +139,7 @@ esp_err_t SharedBusTaskDaemonRunsConfirmed(
         DaemonEventBits = xEventGroupSetBits(
                             DaemonEventGroupHandle, /* The event group being updated. */
                             (1 << interfaceID));  
-        TaskDaemonCnt++;
-        //ESP_LOGE(TAG, "1, %d", interfaceID);        
+        TaskDaemonCnt++;        
         return false;                
     }
 
@@ -166,7 +164,7 @@ uint8_t SharedBusTaskContinuousPermission()
         return NOT_ANY_ID;
     }    
     
-    //ESP_LOGE(TAG, "5, %d", TaskID);    
+    
     return TaskID;                            
 }
 
