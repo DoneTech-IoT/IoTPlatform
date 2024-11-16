@@ -160,8 +160,7 @@ uint8_t SharedBusTaskContinuousPermission()
     if((EventBits & BIT_22) == BIT_22)
     {        
         return NOT_ANY_ID;
-    }    
-    
+    }        
     
     return TaskID;                            
 }
