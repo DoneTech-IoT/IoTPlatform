@@ -19,8 +19,7 @@ static const char *TAG = "SharedBus";
 static EventBits_t EventBits;
 static EventGroupHandle_t EventGroupHandleLocal;
 static uint8_t TaskID = 1;//start by service manager id
-static uint8_t TaskDaemonCnt = 0;//start by service manager id
-static uint8_t TaskReceiveCnt = 0;//start by service manager id
+static uint8_t TaskReceiveCnt = 0;
 QueueHandle_t QueueHandle;
 
 static EventBits_t DaemonEventBits;
@@ -138,8 +137,7 @@ esp_err_t SharedBusTaskDaemonRunsConfirmed(
     {
         DaemonEventBits = xEventGroupSetBits(
                             DaemonEventGroupHandle, /* The event group being updated. */
-                            (1 << interfaceID));  
-        TaskDaemonCnt++;        
+                            (1 << interfaceID));          
         return false;                
     }
 
