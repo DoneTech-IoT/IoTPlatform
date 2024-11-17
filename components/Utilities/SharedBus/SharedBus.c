@@ -2,8 +2,10 @@
 #include "SharedBus.h"
 #include "Custom_Log.h"
 
+#define SHAREDBUS_QUEUE_CAPACITY 1000
+
 #define BIT_23	( 1 << 23 ) //prevent overwriting bus for send 
-#define BIT_22	( 1 << 22 ) //permission for all components to peek from SharedBus 
+#define BIT_22	( 1 << 22 ) //notify the end of task run permission
 
 #define UI_DAEMON_ID        ( 1 << UI_INTERFACE_ID )
 #define MATTER_DAEMON_ID    ( 1 << MATTER_INTERFACE_ID ) 
@@ -43,7 +45,7 @@ esp_err_t SharedBusInit(void)
                     ALL_DAEMON_IDs);      
 
     QueueHandle = xQueueCreate(1, sizeof(SharedBusPacket_t));     
-    SharedBusPacket.data =  malloc(1000);
+    SharedBusPacket.data =  malloc(SHAREDBUS_QUEUE_CAPACITY);
     
     DaemonEventGroupHandle = xEventGroupCreate();  
     DaemonEventBits = xEventGroupClearBits(
