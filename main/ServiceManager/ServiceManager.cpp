@@ -167,9 +167,7 @@ static void ServiceManger_MainTask(void *pvParameter)
         {                             
             switch (SharedBusPacket.PacketID)
             {
-                case MATTER_EVENT_PACKET_ID:
-                    //SharedBusReceiveConfirmed(SERVICE_MANAGER_INTERFACE_ID);                    
-                    ESP_LOGE(TAG, "MATTER_EVENT_PACKET_ID received.");         
+                case MATTER_EVENT_PACKET_ID:                    
                     MatterEventPacketToSend = (MatterEventPacket*) SharedBusPacket.data;
                     if(MatterEventPacketToSend->PublicEventTypes == kInterfaceIpAddressChanged)
                     {
