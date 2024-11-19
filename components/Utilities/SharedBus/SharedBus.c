@@ -11,8 +11,6 @@
 #define MATTER_DAEMON_ID    ( 1 << MATTER_INTERFACE_ID ) 
 #define MQTT_DAEMON_ID      ( 1 << MQTT_INTERFACE_ID )
 #define SERVICE_MANAGER_DAEMON_ID   ( 1 << SERVICE_MANAGER_INTERFACE_ID )
-#define ALL_DAEMON_IDs ( UI_DAEMON_ID    | MATTER_DAEMON_ID |\ 
-                        /*MQTT_DAEMON_ID  |*/ SERVICE_MANAGER_DAEMON_ID )
 
 #define COUNT_ONES(x) __builtin_popcount(x)
 
@@ -22,6 +20,7 @@ static EventBits_t EventBits;
 static EventGroupHandle_t EventGroupHandleLocal;
 static uint8_t TaskID = 1;//start by service manager id
 static uint8_t TaskReceiveCnt = 0;
+static uint32_t AllDaemonIDs = 0;
 QueueHandle_t QueueHandle;
 
 static EventBits_t DaemonEventBits;
@@ -39,10 +38,21 @@ SharedBusPacket_t SharedBusPacket;
  */
 esp_err_t SharedBusInit(void)    
 {    
+    AllDaemonIDs |= SERVICE_MANAGER_DAEMON_ID;
+#ifdef CONFIG_DONE_COMPONENT_LVGL
+    AllDaemonIDs |= UI_DAEMON_ID;
+#endif    
+#ifdef CONFIG_DONE_COMPONENT_MATTER
+    AllDaemonIDs |= MATTER_DAEMON_ID;
+#endif
+// #ifdef CONFIG_DONE_COMPONENT_MQTT  
+//     AllDaemonIDs |= MQTT_DAEMON_ID;
+// #endif
+
     EventGroupHandleLocal = xEventGroupCreate();  
     EventBits = xEventGroupClearBits(
                     EventGroupHandleLocal,
-                    ALL_DAEMON_IDs);      
+                    AllDaemonIDs);      
 
     QueueHandle = xQueueCreate(1, sizeof(SharedBusPacket_t));     
     SharedBusPacket.data =  malloc(SHAREDBUS_QUEUE_CAPACITY);
@@ -50,12 +60,12 @@ esp_err_t SharedBusInit(void)
     DaemonEventGroupHandle = xEventGroupCreate();  
     DaemonEventBits = xEventGroupClearBits(
                             DaemonEventGroupHandle,
-                            ALL_DAEMON_IDs);      
+                            AllDaemonIDs);      
     
     ReceiveEventGroupHandle = xEventGroupCreate();  
     ReceiveEventBits = xEventGroupClearBits(
                             ReceiveEventGroupHandle,
-                            ALL_DAEMON_IDs);      
+                            AllDaemonIDs);      
 
     return true;         
 }
@@ -81,7 +91,7 @@ esp_err_t SharedBusSend(SharedBusPacket_t SharedBusPacket)
 
     ReceiveEventBits = xEventGroupClearBits(
                             ReceiveEventGroupHandle,
-                            ALL_DAEMON_IDs);      
+                            AllDaemonIDs);      
 
     EventBits = xEventGroupSetBits(
                     EventGroupHandleLocal, /* The event group being updated. */
@@ -102,7 +112,7 @@ esp_err_t SharedBusReceive(
     SharedBusPacket_t *SharedBusPacket,
     TaskInterfaceID_t interfaceID)
 {       
-    if(TaskReceiveCnt == COUNT_ONES(ALL_DAEMON_IDs))
+    if(TaskReceiveCnt == COUNT_ONES(AllDaemonIDs))
     {
         TaskReceiveCnt = 0; 
         EventBits = xEventGroupClearBits(
@@ -135,7 +145,7 @@ esp_err_t SharedBusTaskDaemonRunsConfirmed(
     TaskInterfaceID_t interfaceID)
 {       
     DaemonEventBits = xEventGroupGetBits(DaemonEventGroupHandle);
-    if((DaemonEventBits & ALL_DAEMON_IDs) != ALL_DAEMON_IDs)
+    if((DaemonEventBits & AllDaemonIDs) != AllDaemonIDs)
     {
         DaemonEventBits = xEventGroupSetBits(
                             DaemonEventGroupHandle, /* The event group being updated. */
@@ -174,7 +184,7 @@ uint8_t SharedBusTaskContinuousPermission()
 void SharedBusTaskContinuousConfirm()
 {        
     TaskID++;      
-    if(TaskID > COUNT_ONES(ALL_DAEMON_IDs))
+    if(TaskID > COUNT_ONES(AllDaemonIDs))
     {        
         TaskID = 0;
         EventBits = xEventGroupSetBits(
