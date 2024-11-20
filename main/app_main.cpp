@@ -12,6 +12,6 @@ extern "C" void app_main()
 {
 
     Log_RamOccupy("main", "service manager");
-    ServiceManger_Init();
+    ServiceManger_TaskInit();
     Log_RamOccupy("main", "service manager");
 }

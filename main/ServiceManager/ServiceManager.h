@@ -37,7 +37,7 @@
 #define LVGL_STACK 100 * 1024 // in word not byte
 #define SERVICE_MANGER_STACK 30 * 1024
 #define NUMBER_OF_COSTUME_TASK 10
-#define MATTER_STACK_SIZE 30 * 1024
+#define MATTER_STACK_SIZE 20 * 1024
 #define MQTT_STACK 30 * 1024
 
 typedef enum
@@ -54,14 +54,13 @@ typedef enum
 
 typedef void (*TaskCreatorPtr)(void);
 typedef void (*TaskKillerPtr)(TaskHandle_t *);
-typedef esp_err_t (*TaskInitPtr)(void*, 
+typedef esp_err_t (*TaskInitPtr)(
                             TaskHandle_t *taskHandler,
                             UBaseType_t taskPriority,
                             uint32_t taskStack);
 typedef struct
 {
-    char name[32];            // Task name
-    void *interfaceHandler;                             // Interface handler
+    char name[32];            // Task name    
     UBaseType_t priority;     // Priority of the task
     uint32_t startupRAM;      // Amount of RAM needed at startup time
     TaskHandle_t taskHandler; // Pointer to the task handler function
@@ -84,7 +83,7 @@ typedef struct
  * This function initializes the Service Manager task by allocating memory and creating the task.
  * @return void
  */
-void ServiceManger_Init();
+void ServiceManger_TaskInit();
 
 /* 
     * @brief run given service.
@@ -94,4 +93,5 @@ void ServiceManger_Init();
     * @retval ESP_OK if the service is run successfully, otherwise ESP_FAIL
 */ 
 esp_err_t ServiceManager_RunService(ServiceParams_t serviceParams);
+
 #endif

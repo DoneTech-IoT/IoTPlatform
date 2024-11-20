@@ -6,31 +6,24 @@
 static const char *TAG = "Service_Manager";
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
-MatterInterfaceHandler_t MatterInterfaceHandler;
 static TaskHandle_t MatterHandle = NULL;
 #endif  //CONFIG_DONE_COMPONENT_MATTER
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
-MQTT_InterfaceHandler_t MQTT_InterfaceHandler;
 static QueueHandle_t MQTTDataFromBrokerQueue;
 static SemaphoreHandle_t MQTTConnectedSemaphore;
 static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
 static TaskHandle_t MQTTHandle = NULL;
 
+extern SharedBusPacket_t SharedBusPacket;
+static MatterEventPacket *MatterEventPacketToSend;
 #endif  //CONFIG_DONE_COMPONENT_MQTT
 
 #define TASK_LIST_BUFFER_SIZE 512
 // #define MONITORING
-/**
- * @brief Task function for the Service Manager task.
- * This task initializes and manages other tasks.
- * @param pvParameter Pointer to task parameters.
- * @return void
- */
-void ServiceMangerTask(void *pvParameter);
 
 // Global instance of Service Manager
-ServiceManger_t ServiceManger;
+static ServiceManger_t ServiceManger;
 
 /**
  * @brief Deletes a task.
@@ -42,25 +35,6 @@ void TaskKiller(int TaskNumber)
 {
     ServiceManger.Services[TaskNumber].TaskKiller(&ServiceManger.Services[TaskNumber].taskHandler);
     ESP_LOGI(TAG, "Task %d Deleted !", TaskNumber);
-}
-
-/**
- * @brief Initializes the Service Manager task.
- * This function initializes the Service Manager task by allocating memory and creating the task.
- * @return void
- */
-void ServiceManger_Init()
-{
-    StaticTask_t *xTaskServiceMangerBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
-    StackType_t *xServiceMangerStack = (StackType_t *)malloc(SERVICE_MANGER_STACK * sizeof(StackType_t));
-    xTaskCreateStatic(
-        ServiceMangerTask,         // Task function
-        "ServiceMangerTask",       // Task name (for debugging)
-        SERVICE_MANGER_STACK,      // Stack size (in words)
-        NULL,                      // Task parameters (passed to the task function)
-        tskIDLE_PRIORITY + 1,      // Task priority (adjust as needed)
-        xServiceMangerStack,       // Stack buffer
-        xTaskServiceMangerBuffer); // Task control block
 }
 
 /* 
@@ -76,8 +50,7 @@ esp_err_t ServiceManager_RunService(ServiceParams_t serviceParams)
 
     // Call the function pointer (init_func) with proper arguments
     TaskInitPtr init_func = serviceParams.TaskInit;
-    err = init_func(serviceParams.interfaceHandler, 
-                    &serviceParams.taskHandler, 
+    err = init_func(&serviceParams.taskHandler, 
                     serviceParams.priority, 
                     serviceParams.taskStack);
     if (err != ESP_OK) 
@@ -89,25 +62,9 @@ esp_err_t ServiceManager_RunService(ServiceParams_t serviceParams)
     return ESP_OK;
 }
 
-/**
- * @brief Task function for the Service Manager task.
- * This task initializes and manages other tasks.
- * @param pvParameter Pointer to task parameters.
- * @return void
- */
-void ServiceMangerTask(void *pvParameter)
-{
+static void ServiceManger_RunAllDaemons()
+{    
     esp_err_t err;
-    nvsFlashInit();
-    
-    if (SharedBusInit())
-    {
-        ESP_LOGI(TAG, "initialized SharedBus successfully");
-    }
-    else
-    {
-        ESP_LOGE(TAG, "Failed to Initialize SharedBus.");
-    }
 
     ServiceParams_t GUIParams;
     GUIParams.maximumRAM_Needed = LVGL_STACK * 2;
@@ -115,8 +72,7 @@ void ServiceMangerTask(void *pvParameter)
     GUIParams.ramType = PSRAM_;
     GUIParams.TaskKiller = GUI_TaskKill;
     GUIParams.taskStack = LVGL_STACK;
-    GUIParams.priority = tskIDLE_PRIORITY + 1;
-    GUIParams.taskHandler = NULL;
+    GUIParams.priority = tskIDLE_PRIORITY + 1;    
     GUIParams.TaskInit = GUI_TaskInit;
     err = ServiceManager_RunService(GUIParams);
     if (err)
@@ -125,15 +81,13 @@ void ServiceMangerTask(void *pvParameter)
     }
     else
     {
-        ESP_LOGI(TAG, "GUI Created !");        
-    }
-    vTaskDelay(pdMS_TO_TICKS(1000));
+        ESP_LOGI(TAG, "GUI Daemon Created !");        
+    }    
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
     // Config and Run Matter        
     ServiceParams_t MatterParams;
-    strcpy(MatterParams.name, "Matter");
-    MatterParams.interfaceHandler = &MatterInterfaceHandler;
+    strcpy(MatterParams.name, "Matter");    
     MatterParams.maximumRAM_Needed = 0;
     MatterParams.ramType = SRAM_;
     MatterParams.TaskKiller = Matter_TaskKill;
@@ -148,50 +102,117 @@ void ServiceMangerTask(void *pvParameter)
     }
     else 
     {
-        ESP_LOGI(TAG, "Matter Created !");
+        ESP_LOGI(TAG, "Matter Daemon Created !");
     }
 #endif
-
-    vTaskDelay(pdMS_TO_TICKS(1000));
-
+    
 #ifdef CONFIG_DONE_COMPONENT_MQTT
     // Config and Run MQTT
-    MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
-    MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
-    MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
+    // MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
+    // MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
+    // MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
 
-    ServiceParams_t MQTTParams;
-    strcpy(MQTTParams.name, "MQTT");
-    MQTTParams.maximumRAM_Needed = 0;
-    MQTTParams.interfaceHandler = &MQTT_InterfaceHandler;
-    MQTTParams.ramType = SRAM_;
-    MQTTParams.TaskKiller = MQTT_TaskKill;
-    MQTTParams.taskStack = MQTT_STACK;
-    MQTTParams.priority = tskIDLE_PRIORITY + 1;
-    MQTTParams.taskHandler = MQTTHandle;
-    MQTTParams.TaskInit = MQTT_TaskInit;
-    err = ServiceManager_RunService (MQTTParams);
-    if (err)
+    // ServiceParams_t MQTTParams;
+    // strcpy(MQTTParams.name, "MQTT");
+    // MQTTParams.maximumRAM_Needed = 0;                
+    // MQTTParams.ramType = SRAM_;
+    // MQTTParams.TaskKiller = MQTT_TaskKill;
+    // MQTTParams.taskStack = MQTT_STACK;
+    // MQTTParams.priority = tskIDLE_PRIORITY + 1;
+    // MQTTParams.taskHandler = MQTTHandle;
+    // MQTTParams.TaskInit = MQTT_TaskInit;
+    // err = ServiceManager_RunService (MQTTParams);
+    // if (err)
+    // {
+    //     ESP_LOGE(TAG, "Failed to create MQTT !");
+    // }
+    // else
+    // {
+    //     ESP_LOGI(TAG, "MQTT Daemon Created !");
+    //     vTaskDelay(pdMS_TO_TICKS(500));
+    //     MQTT_Start();
+    //     vTaskDelay(pdMS_TO_TICKS(500));   
+    // }
+    // CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
+#endif  //CONFIG_DONE_COMPONENT_MQTT
+}
+
+/**
+ * @brief Task function for the Service Manager task.
+ * This task initializes and manages other tasks.
+ * @param pvParameter Pointer to task parameters.
+ * @return void
+ */
+static void ServiceManger_MainTask(void *pvParameter)
+{    
+    nvsFlashInit();
+    
+    if (SharedBusInit())
     {
-        ESP_LOGE(TAG, "Failed to create MQTT !");
+        ESP_LOGI(TAG, "initialized SharedBus successfully");
     }
     else
     {
-        ESP_LOGI(TAG, "MQTT Created !");
-        vTaskDelay(pdMS_TO_TICKS(500));
-        MQTT_Start();
-        vTaskDelay(pdMS_TO_TICKS(500));   
-    }
-#endif  //CONFIG_DONE_COMPONENT_MQTT
+        ESP_LOGE(TAG, "Failed to Initialize SharedBus.");
+    }                
 
-    CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
-    // char pcTaskList[TASK_LIST_BUFFER_SIZE];
+#ifdef MONITORING
+// char pcTaskList[TASK_LIST_BUFFER_SIZE];
+#endif                
+    
+    bool JustRunOneTime = true;
     while (true)
-    {
+    {        
+        if(SharedBusReceive(&SharedBusPacket, SERVICE_MANAGER_INTERFACE_ID))        
+        {                             
+            switch (SharedBusPacket.PacketID)
+            {
+                case MATTER_EVENT_PACKET_ID:                    
+                    MatterEventPacketToSend = (MatterEventPacket*) SharedBusPacket.data;
+                    if(MatterEventPacketToSend->PublicEventTypes == kInterfaceIpAddressChanged)
+                    {
+                        
+                    }
+                    break;
+            
+                default:
+                    break;
+            }
+        }
+                
+        SharedBusTaskDaemonRunsConfirmed(SERVICE_MANAGER_INTERFACE_ID);                
+        if(JustRunOneTime)
+        {
+            JustRunOneTime = false;            
+            ESP_LOGI(TAG, "Service Manager Daemon Created !");            
+            ServiceManger_RunAllDaemons();              
+            SharedBusTaskContinuousConfirm();
+        }                                       
+
+        vTaskDelay(pdMS_TO_TICKS(1));
+
 #ifdef MONITORING
 // vTaskList(pcTaskList);
 // ESP_LOGI(TAG, "Task List:\n%s\n", pcTaskList);
-#endif
-        vTaskDelay(pdMS_TO_TICKS(500));
+#endif                
     }
+}
+
+/**
+ * @brief Initializes the Service Manager task.
+ * This function initializes the Service Manager task by allocating memory and creating the task.
+ * @return void
+ */
+void ServiceManger_TaskInit()
+{
+    StaticTask_t *xTaskServiceMangerBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
+    StackType_t *xServiceMangerStack = (StackType_t *)malloc(SERVICE_MANGER_STACK * sizeof(StackType_t));
+    xTaskCreateStatic(
+        ServiceManger_MainTask,         // Task function
+        "ServiceMangerTask",       // Task name (for debugging)
+        SERVICE_MANGER_STACK,      // Stack size (in words)
+        NULL,                      // Task parameters (passed to the task function)
+        tskIDLE_PRIORITY + 1,      // Task priority (adjust as needed)
+        xServiceMangerStack,       // Stack buffer
+        xTaskServiceMangerBuffer); // Task control block
 }
