@@ -8,7 +8,8 @@ typedef enum
 {
     IDLE = 0,
     INIT,
-    START,    
+    START,
+    ACTIVE, 
 }ServiceManagerDaemonState;
 static ServiceManagerDaemonState State;
 
@@ -193,7 +194,7 @@ static void ServiceManger_MainTask(void *pvParameter)
         {
             case ServiceManagerDaemonState::IDLE:
                 break;
-            case ServiceManagerDaemonState::INIT:    
+            case ServiceManagerDaemonState::INIT:   
                 SharedBusTaskDaemonRunsConfirmed(SERVICE_MANAGER_INTERFACE_ID);
                 State = ServiceManagerDaemonState::START;
                 break;
@@ -202,7 +203,12 @@ static void ServiceManger_MainTask(void *pvParameter)
                 ESP_LOGI(TAG, "Service Manager Daemon Created !");            
                 ServiceManger_RunAllDaemons();              
                 SharedBusTaskContinuousConfirm();
-                State = ServiceManagerDaemonState::IDLE;
+                State = ServiceManagerDaemonState::ACTIVE;
+                break;
+
+            case ServiceManagerDaemonState::ACTIVE:
+                //TODO: call ProcessMessageFunction to 
+                //TODO: process sharedbus messages
                 break;
 
             default:
