@@ -3,6 +3,15 @@
 #include "SharedBus.h"
 #include "GUI.h"
 
+// ****************************** Local Variables
+typedef enum 
+{
+    IDLE = 0,
+    INIT,
+    START,    
+}ServiceManagerDaemonState;
+static ServiceManagerDaemonState State;
+
 static const char *TAG = "Service_Manager";
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
@@ -160,7 +169,7 @@ static void ServiceManger_MainTask(void *pvParameter)
 // char pcTaskList[TASK_LIST_BUFFER_SIZE];
 #endif                
     
-    bool JustRunOneTime = true;
+    State = ServiceManagerDaemonState::INIT;
     while (true)
     {        
         if(SharedBusReceive(&SharedBusPacket, SERVICE_MANAGER_INTERFACE_ID))        
@@ -180,14 +189,25 @@ static void ServiceManger_MainTask(void *pvParameter)
             }
         }
                 
-        SharedBusTaskDaemonRunsConfirmed(SERVICE_MANAGER_INTERFACE_ID);                
-        if(JustRunOneTime)
+        switch (State)
         {
-            JustRunOneTime = false;            
-            ESP_LOGI(TAG, "Service Manager Daemon Created !");            
-            ServiceManger_RunAllDaemons();              
-            SharedBusTaskContinuousConfirm();
-        }                                       
+            case ServiceManagerDaemonState::IDLE:
+                break;
+            case ServiceManagerDaemonState::INIT:    
+                SharedBusTaskDaemonRunsConfirmed(SERVICE_MANAGER_INTERFACE_ID);
+                State = ServiceManagerDaemonState::START;
+                break;
+
+            case ServiceManagerDaemonState::START:        
+                ESP_LOGI(TAG, "Service Manager Daemon Created !");            
+                ServiceManger_RunAllDaemons();              
+                SharedBusTaskContinuousConfirm();
+                State = ServiceManagerDaemonState::IDLE;
+                break;
+
+            default:
+                break;
+        }                                                     
 
         vTaskDelay(pdMS_TO_TICKS(1));
 
