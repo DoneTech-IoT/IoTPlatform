@@ -10,8 +10,8 @@ typedef enum
     INIT,
     START,
     ACTIVE, 
-}ServiceManagerDaemonState;
-static ServiceManagerDaemonState State;
+}DaemonState;
+static DaemonState State;
 
 static const char *TAG = "Service_Manager";
 
@@ -170,7 +170,7 @@ static void ServiceManger_MainTask(void *pvParameter)
 // char pcTaskList[TASK_LIST_BUFFER_SIZE];
 #endif                
     
-    State = ServiceManagerDaemonState::INIT;
+    State = DaemonState::INIT;
     while (true)
     {        
         if(SharedBusReceive(&SharedBusPacket, SERVICE_MANAGER_INTERFACE_ID))        
@@ -192,21 +192,21 @@ static void ServiceManger_MainTask(void *pvParameter)
                 
         switch (State)
         {
-            case ServiceManagerDaemonState::IDLE:
+            case DaemonState::IDLE:
                 break;
-            case ServiceManagerDaemonState::INIT:   
+            case DaemonState::INIT:   
                 SharedBusTaskDaemonRunsConfirmed(SERVICE_MANAGER_INTERFACE_ID);
-                State = ServiceManagerDaemonState::START;
+                State = DaemonState::START;
                 break;
 
-            case ServiceManagerDaemonState::START:        
+            case DaemonState::START:        
                 ESP_LOGI(TAG, "Service Manager Daemon Created !");            
                 ServiceManger_RunAllDaemons();              
                 SharedBusTaskContinuousConfirm();
-                State = ServiceManagerDaemonState::ACTIVE;
+                State = DaemonState::ACTIVE;
                 break;
 
-            case ServiceManagerDaemonState::ACTIVE:
+            case DaemonState::ACTIVE:
                 //TODO: call ProcessMessageFunction to 
                 //TODO: process sharedbus messages
                 break;
