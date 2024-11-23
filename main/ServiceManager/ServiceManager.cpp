@@ -3,6 +3,16 @@
 #include "SharedBus.h"
 #include "GUI.h"
 
+// ****************************** Local Variables
+typedef enum 
+{
+    IDLE = 0,
+    INIT,
+    START,
+    ACTIVE, 
+}DaemonState;
+static DaemonState State;
+
 static const char *TAG = "Service_Manager";
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
@@ -160,7 +170,7 @@ static void ServiceManger_MainTask(void *pvParameter)
 // char pcTaskList[TASK_LIST_BUFFER_SIZE];
 #endif                
     
-    bool JustRunOneTime = true;
+    State = DaemonState::INIT;
     while (true)
     {        
         if(SharedBusReceive(&SharedBusPacket, SERVICE_MANAGER_INTERFACE_ID))        
@@ -180,14 +190,30 @@ static void ServiceManger_MainTask(void *pvParameter)
             }
         }
                 
-        SharedBusTaskDaemonRunsConfirmed(SERVICE_MANAGER_INTERFACE_ID);                
-        if(JustRunOneTime)
+        switch (State)
         {
-            JustRunOneTime = false;            
-            ESP_LOGI(TAG, "Service Manager Daemon Created !");            
-            ServiceManger_RunAllDaemons();              
-            SharedBusTaskContinuousConfirm();
-        }                                       
+            case DaemonState::IDLE:
+                break;
+            case DaemonState::INIT:   
+                SharedBusTaskDaemonRunsConfirmed(SERVICE_MANAGER_INTERFACE_ID);
+                State = DaemonState::START;
+                break;
+
+            case DaemonState::START:        
+                ESP_LOGI(TAG, "Service Manager Daemon Created !");            
+                ServiceManger_RunAllDaemons();              
+                SharedBusTaskContinuousConfirm();
+                State = DaemonState::ACTIVE;
+                break;
+
+            case DaemonState::ACTIVE:
+                //TODO: call ProcessMessageFunction to 
+                //TODO: process sharedbus messages
+                break;
+
+            default:
+                break;
+        }                                                     
 
         vTaskDelay(pdMS_TO_TICKS(1));
 
