@@ -45,9 +45,9 @@ esp_err_t SharedBusInit(void)
 #ifdef CONFIG_DONE_COMPONENT_MATTER
     AllDaemonIDs |= MATTER_DAEMON_ID;
 #endif
-// #ifdef CONFIG_DONE_COMPONENT_MQTT  
-//     AllDaemonIDs |= MQTT_DAEMON_ID;
-// #endif
+#ifdef CONFIG_DONE_COMPONENT_MQTT  
+    AllDaemonIDs |= MQTT_DAEMON_ID;
+#endif
 
     EventGroupHandleLocal = xEventGroupCreate();  
     EventBits = xEventGroupClearBits(
