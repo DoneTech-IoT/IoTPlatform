@@ -94,8 +94,7 @@ static void ServiceManger_RunAllDaemons()
         ESP_LOGI(TAG, "GUI Daemon Created !");        
     }    
 
-#ifdef CONFIG_DONE_COMPONENT_MATTER
-    // Config and Run Matter        
+#ifdef CONFIG_DONE_COMPONENT_MATTER    
     ServiceParams_t MatterParams;
     strcpy(MatterParams.name, "Matter");    
     MatterParams.maximumRAM_Needed = 0;
@@ -116,34 +115,25 @@ static void ServiceManger_RunAllDaemons()
     }
 #endif
     
-#ifdef CONFIG_DONE_COMPONENT_MQTT
-    // Config and Run MQTT
-    // MQTT_InterfaceHandler.ErrorDisconnectSemaphore = &MQTTErrorOrDisconnectSemaphore;
-    // MQTT_InterfaceHandler.IsConnectedSemaphore = &MQTTConnectedSemaphore;
-    // MQTT_InterfaceHandler.BrokerIncomingDataQueue = &MQTTDataFromBrokerQueue;
-
-    // ServiceParams_t MQTTParams;
-    // strcpy(MQTTParams.name, "MQTT");
-    // MQTTParams.maximumRAM_Needed = 0;                
-    // MQTTParams.ramType = SRAM_;
-    // MQTTParams.TaskKiller = MQTT_TaskKill;
-    // MQTTParams.taskStack = MQTT_STACK;
-    // MQTTParams.priority = tskIDLE_PRIORITY + 1;
-    // MQTTParams.taskHandler = MQTTHandle;
-    // MQTTParams.TaskInit = MQTT_TaskInit;
-    // err = ServiceManager_RunService (MQTTParams);
-    // if (err)
-    // {
-    //     ESP_LOGE(TAG, "Failed to create MQTT !");
-    // }
-    // else
-    // {
-    //     ESP_LOGI(TAG, "MQTT Daemon Created !");
-    //     vTaskDelay(pdMS_TO_TICKS(500));
-    //     MQTT_Start();
-    //     vTaskDelay(pdMS_TO_TICKS(500));   
-    // }
-    // CoffeeMakerApplication(&MQTTDataFromBrokerQueue, &MQTTConnectedSemaphore, &MQTTErrorOrDisconnectSemaphore);
+#ifdef CONFIG_DONE_COMPONENT_MQTT    
+    ServiceParams_t MQTTParams;
+    strcpy(MQTTParams.name, "MQTT");
+    MQTTParams.maximumRAM_Needed = 0;                
+    MQTTParams.ramType = SRAM_;
+    MQTTParams.TaskKiller = MQTT_TaskKill;
+    MQTTParams.taskStack = MQTT_STACK;
+    MQTTParams.priority = tskIDLE_PRIORITY + 1;
+    MQTTParams.taskHandler = MQTTHandle;
+    MQTTParams.TaskInit = MQTT_TaskInit;
+    err = ServiceManager_RunService (MQTTParams);
+    if (err)
+    {
+        ESP_LOGE(TAG, "Failed to create MQTT !");
+    }    
+    else 
+    {
+        ESP_LOGI(TAG, "MQTT Daemon Created !");
+    }
 #endif  //CONFIG_DONE_COMPONENT_MQTT
 }
 
