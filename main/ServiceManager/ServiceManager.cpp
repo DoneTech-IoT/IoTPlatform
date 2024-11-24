@@ -1,5 +1,4 @@
 #include "ServiceManager.h"
-#include "CoffeeMakerApp.hpp"
 #include "SharedBus.h"
 #include "GUI.h"
 
