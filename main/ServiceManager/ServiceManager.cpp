@@ -25,7 +25,7 @@ static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
 static TaskHandle_t MQTTHandle = NULL;
 
 extern SharedBusPacket_t SharedBusPacket;
-static MatterEventPacket *MatterEventPacketToSend;
+static MatterEventPacket *MatterEventReceivedPacket;
 #endif  //CONFIG_DONE_COMPONENT_MQTT
 
 #define TASK_LIST_BUFFER_SIZE 512
@@ -164,19 +164,7 @@ static void ServiceManger_MainTask(void *pvParameter)
     {        
         if(SharedBusReceive(&SharedBusPacket, SERVICE_MANAGER_INTERFACE_ID))        
         {                             
-            switch (SharedBusPacket.PacketID)
-            {
-                case MATTER_EVENT_PACKET_ID:                    
-                    MatterEventPacketToSend = (MatterEventPacket*) SharedBusPacket.data;
-                    if(MatterEventPacketToSend->PublicEventTypes == kInterfaceIpAddressChanged)
-                    {
-                        
-                    }
-                    break;
             
-                default:
-                    break;
-            }
         }
                 
         switch (State)
