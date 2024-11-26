@@ -33,12 +33,11 @@
 #include "MQTT_Interface.h"
 #endif
 
-
-#define LVGL_STACK 100 * 1024 // in word not byte
-#define SERVICE_MANGER_STACK 30 * 1024
 #define NUMBER_OF_COSTUME_TASK 10
-#define MATTER_STACK_SIZE 20 * 1024
-#define MQTT_STACK 30 * 1024
+#define LVGL_STACK 70 * 1024 // in word not byte
+#define SERVICE_MANGER_STACK 15 * 1024
+#define MATTER_STACK_SIZE 15 * 1024
+#define MQTT_STACK 20 * 1024
 
 typedef enum
 {
