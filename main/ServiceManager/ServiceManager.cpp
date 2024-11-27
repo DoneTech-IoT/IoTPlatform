@@ -19,14 +19,11 @@ static TaskHandle_t MatterHandle = NULL;
 #endif  //CONFIG_DONE_COMPONENT_MATTER
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
-static QueueHandle_t MQTTDataFromBrokerQueue;
-static SemaphoreHandle_t MQTTConnectedSemaphore;
-static SemaphoreHandle_t MQTTErrorOrDisconnectSemaphore;
 static TaskHandle_t MQTTHandle = NULL;
+#endif  //CONFIG_DONE_COMPONENT_MQTT
 
 extern SharedBusPacket_t SharedBusPacket;
 static MatterEventPacket *MatterEventReceivedPacket;
-#endif  //CONFIG_DONE_COMPONENT_MQTT
 
 #define TASK_LIST_BUFFER_SIZE 512
 // #define MONITORING
