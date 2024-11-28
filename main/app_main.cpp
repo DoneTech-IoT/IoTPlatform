@@ -6,6 +6,14 @@
 
 #define HEARTBEAT_GPIO GPIO_NUM_21
 
+// Define the heartbeat pattern in milliseconds
+const int HeartbeatPattern[] = {
+    200, // First "lub" (on time)
+    100, // Pause between "lub" and "dub"
+    200, // Second "dub" (on time)
+    1000 // Rest time before the next heartbeat
+};
+const int HeartbeatPatternLength = sizeof(HeartbeatPattern) / sizeof(HeartbeatPattern[0]);
 static const char *TAG = "Main";
 
 /**
@@ -13,7 +21,6 @@ static const char *TAG = "Main";
  */
 extern "C" void app_main()
 {
-
     Log_RamOccupy("main", "service manager");
     ServiceManger_TaskInit();
     Log_RamOccupy("main", "service manager");
@@ -28,9 +35,12 @@ extern "C" void app_main()
 
     while (true)
     {
-        gpio_set_level(HEARTBEAT_GPIO, 1);  
-        vTaskDelay(pdMS_TO_TICKS(500));    
-        gpio_set_level(HEARTBEAT_GPIO, 0); 
-        vTaskDelay(pdMS_TO_TICKS(500));
+        for (int i = 0; i < HeartbeatPatternLength; i++) 
+        {
+            // Toggle GPIO state (ON -> OFF -> ON -> ...)
+            gpio_set_level(HEARTBEAT_GPIO, i % 2);
+            // Wait for the current pattern duration
+            vTaskDelay(pdMS_TO_TICKS(HeartbeatPattern[i]));
+        }
     }
 }
