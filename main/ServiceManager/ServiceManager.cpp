@@ -22,6 +22,9 @@ static TaskHandle_t MatterHandle = NULL;
 static TaskHandle_t MQTTHandle = NULL;
 #endif  //CONFIG_DONE_COMPONENT_MQTT
 
+StaticTask_t xTaskServiceMangerBuffer;
+StackType_t *xServiceMangerStack;
+
 extern SharedBusPacket_t SharedBusPacket;
 static MatterEventPacket *MatterEventReceivedPacket;
 
@@ -205,8 +208,7 @@ static void ServiceManger_MainTask(void *pvParameter)
  */
 void ServiceManger_TaskInit()
 {
-    StaticTask_t *xTaskServiceMangerBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
-    StackType_t *xServiceMangerStack = (StackType_t *)malloc(SERVICE_MANGER_STACK * sizeof(StackType_t));
+    xServiceMangerStack = (StackType_t *)malloc(SERVICE_MANGER_STACK * sizeof(StackType_t));
     xTaskCreateStatic(
         ServiceManger_MainTask,         // Task function
         "ServiceMangerTask",       // Task name (for debugging)
@@ -214,5 +216,5 @@ void ServiceManger_TaskInit()
         NULL,                      // Task parameters (passed to the task function)
         tskIDLE_PRIORITY + 1,      // Task priority (adjust as needed)
         xServiceMangerStack,       // Stack buffer
-        xTaskServiceMangerBuffer); // Task control block
+        &xTaskServiceMangerBuffer); // Task control block
 }
