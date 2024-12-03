@@ -32,36 +32,13 @@ extern "C" void app_main()
     heartBeatConf.pin_bit_mask = (1ULL << HEARTBEAT_GPIO);
     heartBeatConf.pull_down_en = GPIO_PULLDOWN_DISABLE;
     heartBeatConf.pull_up_en = GPIO_PULLUP_DISABLE;
-    gpio_config(&heartBeatConf);
-
-    ESP_LOGW(
-        TAG,
-        "\n"
-        "  Free Heap:           %u  bytes\n"
-        "  MALLOC_CAP_8BIT      %7zu bytes\n"
-        "  MALLOC_CAP_DMA       %7zu bytes\n"
-        "  MALLOC_CAP_SPIRAM    %7zu bytes\n"
-        "  MALLOC_CAP_INTERNAL  %7zu bytes\n"
-        "  MALLOC_CAP_DEFAULT   %7zu bytes\n"
-        "  MALLOC_CAP_IRAM_8BIT %7zu bytes\n"
-        "  MALLOC_CAP_RETENTION %7zu bytes\n",
-        xPortGetFreeHeapSize(),
-        heap_caps_get_free_size(MALLOC_CAP_8BIT),
-        heap_caps_get_free_size(MALLOC_CAP_DMA),
-        heap_caps_get_free_size(MALLOC_CAP_SPIRAM),
-        heap_caps_get_free_size(MALLOC_CAP_INTERNAL),
-        heap_caps_get_free_size(MALLOC_CAP_DEFAULT),
-        heap_caps_get_free_size(MALLOC_CAP_IRAM_8BIT),
-        heap_caps_get_free_size(MALLOC_CAP_RETENTION)
-    );
+    gpio_config(&heartBeatConf);    
 
     while (true)
     {
         for (int i = 0; i < HeartbeatPatternLength; i++) 
-        {
-            // Toggle GPIO state (ON -> OFF -> ON -> ...)
-            gpio_set_level(HEARTBEAT_GPIO, i % 2);
-            // Wait for the current pattern duration
+        {            
+            gpio_set_level(HEARTBEAT_GPIO, i % 2);            
             vTaskDelay(pdMS_TO_TICKS(HeartbeatPattern[i]));
         }
     }
