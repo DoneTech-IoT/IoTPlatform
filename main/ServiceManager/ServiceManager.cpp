@@ -14,6 +14,10 @@ static DaemonState State;
 
 static const char *TAG = "Service_Manager";
 
+#ifdef CONFIG_DONE_COMPONENT_LVGL
+static TaskHandle_t LVGLHandle = NULL;
+#endif  //CONFIG_DONE_COMPONENT_LVGL
+
 #ifdef CONFIG_DONE_COMPONENT_MATTER
 static TaskHandle_t MatterHandle = NULL;
 #endif  //CONFIG_DONE_COMPONENT_MATTER
@@ -72,13 +76,15 @@ static void ServiceManger_RunAllDaemons()
 {    
     esp_err_t err;
 
+#ifdef CONFIG_DONE_COMPONENT_LVGL    
     ServiceParams_t GUIParams;
     GUIParams.maximumRAM_Needed = LVGL_STACK * 2;
     strcpy(GUIParams.name, "GUI");
     GUIParams.ramType = PSRAM_;
     GUIParams.TaskKiller = GUI_TaskKill;
     GUIParams.taskStack = LVGL_STACK;
-    GUIParams.priority = tskIDLE_PRIORITY + 1;    
+    GUIParams.priority = tskIDLE_PRIORITY + 1;  
+    GUIParams.taskHandler = LVGLHandle;  
     GUIParams.TaskInit = GUI_TaskInit;
     err = ServiceManager_RunService(GUIParams);
     if (err)
@@ -89,6 +95,7 @@ static void ServiceManger_RunAllDaemons()
     {
         ESP_LOGI(TAG, "GUI Daemon Created !");        
     }    
+#endif //CONFIG_DONE_COMPONENT_LVGL
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER    
     ServiceParams_t MatterParams;
@@ -109,7 +116,7 @@ static void ServiceManger_RunAllDaemons()
     {
         ESP_LOGI(TAG, "Matter Daemon Created !");
     }
-#endif
+#endif //CONFIG_DONE_COMPONENT_MATTER
     
 #ifdef CONFIG_DONE_COMPONENT_MQTT    
     ServiceParams_t MQTTParams;
@@ -130,7 +137,7 @@ static void ServiceManger_RunAllDaemons()
     {
         ESP_LOGI(TAG, "MQTT Daemon Created !");
     }
-#endif  //CONFIG_DONE_COMPONENT_MQTT
+#endif //CONFIG_DONE_COMPONENT_MQTT
 }
 
 /**
