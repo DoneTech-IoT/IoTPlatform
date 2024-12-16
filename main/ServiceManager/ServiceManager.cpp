@@ -3,28 +3,28 @@
 #include "GUI.h"
 
 // ****************************** Local Variables
-typedef enum 
+typedef enum
 {
     IDLE = 0,
     INIT,
     START,
-    ACTIVE, 
-}DaemonState;
+    ACTIVE,
+} DaemonState;
 static DaemonState State;
 
 static const char *TAG = "Service_Manager";
 
 #ifdef CONFIG_DONE_COMPONENT_LVGL
 static TaskHandle_t LVGLHandle = NULL;
-#endif  //CONFIG_DONE_COMPONENT_LVGL
+#endif // CONFIG_DONE_COMPONENT_LVGL
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER
 static TaskHandle_t MatterHandle = NULL;
-#endif  //CONFIG_DONE_COMPONENT_MATTER
+#endif // CONFIG_DONE_COMPONENT_MATTER
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
 static TaskHandle_t MQTTHandle = NULL;
-#endif  //CONFIG_DONE_COMPONENT_MQTT
+#endif // CONFIG_DONE_COMPONENT_MQTT
 
 extern SharedBusPacket_t SharedBusPacket;
 static MatterEventPacket *MatterEventReceivedPacket;
@@ -47,23 +47,23 @@ void TaskKiller(int TaskNumber)
     ESP_LOGI(TAG, "Task %d Deleted !", TaskNumber);
 }
 
-/* 
-    * @brief run given service.
-    * This function runs the given service by initializing the service parameters and creating the task.
-    * @param[in] serviceParams Service parameters
-    * @param[in] id Service to run
-    * @retval ESP_OK if the service is run successfully, otherwise ESP_FAIL
-*/ 
+/*
+ * @brief run given service.
+ * This function runs the given service by initializing the service parameters and creating the task.
+ * @param[in] serviceParams Service parameters
+ * @param[in] id Service to run
+ * @retval ESP_OK if the service is run successfully, otherwise ESP_FAIL
+ */
 esp_err_t ServiceManager_RunService(ServiceParams_t serviceParams)
 {
     esp_err_t err = ESP_OK;
 
     // Call the function pointer (init_func) with proper arguments
     TaskInitPtr init_func = serviceParams.TaskInit;
-    err = init_func(&serviceParams.taskHandler, 
-                    serviceParams.priority, 
+    err = init_func(&serviceParams.taskHandler,
+                    serviceParams.priority,
                     serviceParams.taskStack);
-    if (err != ESP_OK) 
+    if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "Failed to create MQTT!");
         return err;
@@ -73,18 +73,18 @@ esp_err_t ServiceManager_RunService(ServiceParams_t serviceParams)
 }
 
 static void ServiceManger_RunAllDaemons()
-{    
+{
     esp_err_t err;
 
-#ifdef CONFIG_DONE_COMPONENT_LVGL    
+#ifdef CONFIG_DONE_COMPONENT_LVGL
     ServiceParams_t GUIParams;
     GUIParams.maximumRAM_Needed = LVGL_STACK * 2;
     strcpy(GUIParams.name, "GUI");
     GUIParams.ramType = PSRAM_;
     GUIParams.TaskKiller = GUI_TaskKill;
     GUIParams.taskStack = LVGL_STACK;
-    GUIParams.priority = tskIDLE_PRIORITY + 1;  
-    GUIParams.taskHandler = LVGLHandle;  
+    GUIParams.priority = tskIDLE_PRIORITY + 1;
+    GUIParams.taskHandler = LVGLHandle;
     GUIParams.TaskInit = GUI_TaskInit;
     err = ServiceManager_RunService(GUIParams);
     if (err)
@@ -93,13 +93,13 @@ static void ServiceManger_RunAllDaemons()
     }
     else
     {
-        ESP_LOGI(TAG, "GUI Daemon Created !");        
-    }    
-#endif //CONFIG_DONE_COMPONENT_LVGL
+        ESP_LOGI(TAG, "GUI Daemon Created !");
+    }
+#endif // CONFIG_DONE_COMPONENT_LVGL
 
-#ifdef CONFIG_DONE_COMPONENT_MATTER    
+#ifdef CONFIG_DONE_COMPONENT_MATTER
     ServiceParams_t MatterParams;
-    strcpy(MatterParams.name, "Matter");    
+    strcpy(MatterParams.name, "Matter");
     MatterParams.maximumRAM_Needed = 0;
     MatterParams.ramType = SRAM_;
     MatterParams.TaskKiller = Matter_TaskKill;
@@ -112,32 +112,51 @@ static void ServiceManger_RunAllDaemons()
     {
         ESP_LOGE(TAG, "Failed to create Matter !");
     }
-    else 
+    else
     {
         ESP_LOGI(TAG, "Matter Daemon Created !");
     }
-#endif //CONFIG_DONE_COMPONENT_MATTER
-    
-#ifdef CONFIG_DONE_COMPONENT_MQTT    
+#endif // CONFIG_DONE_COMPONENT_MATTER
+
+#ifdef CONFIG_DONE_COMPONENT_MQTT
     ServiceParams_t MQTTParams;
     strcpy(MQTTParams.name, "MQTT");
-    MQTTParams.maximumRAM_Needed = 0;                
+    MQTTParams.maximumRAM_Needed = 0;
     MQTTParams.ramType = SRAM_;
     MQTTParams.TaskKiller = MQTT_TaskKill;
     MQTTParams.taskStack = MQTT_STACK;
     MQTTParams.priority = tskIDLE_PRIORITY + 1;
     MQTTParams.taskHandler = MQTTHandle;
     MQTTParams.TaskInit = MQTT_TaskInit;
-    err = ServiceManager_RunService (MQTTParams);
+    err = ServiceManager_RunService(MQTTParams);
     if (err)
     {
         ESP_LOGE(TAG, "Failed to create MQTT !");
-    }    
-    else 
+    }
+    else
     {
         ESP_LOGI(TAG, "MQTT Daemon Created !");
     }
-#endif //CONFIG_DONE_COMPONENT_MQTT
+#endif // CONFIG_DONE_COMPONENT_MQTT
+    ESP_LOGW(
+        TAG,
+        "\n"
+        " Free Heap: %u bytes\n"
+        " MALLOC_CAP_8BIT %7zu bytes\n"
+        " MALLOC_CAP_DMA %7zu bytes\n"
+        " MALLOC_CAP_SPIRAM %7zu bytes\n"
+        " MALLOC_CAP_INTERNAL %7zu bytes\n"
+        " MALLOC_CAP_DEFAULT %7zu bytes\n"
+        " MALLOC_CAP_IRAM_8BIT %7zu bytes\n"
+        " MALLOC_CAP_RETENTION %7zu bytes\n",
+        xPortGetFreeHeapSize(),
+        heap_caps_get_free_size(MALLOC_CAP_8BIT),
+        heap_caps_get_free_size(MALLOC_CAP_DMA),
+        heap_caps_get_free_size(MALLOC_CAP_SPIRAM),
+        heap_caps_get_free_size(MALLOC_CAP_INTERNAL),
+        heap_caps_get_free_size(MALLOC_CAP_DEFAULT),
+        heap_caps_get_free_size(MALLOC_CAP_IRAM_8BIT),
+        heap_caps_get_free_size(MALLOC_CAP_RETENTION));
 }
 
 /**
@@ -147,9 +166,9 @@ static void ServiceManger_RunAllDaemons()
  * @return void
  */
 static void ServiceManger_MainTask(void *pvParameter)
-{    
+{
     nvsFlashInit();
-    
+
     if (SharedBusInit())
     {
         ESP_LOGI(TAG, "initialized SharedBus successfully");
@@ -157,51 +176,50 @@ static void ServiceManger_MainTask(void *pvParameter)
     else
     {
         ESP_LOGE(TAG, "Failed to Initialize SharedBus.");
-    }                
+    }
 
 #ifdef MONITORING
 // char pcTaskList[TASK_LIST_BUFFER_SIZE];
-#endif                
-    
+#endif
+
     State = DaemonState::INIT;
     while (true)
-    {        
-        if(SharedBusReceive(&SharedBusPacket, SERVICE_MANAGER_INTERFACE_ID))        
-        {                             
-            
+    {
+        if (SharedBusReceive(&SharedBusPacket, SERVICE_MANAGER_INTERFACE_ID))
+        {
         }
-                
+
         switch (State)
         {
-            case DaemonState::IDLE:
-                break;
-            case DaemonState::INIT:   
-                SharedBusTaskDaemonRunsConfirmed(SERVICE_MANAGER_INTERFACE_ID);
-                State = DaemonState::START;
-                break;
+        case DaemonState::IDLE:
+            break;
+        case DaemonState::INIT:
+            SharedBusTaskDaemonRunsConfirmed(SERVICE_MANAGER_INTERFACE_ID);
+            State = DaemonState::START;
+            break;
 
-            case DaemonState::START:        
-                ESP_LOGI(TAG, "Service Manager Daemon Created !");            
-                ServiceManger_RunAllDaemons();              
-                SharedBusTaskContinuousConfirm();
-                State = DaemonState::ACTIVE;
-                break;
+        case DaemonState::START:
+            ESP_LOGI(TAG, "Service Manager Daemon Created !");
+            ServiceManger_RunAllDaemons();
+            SharedBusTaskContinuousConfirm();
+            State = DaemonState::ACTIVE;
+            break;
 
-            case DaemonState::ACTIVE:
-                //TODO: call ProcessMessageFunction to 
-                //TODO: process sharedbus messages
-                break;
+        case DaemonState::ACTIVE:
+            // TODO: call ProcessMessageFunction to
+            // TODO: process sharedbus messages
+            break;
 
-            default:
-                break;
-        }                                                     
+        default:
+            break;
+        }
 
         vTaskDelay(pdMS_TO_TICKS(1));
 
 #ifdef MONITORING
 // vTaskList(pcTaskList);
 // ESP_LOGI(TAG, "Task List:\n%s\n", pcTaskList);
-#endif                
+#endif
     }
 }
 
@@ -215,7 +233,7 @@ void ServiceManger_TaskInit()
     StaticTask_t *xTaskServiceMangerBuffer = (StaticTask_t *)malloc(sizeof(StaticTask_t));
     StackType_t *xServiceMangerStack = (StackType_t *)malloc(SERVICE_MANGER_STACK * sizeof(StackType_t));
     xTaskCreateStatic(
-        ServiceManger_MainTask,         // Task function
+        ServiceManger_MainTask,    // Task function
         "ServiceMangerTask",       // Task name (for debugging)
         SERVICE_MANGER_STACK,      // Stack size (in words)
         NULL,                      // Task parameters (passed to the task function)

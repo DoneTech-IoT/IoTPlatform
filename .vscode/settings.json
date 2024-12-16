@@ -62,10 +62,15 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "screen_driver.h": "c",
+        "screen_utility.h": "c",
+        "esp_lcd_panel_interface.h": "c",
+        "esp_lcd_panel_io.h": "c"
     },
     "idf.openOcdConfigs": [
-        "board/esp32s3-builtin.cfg"
+        "interface/ftdi/esp32_devkitj_v1.cfg",
+        "target/esp32s3.cfg"
     ],
     "idf.port": "/dev/ttyACM0",
     "idf.flashType": "UART",
