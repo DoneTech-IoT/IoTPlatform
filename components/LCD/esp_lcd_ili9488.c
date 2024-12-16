@@ -425,7 +425,7 @@ err:
     }
     return ret;
 }
-void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_map)
+void disp_driver_flush(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_map)
 {
     esp_lcd_panel_handle_t panel_handle = lcd_handle;
 
@@ -570,10 +570,10 @@ void display_brightness_set(int brightness_percentage)
     ESP_ERROR_CHECK(ledc_set_duty(BACKLIGHT_LEDC_MODE, BACKLIGHT_LEDC_CHANNEL, duty_cycle));
     ESP_ERROR_CHECK(ledc_update_duty(BACKLIGHT_LEDC_MODE, BACKLIGHT_LEDC_CHANNEL));
 }
-void display_init()
+void lvgl_driver_init()
 {
-    display_brightness_init();
-    display_brightness_set(100);
+    // display_brightness_init();
+    // display_brightness_set(100);
     initialize_spi();
     initialize_display();
 }

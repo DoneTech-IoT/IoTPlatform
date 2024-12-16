@@ -66,7 +66,8 @@
         "screen_driver.h": "c",
         "screen_utility.h": "c",
         "esp_lcd_panel_interface.h": "c",
-        "esp_lcd_panel_io.h": "c"
+        "esp_lcd_panel_io.h": "c",
+        "coffeemaker_gui.h": "c"
     },
     "idf.openOcdConfigs": [
         "interface/ftdi/esp32_devkitj_v1.cfg",
