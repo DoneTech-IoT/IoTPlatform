@@ -12,6 +12,7 @@ extern "C"
 typedef enum {
     COFFEE_MAKER_PACKET_ID = 1,
     MATTER_EVENT_PACKET_ID = 2,
+    COFFEE_MAKER_EVENT_PACKET_ID = 3,
 } PacketIDs;
 
 #ifdef __cplusplus
