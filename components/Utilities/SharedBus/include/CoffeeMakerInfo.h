@@ -15,8 +15,7 @@ typedef enum
 } CookingMode;
 
 typedef enum
-{
-    DONT_CARE = 0,
+{    
     COFFEE_BEAN_STATE =1,
     GRINDER_STATE = 2,
     HEATER_STATE = 3,
