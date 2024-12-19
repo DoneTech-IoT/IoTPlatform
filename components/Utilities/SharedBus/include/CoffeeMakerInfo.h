@@ -16,6 +16,17 @@ typedef enum
 
 typedef enum
 {
+    DONT_CARE = 0,
+    COFFEE_BEAN_STATE =1,
+    GRINDER_STATE = 2,
+    HEATER_STATE = 3,
+    READY_STATE = 4,
+    WARMER_STATE = 5, 
+    EOF_COOKING_STATE = 6
+} CookingState;
+
+typedef enum
+{
     STANDBY_MODE = 1,
     ON_MODE = 2,
     PAUSE_MODE = 3
@@ -36,6 +47,11 @@ typedef struct
     uint8_t GrinderLevel;
     uint8_t CupCounter;
 } CoffeeMakerPacket;
+
+typedef struct 
+{
+    CookingState CookingState;    
+} CoffeeMakerEventPacket;
 
 #ifdef __cplusplus
 }
