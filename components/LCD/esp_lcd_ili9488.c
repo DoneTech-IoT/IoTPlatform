@@ -511,7 +511,7 @@ void initialize_display()
     ESP_ERROR_CHECK(
         esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)SPI2_HOST, &io_config, &lcd_io_handle));
 
-    ESP_ERROR_CHECK(esp_lcd_new_panel_ili9488(lcd_io_handle, &lcd_config, LV_VER_RES_MAX * 10, &lcd_handle));
+    ESP_ERROR_CHECK(esp_lcd_new_panel_ili9488(lcd_io_handle, &lcd_config, LV_VER_RES_MAX * 25, &lcd_handle));
 
     ESP_ERROR_CHECK(esp_lcd_panel_reset(lcd_handle));
     ESP_ERROR_CHECK(esp_lcd_panel_init(lcd_handle));
@@ -519,9 +519,11 @@ void initialize_display()
     ESP_ERROR_CHECK(esp_lcd_panel_set_gap(lcd_handle, 0, 0));
     esp_lcd_panel_swap_xy(lcd_handle, true);
     esp_lcd_panel_mirror(lcd_handle, true, false);
-
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
+    ESP_ERROR_CHECK(esp_lcd_panel_disp_off(lcd_handle, false));
+#else
     ESP_ERROR_CHECK(esp_lcd_panel_disp_on_off(lcd_handle, true));
-
+#endif
 }
 
 static void display_brightness_init(void)
