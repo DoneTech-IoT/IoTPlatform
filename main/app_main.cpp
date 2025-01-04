@@ -6,7 +6,21 @@
 #include "esp_heap_caps.h"
 
 #define HEARTBEAT_GPIO GPIO_NUM_21
+#include "esp_heap_trace.h"
 
+#define NUM_RECORDS 100
+static heap_trace_record_t trace_records[NUM_RECORDS];
+
+void init_heap_tracing()
+{
+    esp_err_t err = heap_trace_init_standalone(trace_records, NUM_RECORDS);
+    if (err != ESP_OK)
+    {
+        printf("Failed to initialize heap tracing: %s\n", esp_err_to_name(err));
+        return;
+    }
+    heap_trace_start(HEAP_TRACE_LEAKS);
+}
 // Define the heartbeat pattern in milliseconds
 const int HeartbeatPattern[] = {
     200, // First "lub" (on time)
@@ -22,6 +36,7 @@ static const char *TAG = "Main";
  */
 extern "C" void app_main()
 {
+    init_heap_tracing();
     Log_RamOccupy("main", "service manager");
     ServiceManger_TaskInit();
     Log_RamOccupy("main", "service manager");
@@ -32,13 +47,13 @@ extern "C" void app_main()
     heartBeatConf.pin_bit_mask = (1ULL << HEARTBEAT_GPIO);
     heartBeatConf.pull_down_en = GPIO_PULLDOWN_DISABLE;
     heartBeatConf.pull_up_en = GPIO_PULLUP_DISABLE;
-    gpio_config(&heartBeatConf);    
+    gpio_config(&heartBeatConf);
 
     while (true)
     {
-        for (int i = 0; i < HeartbeatPatternLength; i++) 
-        {            
-            gpio_set_level(HEARTBEAT_GPIO, i % 2);            
+        for (int i = 0; i < HeartbeatPatternLength; i++)
+        {
+            gpio_set_level(HEARTBEAT_GPIO, i % 2);
             vTaskDelay(pdMS_TO_TICKS(HeartbeatPattern[i]));
         }
     }

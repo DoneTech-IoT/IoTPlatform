@@ -369,7 +369,7 @@ esp_err_t esp_lcd_new_panel_ili9488(
 
         // Allocate DMA buffer for color conversions
         ili9488->color_buffer =
-            (uint8_t *)heap_caps_malloc(buffer_size * 3, MALLOC_CAP_DMA);
+            (uint8_t *)heap_caps_malloc(buffer_size * 3, MALLOC_CAP_SPIRAM|MALLOC_CAP_8BIT);
         ESP_GOTO_ON_FALSE(ili9488->color_buffer, ESP_ERR_NO_MEM, err, TAG,
                           "Failed to allocate DMA color conversion buffer");
     }
@@ -462,7 +462,8 @@ void initialize_spi()
             .max_transfer_sz = SPI_MAX_TRANSFER_SIZE,
             .flags = SPICOMMON_BUSFLAG_SCLK | SPICOMMON_BUSFLAG_MISO |
                      SPICOMMON_BUSFLAG_MOSI | SPICOMMON_BUSFLAG_MASTER,
-            .intr_flags = ESP_INTR_FLAG_LOWMED | ESP_INTR_FLAG_IRAM};
+            .intr_flags = ESP_INTR_FLAG_LOWMED };
+            // .intr_flags = ESP_INTR_FLAG_LOWMED | ESP_INTR_FLAG_IRAM};
 
     ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &bus, SPI_DMA_CH_AUTO));
 }
