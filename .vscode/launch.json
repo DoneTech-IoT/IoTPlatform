@@ -2,20 +2,25 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "gdbtarget",
+            "request": "attach",
+            "name": "Eclipse CDT GDB Adapter"
+          },
+          {
             "type": "espidf",
             "name": "Launch",
             "request": "launch"
-        },
+          },
         {
             "name": "C/C++: gcc build and debug active file",
             "type": "cppdbg",
             "request": "launch",
             "program": "${fileDirname}/${fileBasenameNoExtension}",
             "args": [],
-            "stopAtEntry": false,
+            "stopAtEntry": true,
             "cwd": "${fileDirname}",
             "environment": [],
-            "externalConsole": false,
+            "externalConsole": true,
             "MIMode": "gdb",
             "setupCommands": [
                 {
