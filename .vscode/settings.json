@@ -62,7 +62,8 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "freertos.h": "c"
     },
     "idf.openOcdConfigs": [
         "board/esp32s3-builtin.cfg"
