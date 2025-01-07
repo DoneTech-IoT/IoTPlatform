@@ -406,7 +406,7 @@ err:
     }
     return ret;
 }
-void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_map)
+void disp_driver_flush(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_map)
 {
     esp_lcd_panel_handle_t panel_handle = lcd_handle;
 
@@ -417,14 +417,7 @@ void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_
     esp_lcd_panel_draw_bitmap(panel_handle, offsetx1, offsety1, offsetx2 + 1, offsety2 + 1, color_map);
     lv_disp_flush_ready(drv);
 }
-// bool lcd_flush_ready(esp_lcd_panel_io_handle_t panel_io,
-//                      esp_lcd_panel_io_event_data_t *edata, void *user_ctx)
-// {
-//     lv_disp_drv_t *disp_driver = (lv_disp_drv_t *)user_ctx;
-//     // lv_disp_drv_t *disp_driver = &lv_disp_drv;
-//     lv_disp_flush_ready(disp_driver);
-//     return false;
-// }
+
 void initialize_spi()
 {
     ESP_LOGI(TAG, "Initializing SPI bus (MOSI:%d, MISO:%d, CLK:%d)",
@@ -551,10 +544,10 @@ void display_brightness_set(int brightness_percentage)
     ESP_ERROR_CHECK(ledc_set_duty(BACKLIGHT_LEDC_MODE, BACKLIGHT_LEDC_CHANNEL, duty_cycle));
     ESP_ERROR_CHECK(ledc_update_duty(BACKLIGHT_LEDC_MODE, BACKLIGHT_LEDC_CHANNEL));
 }
-void display_init()
+void lvgl_driver_init()
 {
-    display_brightness_init();
-    display_brightness_set(100);
+    // display_brightness_init();
+    // display_brightness_set(100);
     initialize_spi();
     initialize_display();
 }

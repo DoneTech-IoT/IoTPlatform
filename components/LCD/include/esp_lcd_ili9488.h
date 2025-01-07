@@ -45,8 +45,8 @@ extern "C"
 #define CONFIG_TFT_DC_PIN 8
 #define CONFIG_TFT_BACKLIGHT_PIN 12
 
-    void lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_map);
-    void display_init();
+    void disp_driver_flush(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_map);
+    void lvgl_driver_init();
 
 #ifdef __cplusplus
 }
