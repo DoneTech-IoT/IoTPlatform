@@ -5,6 +5,26 @@
  */
 
 #include <esp_lcd_ili9488.h>
+#include <driver/gpio.h>
+#include <driver/ledc.h>
+#include <driver/spi_master.h>
+
+#include <esp_lcd_panel_interface.h>
+#include <esp_lcd_panel_io.h>
+#include <esp_lcd_panel_vendor.h>
+#include <esp_lcd_panel_ops.h>
+#include <esp_lcd_panel_commands.h>
+
+#include <esp_log.h>
+#include <esp_rom_gpio.h>
+#include <esp_check.h>
+
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+
+#include <memory.h>
+#include <stdlib.h>
+#include <sys/cdefs.h>
 
 static const char *TAG = "ili9488";
 
