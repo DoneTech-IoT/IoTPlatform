@@ -25,7 +25,7 @@
 #include <memory.h>
 #include <stdlib.h>
 #include <sys/cdefs.h>
-
+#include <lvgl.h>
 static const char *TAG = "ili9488";
 
 static esp_lcd_panel_handle_t lcd_handle = NULL;
@@ -370,7 +370,7 @@ esp_err_t esp_lcd_new_panel_ili9488(
 
         // Allocate DMA buffer for color conversions
         ili9488->color_buffer =
-            (uint8_t *)malloc(buffer_size * 3);
+            (uint8_t *)heap_caps_malloc(buffer_size * 3, MALLOC_CAP_DMA);
         ESP_GOTO_ON_FALSE(ili9488->color_buffer, ESP_ERR_NO_MEM, err, TAG,
                           "Failed to allocate DMA color conversion buffer");
     }
@@ -420,7 +420,7 @@ err:
         }
         if (ili9488->color_buffer != NULL)
         {
-            free(ili9488->color_buffer);
+            heap_caps_free(ili9488->color_buffer);
         }
         free(ili9488);
     }
@@ -437,7 +437,6 @@ void disp_driver_flush(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *co
     esp_lcd_panel_draw_bitmap(panel_handle, offsetx1, offsety1, offsetx2 + 1, offsety2 + 1, color_map);
     lv_disp_flush_ready(drv);
 }
-
 void initialize_spi()
 {
     ESP_LOGI(TAG, "Initializing SPI bus (MOSI:%d, MISO:%d, CLK:%d)",
