@@ -459,7 +459,7 @@ void initialize_spi()
             .data5_io_num = GPIO_NUM_NC,
             .data6_io_num = GPIO_NUM_NC,
             .data7_io_num = GPIO_NUM_NC,
-            .max_transfer_sz = SPI_MAX_TRANSFER_SIZE,
+            .max_transfer_sz = CONFIG_SPI_MAX_TRANSFER_SIZE,
             .flags = SPICOMMON_BUSFLAG_SCLK | SPICOMMON_BUSFLAG_MISO |
                      SPICOMMON_BUSFLAG_MOSI | SPICOMMON_BUSFLAG_MASTER,
             .intr_flags = ESP_INTR_FLAG_LOWMED | ESP_INTR_FLAG_IRAM};
@@ -474,14 +474,14 @@ void initialize_display()
             .cs_gpio_num = CONFIG_TFT_CS_PIN,
             .dc_gpio_num = CONFIG_TFT_DC_PIN,
             .spi_mode = 0,
-            .pclk_hz = SPI_TFT_CLOCK_SPEED_HZ,
-            .trans_queue_depth = DISPLAY_SPI_QUEUE_LEN,
+            .pclk_hz = CONFIG_SPI_TFT_CLOCK_SPEED_HZ,
+            .trans_queue_depth = CONFIG_DISPLAY_SPI_QUEUE_LEN,
             // .on_color_trans_done = lcd_flush_ready,
             .on_color_trans_done = NULL,
             // .user_ctx = &lv_disp_drv,
             .user_ctx = NULL,
-            .lcd_cmd_bits = DISPLAY_COMMAND_BITS,
-            .lcd_param_bits = DISPLAY_PARAMETER_BITS,
+            .lcd_cmd_bits = 8,
+            .lcd_param_bits = 8,
             .flags =
                 {
 #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0)
@@ -511,7 +511,7 @@ void initialize_display()
     ESP_ERROR_CHECK(
         esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t)SPI2_HOST, &io_config, &lcd_io_handle));
 
-    ESP_ERROR_CHECK(esp_lcd_new_panel_ili9488(lcd_io_handle, &lcd_config, LV_VER_RES_MAX * 10, &lcd_handle));
+    ESP_ERROR_CHECK(esp_lcd_new_panel_ili9488(lcd_io_handle, &lcd_config, CONFIG_LV_VER_RES_MAX * 10, &lcd_handle));
 
     ESP_ERROR_CHECK(esp_lcd_panel_reset(lcd_handle));
     ESP_ERROR_CHECK(esp_lcd_panel_init(lcd_handle));

@@ -27,7 +27,7 @@ menu "Pin Configuration"
             default 8
 
         config TFT_BACKLIGHT_PIN
-            int "Backlight pin"
+            int "Backlight pin (-1 means backlight is deactivate)"
             default -1
     endmenu
 endmenu
@@ -64,5 +64,5 @@ config DISPLAY_SPI_QUEUE_LEN
     default 50
 
 config SPI_MAX_TRANSFER_SIZE
-    int "Maximum SPI transfer size"
+    int "Maximum SPI transfer size (Byte)"
     default 4000
