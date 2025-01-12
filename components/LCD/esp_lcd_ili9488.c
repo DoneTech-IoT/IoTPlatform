@@ -433,14 +433,7 @@ void disp_driver_flush(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *co
     esp_lcd_panel_draw_bitmap(panel_handle, offsetx1, offsety1, offsetx2 + 1, offsety2 + 1, color_map);
     lv_disp_flush_ready(drv);
 }
-// bool lcd_flush_ready(esp_lcd_panel_io_handle_t panel_io,
-//                      esp_lcd_panel_io_event_data_t *edata, void *user_ctx)
-// {
-//     lv_disp_drv_t *disp_driver = (lv_disp_drv_t *)user_ctx;
-//     // lv_disp_drv_t *disp_driver = &lv_disp_drv;
-//     lv_disp_flush_ready(disp_driver);
-//     return false;
-// }
+
 void initialize_spi()
 {
     ESP_LOGI(TAG, "Initializing SPI bus (MOSI:%d, MISO:%d, CLK:%d)",
@@ -523,7 +516,6 @@ void initialize_display()
 void lvgl_driver_init()
 {
 #ifdef CONFIG_TFT_BACKLIGHT_ENABLE
-    ESP_LOGE(TAG, "BACKlight test");
     display_brightness_init();
     display_brightness_set(100);
 #endif
