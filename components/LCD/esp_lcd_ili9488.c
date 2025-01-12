@@ -3,10 +3,9 @@
  *
  * SPDX-License-Identifier: MIT
  */
-#include <driver/gpio.h>
-#include <driver/ledc.h>
-#include <driver/spi_master.h>
 
+#include <driver/spi_master.h>
+#include <driver/gpio.h>
 #include <esp_lcd_panel_interface.h>
 #include <esp_lcd_panel_io.h>
 #include <esp_lcd_panel_vendor.h>
@@ -23,17 +22,15 @@
 #include <memory.h>
 #include <stdlib.h>
 #include <sys/cdefs.h>
+
 #include <esp_lcd_ili9488.h>
+#include"esp_lcd_backlight.h"
 
 static const char *TAG = "ili9488";
 
 static esp_lcd_panel_handle_t lcd_handle = NULL;
 static esp_lcd_panel_io_handle_t lcd_io_handle = NULL;
-static const ledc_mode_t BACKLIGHT_LEDC_MODE = LEDC_LOW_SPEED_MODE;
-static const ledc_channel_t BACKLIGHT_LEDC_CHANNEL = LEDC_CHANNEL_0;
-static const ledc_timer_t BACKLIGHT_LEDC_TIMER = LEDC_TIMER_1;
-static const ledc_timer_bit_t BACKLIGHT_LEDC_TIMER_RESOLUTION = LEDC_TIMER_10_BIT;
-static const uint32_t BACKLIGHT_LEDC_FRQUENCY = 5000;
+
 
 typedef struct
 {
@@ -521,57 +518,15 @@ void initialize_display()
     esp_lcd_panel_mirror(lcd_handle, true, false);
 
     ESP_ERROR_CHECK(esp_lcd_panel_disp_on_off(lcd_handle, true));
-
 }
 
-static void display_brightness_init(void)
-{
-    const ledc_channel_config_t LCD_backlight_channel =
-        {
-            .gpio_num = (gpio_num_t)CONFIG_TFT_BACKLIGHT_PIN,
-            .speed_mode = BACKLIGHT_LEDC_MODE,
-            .channel = BACKLIGHT_LEDC_CHANNEL,
-            .intr_type = LEDC_INTR_DISABLE,
-            .timer_sel = BACKLIGHT_LEDC_TIMER,
-            .duty = 0,
-            .hpoint = 0,
-            .flags =
-                {
-                    .output_invert = 0}};
-    const ledc_timer_config_t LCD_backlight_timer =
-        {
-            .speed_mode = BACKLIGHT_LEDC_MODE,
-            .duty_resolution = BACKLIGHT_LEDC_TIMER_RESOLUTION,
-            .timer_num = BACKLIGHT_LEDC_TIMER,
-            .freq_hz = BACKLIGHT_LEDC_FRQUENCY,
-            .clk_cfg = LEDC_AUTO_CLK};
-    ESP_LOGI(TAG, "Initializing LEDC for backlight pin: %d", CONFIG_TFT_BACKLIGHT_PIN);
-
-    ESP_ERROR_CHECK(ledc_timer_config(&LCD_backlight_timer));
-    ESP_ERROR_CHECK(ledc_channel_config(&LCD_backlight_channel));
-}
-
-void display_brightness_set(int brightness_percentage)
-{
-    if (brightness_percentage > 100)
-    {
-        brightness_percentage = 100;
-    }
-    else if (brightness_percentage < 0)
-    {
-        brightness_percentage = 0;
-    }
-    ESP_LOGI(TAG, "Setting backlight to %d%%", brightness_percentage);
-
-    // LEDC resolution set to 10bits, thus: 100% = 1023
-    uint32_t duty_cycle = (1023 * brightness_percentage) / 100;
-    ESP_ERROR_CHECK(ledc_set_duty(BACKLIGHT_LEDC_MODE, BACKLIGHT_LEDC_CHANNEL, duty_cycle));
-    ESP_ERROR_CHECK(ledc_update_duty(BACKLIGHT_LEDC_MODE, BACKLIGHT_LEDC_CHANNEL));
-}
 void lvgl_driver_init()
 {
-    // display_brightness_init();
-    // display_brightness_set(100);
+#ifdef CONFIG_TFT_BACKLIGHT_ENABLE
+    ESP_LOGE(TAG, "BACKlight test");
+    display_brightness_init();
+    display_brightness_set(100);
+#endif
     initialize_spi();
     initialize_display();
 }
