@@ -6,7 +6,7 @@
 #include "esp_heap_caps.h"
 
 #define HEARTBEAT_GPIO GPIO_NUM_21
-
+#define BackLightPin GPIO_NUM_4
 // Define the heartbeat pattern in milliseconds
 const int HeartbeatPattern[] = {
     200, // First "lub" (on time)
@@ -22,6 +22,18 @@ static const char *TAG = "Main";
  */
 extern "C" void app_main()
 {
+
+
+
+    gpio_config_t BackLight;
+    BackLight.intr_type = GPIO_INTR_DISABLE;
+    BackLight.mode = GPIO_MODE_OUTPUT;
+    BackLight.pin_bit_mask = (1ULL << BackLightPin);
+    BackLight.pull_down_en = GPIO_PULLDOWN_DISABLE;
+    BackLight.pull_up_en = GPIO_PULLUP_DISABLE;
+    gpio_config(&BackLight);
+    gpio_set_level(BackLightPin, 1);
+
     Log_RamOccupy("main", "service manager");
     ServiceManger_TaskInit();
     Log_RamOccupy("main", "service manager");
@@ -32,13 +44,32 @@ extern "C" void app_main()
     heartBeatConf.pin_bit_mask = (1ULL << HEARTBEAT_GPIO);
     heartBeatConf.pull_down_en = GPIO_PULLDOWN_DISABLE;
     heartBeatConf.pull_up_en = GPIO_PULLUP_DISABLE;
-    gpio_config(&heartBeatConf);    
-
+    gpio_config(&heartBeatConf);
+    vTaskDelay(1000);
+    ESP_LOGW(
+        TAG,
+        "\n"
+        " Free Heap: %u bytes\n"
+        " MALLOC_CAP_8BIT %7zu bytes\n"
+        " MALLOC_CAP_DMA %7zu bytes\n"
+        " MALLOC_CAP_SPIRAM %7zu bytes\n"
+        " MALLOC_CAP_INTERNAL %7zu bytes\n"
+        " MALLOC_CAP_DEFAULT %7zu bytes\n"
+        " MALLOC_CAP_IRAM_8BIT %7zu bytes\n"
+        " MALLOC_CAP_RETENTION %7zu bytes\n",
+        xPortGetFreeHeapSize(),
+        heap_caps_get_free_size(MALLOC_CAP_8BIT),
+        heap_caps_get_free_size(MALLOC_CAP_DMA),
+        heap_caps_get_free_size(MALLOC_CAP_SPIRAM),
+        heap_caps_get_free_size(MALLOC_CAP_INTERNAL),
+        heap_caps_get_free_size(MALLOC_CAP_DEFAULT),
+        heap_caps_get_free_size(MALLOC_CAP_IRAM_8BIT),
+        heap_caps_get_free_size(MALLOC_CAP_RETENTION));
     while (true)
     {
-        for (int i = 0; i < HeartbeatPatternLength; i++) 
-        {            
-            gpio_set_level(HEARTBEAT_GPIO, i % 2);            
+        for (int i = 0; i < HeartbeatPatternLength; i++)
+        {
+            gpio_set_level(HEARTBEAT_GPIO, i % 2);
             vTaskDelay(pdMS_TO_TICKS(HeartbeatPattern[i]));
         }
     }
