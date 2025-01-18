@@ -9,6 +9,7 @@ extern "C"
 #include "CoffeeMakerInfo.h"
 #include "MatterEventInfo.h"
 #include "MQTTEventInfo.h"
+#include "GuiRefreshInfo.h"
 
 typedef enum {
     COFFEE_MAKER_PACKET_ID = 1,
