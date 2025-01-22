@@ -15,6 +15,18 @@ typedef enum
 } CookingMode;
 
 typedef enum
+{    
+    COFFEE_BEAN_STATE =1,
+    GRINDER_STATE = 2,
+    COFFEE_STATE = 3,
+    TEA_STATE = 4,
+    HEATER_STATE = 5,
+    READY_STATE = 6,
+    WARMER_STATE = 7, 
+    EOF_COOKING_STATE = 8
+} CookingState;
+
+typedef enum
 {
     STANDBY_MODE = 1,
     ON_MODE = 2,
@@ -27,6 +39,16 @@ typedef enum
     NORMAL_MODE = 1
 } MicroSwitchMode;
 
+typedef enum 
+{
+    POWER_KEY_INDEX = 0,
+    POWER_KEY_MODE_INDEX,
+    COOKING_MODE_INDEX,
+    MICRO_SWITCH_MODE_INDEX,
+    GRINDER_LEVEL_INDEX,
+    CUP_COUNTER_INDEX,
+} CoffeeMakerEventIndex;
+
 typedef struct 
 {
     bool PowerKey;
@@ -35,7 +57,13 @@ typedef struct
     MicroSwitchMode MicroSwitchMode;
     uint8_t GrinderLevel;
     uint8_t CupCounter;
+    CoffeeMakerEventIndex CoffeeMakerEventIndex;
 } CoffeeMakerPacket;
+
+typedef struct 
+{
+    CookingState CookingState;    
+} CoffeeMakerEventPacket;
 
 #ifdef __cplusplus
 }
