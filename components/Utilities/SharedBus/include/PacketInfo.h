@@ -16,6 +16,7 @@ typedef enum {
     MATTER_EVENT_PACKET_ID = 2,
     MQTT_EVENT_PACKET_ID = 3,
     GUI_REFRESH_PACKET_ID = 4,
+    COFFEE_MAKER_EVENT_PACKET_ID = 5,
 } PacketIDs;
 
 #ifdef __cplusplus
