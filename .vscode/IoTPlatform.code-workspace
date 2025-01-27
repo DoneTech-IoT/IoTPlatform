@@ -94,13 +94,13 @@
 		},
 		"peacock.color": "#dd0531",
 		"idf.adapterTargetName": "esp32s3",
-		"idf.espIdfPath": "/home/mj/esp/esp-idf-v5.3.1",
-		"idf.pythonBinPath": "/home/mj/.espressif/python_env/idf5.3_py3.12_env/bin/python",
-		"idf.toolsPath": "/home/mj/.espressif",
-		"idf.customExtraPaths": "/home/mj/.espressif/tools/xtensa-esp-elf-gdb/14.2_20240403/xtensa-esp-elf-gdb/bin:/home/mj/.espressif/tools/riscv32-esp-elf-gdb/14.2_20240403/riscv32-esp-elf-gdb/bin:/home/mj/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20240530/xtensa-esp-elf/bin:/home/mj/.espressif/tools/riscv32-esp-elf/esp-13.2.0_20240530/riscv32-esp-elf/bin:/home/mj/.espressif/tools/esp32ulp-elf/2.38_20240113/esp32ulp-elf/bin:/home/mj/.espressif/tools/cmake/3.24.0/bin:/home/mj/.espressif/tools/openocd-esp32/v0.12.0-esp32-20240318/openocd-esp32/bin:/home/mj/.espressif/tools/ninja/1.11.1:/home/mj/.espressif/tools/esp-rom-elfs/20240305",
+		"idf.espIdfPath": "${IDF_PATH}",
+		"idf.pythonBinPath": "${HOME}/.espressif/python_env/idf5.3_py3.12_env/bin/python",
+		"idf.toolsPath": "${HOME}/.espressif",
+		"idf.customExtraPaths": "${HOME}/.espressif/tools/xtensa-esp-elf-gdb/14.2_20240403/xtensa-esp-elf-gdb/bin:${HOME}/.espressif/tools/riscv32-esp-elf-gdb/14.2_20240403/riscv32-esp-elf-gdb/bin:${HOME}/.espressif/tools/xtensa-esp-elf/esp-13.2.0_20240530/xtensa-esp-elf/bin:${HOME}/.espressif/tools/riscv32-esp-elf/esp-13.2.0_20240530/riscv32-esp-elf/bin:${HOME}/.espressif/tools/esp32ulp-elf/2.38_20240113/esp32ulp-elf/bin:${HOME}/.espressif/tools/cmake/3.24.0/bin:${HOME}/.espressif/tools/openocd-esp32/v0.12.0-esp32-20240318/openocd-esp32/bin:${HOME}/.espressif/tools/ninja/1.11.1:${HOME}/.espressif/tools/esp-rom-elfs/20240305",
 		"idf.customExtraVars": {
-			"OPENOCD_SCRIPTS": "/home/mj/.espressif/tools/openocd-esp32/v0.12.0-esp32-20240318/openocd-esp32/share/openocd/scripts",
-			"ESP_ROM_ELF_DIR": "/home/mj/.espressif/tools/esp-rom-elfs/20240305/"
+			"OPENOCD_SCRIPTS": "${HOME}/.espressif/tools/openocd-esp32/v0.12.0-esp32-20240318/openocd-esp32/share/openocd/scripts",
+			"ESP_ROM_ELF_DIR": "${HOME}/.espressif/tools/esp-rom-elfs/20240305/"
 		},
 		"idf.gitPath": "git",
 		"idf.port": "/dev/ttyACM0",
