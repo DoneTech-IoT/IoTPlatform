@@ -1,0 +1,133 @@
+menu "LCD Configuration"
+    menu "SPI Pins"
+        # SPI pin mapping is only configurable on the ESP32-S3
+        visible if IDF_TARGET_ESP32S3
+        config SPI_MISO
+            int "MISO pin"
+            default 7
+        config SPI_MOSI
+            int "MOSI pin"
+            default 18 
+        config SPI_CLOCK
+            int "Clock pin"
+            default 47 
+    endmenu
+
+    menu "TFT Pins"
+        config TFT_CS_PIN
+            int "Chip Select pin"
+            default 3
+
+        config TFT_RESET_PIN
+            int "Reset pin"
+            default 48 
+    
+        config TFT_DC_PIN
+            int "Data/Command pin"
+            default 8
+
+        config TFT_BACKLIGHT_ENABLE
+            bool "Enable Backlight"
+            default y
+            help
+                Enable or disable backlight functionality for the display.
+
+        config TFT_BACKLIGHT_PIN
+            int "Backlight pin"
+            default 12
+            depends on TFT_BACKLIGHT_ENABLE
+            help
+                Pin assigned for the display backlight. Only configurable if the backlight is enabled.
+
+        choice BACKLIGHT_LEDC_CHANNEL
+            prompt "LEDC Channel"
+            default BACKLIGHT_LEDC_CHANNEL_0
+            depends on TFT_BACKLIGHT_ENABLE
+            help
+                LEDC channel to use for the backlight.
+
+            config BACKLIGHT_LEDC_CHANNEL_0
+                bool "Channel 0"
+            config BACKLIGHT_LEDC_CHANNEL_1
+                bool "Channel 1"
+            config BACKLIGHT_LEDC_CHANNEL_2
+                bool "Channel 2"
+            config BACKLIGHT_LEDC_CHANNEL_3
+                bool "Channel 3"
+            config BACKLIGHT_LEDC_CHANNEL_4
+                bool "Channel 4"
+            config BACKLIGHT_LEDC_CHANNEL_5
+                bool "Channel 5"
+        endchoice
+
+        choice BACKLIGHT_LEDC_TIMER
+            prompt "LEDC Timer"
+            default BACKLIGHT_LEDC_TIMER_1
+            depends on TFT_BACKLIGHT_ENABLE
+            help
+                LEDC timer to use for the backlight.
+
+            config BACKLIGHT_LEDC_TIMER_0
+                bool "Timer 0"
+            config BACKLIGHT_LEDC_TIMER_1
+                bool "Timer 1"
+            config BACKLIGHT_LEDC_TIMER_2
+                bool "Timer 2"
+        endchoice
+
+        choice BACKLIGHT_LEDC_TIMER_RESOLUTION
+            prompt "LEDC Timer Resolution"
+            default BACKLIGHT_LEDC_TIMER_10_BIT
+            depends on TFT_BACKLIGHT_ENABLE
+            help
+                Resolution of the LEDC timer used for the backlight.
+
+            config BACKLIGHT_LEDC_TIMER_10_BIT
+                bool "10-bit"
+            config BACKLIGHT_LEDC_TIMER_12_BIT
+                bool "12-bit"
+        endchoice
+    endmenu
+endmenu
+
+choice DISPLAY_COLOR_MODE
+    bool "Color Mode"
+    default DISPLAY_COLOR_MODE_BGR
+    config DISPLAY_COLOR_MODE_BGR
+        bool "Blue,Green,Red"
+    config DISPLAY_COLOR_MODE_RGB
+        bool "Red,Green,Blue"
+endchoice
+
+config DISPLAY_COLOR_MODE
+    int
+    default 1 if DISPLAY_COLOR_MODE_BGR
+    default 0 if DISPLAY_COLOR_MODE_RGB
+
+config LV_HOR_RES_MAX
+    int "Horizontal resolution"
+    default 320
+
+config LV_VER_RES_MAX
+    int "Vertical resolution"
+    default 480
+
+config DISPLAY_COMMAND_BITS
+    int "Command bits"
+    default 8
+
+config DISPLAY_PARAMETER_BITS
+    int "Parameter bits"
+    default 8
+
+config SPI_TFT_CLOCK_SPEED_HZ
+    int "SPI clock speed (Hz)"
+    default 40000000
+
+config DISPLAY_SPI_QUEUE_LEN
+    int "SPI queue length"
+    default 50
+
+config SPI_MAX_TRANSFER_SIZE
+    int "Maximum SPI transfer size"
+    default 4000
