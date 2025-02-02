@@ -6,6 +6,7 @@
 #include "esp_heap_caps.h"
 
 #define HEARTBEAT_GPIO GPIO_NUM_21
+#define BACKLIIGHT_GPIO GPIO_NUM_38
 
 // Define the heartbeat pattern in milliseconds
 const int HeartbeatPattern[] = {
@@ -33,6 +34,16 @@ extern "C" void app_main()
     heartBeatConf.pull_down_en = GPIO_PULLDOWN_DISABLE;
     heartBeatConf.pull_up_en = GPIO_PULLUP_DISABLE;
     gpio_config(&heartBeatConf);    
+
+
+    gpio_config_t backlightConf;
+    backlightConf.intr_type = GPIO_INTR_DISABLE;
+    backlightConf.mode = GPIO_MODE_OUTPUT;
+    backlightConf.pin_bit_mask = (1ULL << BACKLIIGHT_GPIO);
+    backlightConf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+    backlightConf.pull_up_en = GPIO_PULLUP_DISABLE;
+    gpio_config(&backlightConf);  
+    gpio_set_level(BACKLIIGHT_GPIO, 1);            
 
     while (true)
     {
