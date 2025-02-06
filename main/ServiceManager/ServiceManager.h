@@ -17,22 +17,6 @@
 #include "esp_system.h"
 #include <sys/param.h>
 
-#include "NetworkChecker.h"
-#include "nvsFlash.h"
-#ifdef CONFIG_DONE_COMPONENT_MATTER
-#include "MatterInterface.h"
-#else
-#include "esp_netif.h"
-#include "protocol_examples_common.h"
-#endif
-#ifdef CONFIG_DONE_LOG
-#include "Custom_Log.h"
-#endif
-
-#ifdef CONFIG_DONE_COMPONENT_MQTT
-#include "MQTT_Interface.h"
-#endif
-
 #define NUMBER_OF_COSTUME_TASK 10
 #define LVGL_STACK 100 * 1024 // in word not byte
 #define SERVICE_MANGER_STACK 20 * 1024
