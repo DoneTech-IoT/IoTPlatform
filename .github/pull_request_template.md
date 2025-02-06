@@ -8,4 +8,4 @@ This change improves the user experience by providing clearer feedback on authen
 ## Related Issues
 Closes JiraKey: #xyz
 
-@mentions of the person or team responsible for reviewing proposed changes.
+@DoneTech-IoT/iot-dev
