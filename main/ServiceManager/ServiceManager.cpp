@@ -1,6 +1,22 @@
 #include "ServiceManager.h"
 #include "SharedBus.h"
+#include "nvsFlash.h"
+
+#ifdef CONFIG_DONE_COMPONENT_LVGL
 #include "GUI.h"
+#endif
+#ifdef CONFIG_DONE_COMPONENT_MATTER
+#include "MatterInterface.h"
+#else
+#include "esp_netif.h"
+#include "protocol_examples_common.h"
+#endif
+#ifdef CONFIG_DONE_LOG
+#include "Custom_Log.h"
+#endif
+#ifdef CONFIG_DONE_COMPONENT_MQTT
+#include "MQTT_Interface.h"
+#endif
 
 // ****************************** Local Variables
 typedef enum 
