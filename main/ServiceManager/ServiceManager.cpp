@@ -192,14 +192,14 @@ static void ServiceManger_MainTask(void *pvParameter)
             case DaemonState::IDLE:
                 break;
             case DaemonState::INIT:   
-                SharedBusDaemonRegistered(SERVICE_MANAGER_INTERFACE_ID);
+                SharedBus_DaemonRegistered(SERVICE_MANAGER_INTERFACE_ID);
                 State = DaemonState::START;
                 break;
 
             case DaemonState::START:        
                 ESP_LOGI(TAG, "Service Manager Daemon Created !");            
                 ServiceManger_RunAllDaemons();              
-                SharedBusServiceExecNotify();
+                SharedBus_NotifyTaskExecution();
                 State = DaemonState::ACTIVE;
                 break;
 
