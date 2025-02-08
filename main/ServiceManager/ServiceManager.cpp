@@ -166,7 +166,7 @@ static void ServiceManger_MainTask(void *pvParameter)
 {    
     nvsFlashInit();
     
-    if (SharedBusInit())
+    if (SharedBus_Init())
     {
         ESP_LOGI(TAG, "initialized SharedBus successfully");
     }
