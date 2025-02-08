@@ -182,7 +182,7 @@ static void ServiceManger_MainTask(void *pvParameter)
     State = DaemonState::INIT;
     while (true)
     {        
-        if(SharedBusReceive(&SharedBusPacket, SERVICE_MANAGER_INTERFACE_ID))        
+        if(SharedBus_Receive(&SharedBusPacket, SERVICE_MANAGER_INTERFACE_ID))        
         {                             
             
         }
