@@ -1,6 +1,22 @@
 #include "ServiceManager.h"
 #include "SharedBus.h"
+#include "nvsFlash.h"
+
+#ifdef CONFIG_DONE_COMPONENT_LVGL
 #include "GUI.h"
+#endif
+#ifdef CONFIG_DONE_COMPONENT_MATTER
+#include "MatterInterface.h"
+#else
+#include "esp_netif.h"
+#include "protocol_examples_common.h"
+#endif
+#ifdef CONFIG_DONE_LOG
+#include "Custom_Log.h"
+#endif
+#ifdef CONFIG_DONE_COMPONENT_MQTT
+#include "MQTT_Interface.h"
+#endif
 
 // ****************************** Local Variables
 typedef enum 
@@ -150,7 +166,7 @@ static void ServiceManger_MainTask(void *pvParameter)
 {    
     nvsFlashInit();
     
-    if (SharedBusInit())
+    if (SharedBus_Init())
     {
         ESP_LOGI(TAG, "initialized SharedBus successfully");
     }
@@ -166,7 +182,7 @@ static void ServiceManger_MainTask(void *pvParameter)
     State = DaemonState::INIT;
     while (true)
     {        
-        if(SharedBusReceive(&SharedBusPacket, SERVICE_MANAGER_INTERFACE_ID))        
+        if(SharedBus_Receive(&SharedBusPacket, SERVICE_MANAGER_INTERFACE_ID))        
         {                             
             
         }
@@ -176,14 +192,14 @@ static void ServiceManger_MainTask(void *pvParameter)
             case DaemonState::IDLE:
                 break;
             case DaemonState::INIT:   
-                SharedBusTaskDaemonRunsConfirmed(SERVICE_MANAGER_INTERFACE_ID);
+                SharedBus_DaemonRegistered(SERVICE_MANAGER_INTERFACE_ID);
                 State = DaemonState::START;
                 break;
 
             case DaemonState::START:        
                 ESP_LOGI(TAG, "Service Manager Daemon Created !");            
                 ServiceManger_RunAllDaemons();              
-                SharedBusTaskContinuousConfirm();
+                SharedBus_NotifyTaskExecution();
                 State = DaemonState::ACTIVE;
                 break;
 
