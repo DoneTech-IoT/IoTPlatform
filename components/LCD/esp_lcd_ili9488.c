@@ -1,9 +1,3 @@
-/*
- * SPDX-FileCopyrightText: 2022 atanisoft (github.com/atanisoft)
- *
- * SPDX-License-Identifier: MIT
- */
-
 #include <driver/spi_master.h>
 #include <driver/gpio.h>
 #include <esp_lcd_panel_interface.h>
@@ -24,7 +18,7 @@
 #include <sys/cdefs.h>
 
 #include <esp_lcd_ili9488.h>
-#include"esp_lcd_backlight.h"
+#include"esp_lcd_ili9488_backlight.h"
 
 static const char *TAG = "ili9488";
 
@@ -513,10 +507,9 @@ void initialize_display()
 
 void lvgl_driver_init()
 {
-#ifdef CONFIG_TFT_BACKLIGHT_ENABLE
-    // display_brightness_init();
-    // display_brightness_set(100);
-#endif
+    display_brightness_init();
+    display_brightness_set(100);
+
     initialize_spi();
     initialize_display();
 }
