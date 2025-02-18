@@ -32,13 +32,21 @@ extern "C" void app_main()
     heartBeatConf.pin_bit_mask = (1ULL << HEARTBEAT_GPIO);
     heartBeatConf.pull_down_en = GPIO_PULLDOWN_DISABLE;
     heartBeatConf.pull_up_en = GPIO_PULLUP_DISABLE;
-    gpio_config(&heartBeatConf);    
+    gpio_config(&heartBeatConf);
+    gpio_config_t LCDEnableConfig;
+    LCDEnableConfig.intr_type = GPIO_INTR_DISABLE;
+    LCDEnableConfig.mode = GPIO_MODE_OUTPUT;
+    LCDEnableConfig.pin_bit_mask = (1ULL << GPIO_NUM_4);
+    LCDEnableConfig.pull_down_en = GPIO_PULLDOWN_DISABLE;
+    LCDEnableConfig.pull_up_en = GPIO_PULLUP_DISABLE;
+    gpio_config(&LCDEnableConfig);
+    gpio_set_level(GPIO_NUM_4, 1);
 
     while (true)
     {
-        for (int i = 0; i < HeartbeatPatternLength; i++) 
-        {            
-            gpio_set_level(HEARTBEAT_GPIO, i % 2);            
+        for (int i = 0; i < HeartbeatPatternLength; i++)
+        {
+            gpio_set_level(HEARTBEAT_GPIO, i % 2);
             vTaskDelay(pdMS_TO_TICKS(HeartbeatPattern[i]));
         }
     }
