@@ -39,7 +39,7 @@ set(EXTRA_COMPONENT_DIRS
     "${MATTER_SDK_PATH}/config/esp32/components"
     "${ESP_MATTER_PATH}/components"
     "${ESP_MATTER_PATH}/device_hal/device"
-    "components/UserInterface/esp_lcd_drivers"
+    # "components/UserInterface/esp_lcd_drivers"
     ${IDF_PATH}/examples/common_components/protocol_examples_common
     ${extra_components_dirs_append})
 
