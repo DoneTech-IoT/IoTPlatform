@@ -4,6 +4,7 @@
 
 #ifdef CONFIG_DONE_COMPONENT_LVGL
 #include "GUI.h"
+#include "coffeeMaker_GUI.h"
 #endif
 #ifdef CONFIG_DONE_COMPONENT_MATTER
 #include "MatterInterface.h"
@@ -102,6 +103,8 @@ static void ServiceManger_RunAllDaemons()
     GUIParams.priority = tskIDLE_PRIORITY + 1;  
     GUIParams.taskHandler = LVGLHandle;  
     GUIParams.TaskInit = GUI_TaskInit;
+    GUI_SetInitCallback(GUI_OnInit);
+    GUI_SetSharedBusReceivedCallback(GUI_OnSharedBusReceived);
     err = ServiceManager_RunService(GUIParams);
     if (err)
     {
