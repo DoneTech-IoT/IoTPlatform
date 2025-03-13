@@ -21,7 +21,7 @@
 #include "nvsFlash.h"
 #include <cstring>
 
-const char* ServiceMngr::pTAG = "ServiceMngr";
+static const char* TAG = "ServiceMngr";
 ServiceMngr::ServiceParams_t ServiceMngr::mServiceParams[SharedBus::ServiceID::MAX_ID];
 
 #ifdef CONFIG_DONE_COMPONENT_LVGL
@@ -41,7 +41,21 @@ ServiceMngr::ServiceMngr(
     const SharedBus::ServiceID &ServiceID) :
     ServiceBase(TaskName, ServiceID)
 {
+    nvsFlashInit();
 
+    SharedBus sharedBus;
+    if(sharedBus.Init())
+    {
+        ESP_LOGI(TAG, "Initialized SharedBus successfully");
+    }
+    else
+    {
+        ESP_LOGE(TAG, "Failed to Initialize SharedBus.");
+    }                
+
+#ifdef MONITORING
+// char pcTaskList[TASK_LIST_BUFFER_SIZE];
+#endif    
 }
 
 ServiceMngr::~ServiceMngr()
@@ -65,7 +79,7 @@ esp_err_t ServiceMngr::RunService(ServiceParams_t serviceParams)
                     serviceParams.taskStackSize);
     if (err != ESP_OK) 
     {
-        ESP_LOGE(pTAG, "Failed to create %s!", serviceParams.name);
+        ESP_LOGE(TAG, "Failed to create %s!", serviceParams.name);
         return err;
     }
 
@@ -79,9 +93,8 @@ esp_err_t ServiceMngr::RunService(ServiceParams_t serviceParams)
 * @return void
 */
 void ServiceMngr::KillService(const SharedBus::ServiceID &ServiceID)
-{
-    
-    ESP_LOGI(pTAG, "%s service was Deleted !", mServiceParams[ServiceID].name);
+{    
+    ESP_LOGI(TAG, "%s service was Deleted !", mServiceParams[ServiceID].name);
     mServiceParams[ServiceID].taskKiller(&mServiceParams[ServiceID].taskHandler);
 }
 
@@ -118,20 +131,21 @@ void ServiceMngr::RunAllDaemons()
 #ifdef CONFIG_DONE_COMPONENT_MATTER    
     ServiceParams_t MatterParams;
     strcpy(MatterParams.name, "Matter");    
+    MatterParams.id = SharedBus::ServiceID::MATTER;
     MatterParams.taskHandler = MatterHandle;
-    MatterParams.taskInit = MatterService::InitTask;
+    MatterParams.taskInit = MatterService::TaskInit;
     MatterParams.taskKiller =  MatterService::~MatterService;
-    MatterParams.taskStackSize = mServiceStackSize[SharedBus::ServiceID::MATTER];
+    MatterParams.taskStackSize = mServiceStackSize[MatterParams.id];
     MatterParams.priority = tskIDLE_PRIORITY + 1;
         
     err = RunService(MatterParams);
     if (err)
     {
-        ESP_LOGE(pTAG, "Failed to create Matter !");
+        ESP_LOGE(TAG, "Failed to create Matter !");
     }
     else 
     {
-        ESP_LOGI(pTAG, "Matter Daemon Created !");
+        ESP_LOGI(TAG, "Matter Daemon Created !");
     }
 #endif //CONFIG_DONE_COMPONENT_MATTER
     
@@ -155,4 +169,74 @@ void ServiceMngr::RunAllDaemons()
 //         ESP_LOGI(TAG, "MQTT Daemon Created !");
 //     }
 // #endif //CONFIG_DONE_COMPONENT_MQTT    
+}
+
+esp_err_t OnMachineStateStart()
+{
+    esp_err_t err = ESP_OK;
+
+// #ifdef CONFIG_DONE_COMPONENT_LVGL    
+//     ServiceParams_t GUIParams;    
+//     strcpy(GUIParams.name, "GUI");    
+//     GUIParams.TaskKiller = GUI;
+//     GUIParams.taskStack = LVGL_STACK;
+//     GUIParams.priority = tskIDLE_PRIORITY + 1;  
+//     GUIParams.taskHandler = LVGLHandle;  
+//     GUIParams.TaskInit = GUI_TaskInit;
+//     GUI_OnInitElements(GUI_Init);
+//     GUI_OnSharedBusReceived(GUI_ProcessSharedBusMsg);
+//     err = ServiceManager_RunService(GUIParams);
+//     if (err)
+//     {
+//         ESP_LOGE(TAG, "Failed to create GUI!");
+//     }
+//     else
+//     {
+//         ESP_LOGI(TAG, "GUI Daemon Created !");        
+//     }    
+// #endif //CONFIG_DONE_COMPONENT_LVGL
+
+#ifdef CONFIG_DONE_COMPONENT_MATTER    
+    ServiceParams_t MatterParams;
+    strcpy(MatterParams.name, "Matter");    
+    MatterParams.id = SharedBus::ServiceID::MATTER;
+    MatterParams.taskHandler = MatterHandle;
+    MatterParams.taskInit = MatterService::TaskInit;
+    MatterParams.taskKiller =  MatterService::~MatterService;
+    MatterParams.taskStackSize = mServiceStackSize[MatterParams.id];
+    MatterParams.priority = tskIDLE_PRIORITY + 1;
+        
+    err = RunService(MatterParams);
+    if (err)
+    {
+        ESP_LOGE(TAG, "Failed to create Matter !");
+    }
+    else 
+    {
+        ESP_LOGI(TAG, "Matter Daemon Created !");
+    }
+#endif //CONFIG_DONE_COMPONENT_MATTER
+    
+// #ifdef CONFIG_DONE_COMPONENT_MQTT    
+//     ServiceParams_t MQTTParams;
+//     strcpy(MQTTParams.name, "MQTT");
+//     MQTTParams.maximumRAM_Needed = 0;                
+//     MQTTParams.ramType = SRAM_;
+//     MQTTParams.TaskKiller = MQTT_TaskKill;
+//     MQTTParams.taskStack = MQTT_STACK;
+//     MQTTParams.priority = tskIDLE_PRIORITY + 1;
+//     MQTTParams.taskHandler = MQTTHandle;
+//     MQTTParams.TaskInit = MQTT_TaskInit;
+//     err = ServiceManager_RunService (MQTTParams);
+//     if (err)
+//     {
+//         ESP_LOGE(TAG, "Failed to create MQTT !");
+//     }    
+//     else 
+//     {
+//         ESP_LOGI(TAG, "MQTT Daemon Created !");
+//     }
+// #endif //CONFIG_DONE_COMPONENT_MQTT    
+
+    return err;        
 }

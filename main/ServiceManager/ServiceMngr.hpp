@@ -24,9 +24,7 @@ public:
 
     ~ServiceMngr();
 
-private:
-    static const char *pTAG;  
-
+private:    
 #ifdef CONFIG_DONE_COMPONENT_LVGL
     static TaskHandle_t LVGLHandle;
 #endif  //CONFIG_DONE_COMPONENT_LVGL
@@ -39,17 +37,26 @@ private:
     static TaskHandle_t MQTTHandle;
 #endif  //CONFIG_DONE_COMPONENT_MQTT
 
+    static constexpr char* mServiceName[SharedBus::ServiceID::MAX_ID] =
+    {
+        "",             //NO_ID
+        "SERVICE_MANAGER",
+        "UI",
+        "MATTER",
+        "MQTT",
+        "LOG",      
+    };    
+
     static constexpr uint32_t mServiceStackSize[SharedBus::ServiceID::MAX_ID] =
     {
         0 ,             //NO_ID
-        20  * 1024,     //SERVICE_MANAGER
+        20  * 1024,     //ServiceMngr
         100 * 1024,     //UI
         50  * 1024,     //MATTER
         50  * 1024,     //MQTT
         0               //LOG
     };
-
-    typedef void (*TaskCreatorPtr)(void);
+    
     typedef void (*TaskKillerPtr)(TaskHandle_t *);
     typedef esp_err_t (*TaskInitPtr)(
                             TaskHandle_t *taskHandler,
@@ -58,10 +65,9 @@ private:
     typedef struct
     {           
         char name[32];  //Service name    
-        uint8_t id;     //Service if from SharedBus::ServiceID
+        uint8_t id;     //Service ID from SharedBus::ServiceID
         UBaseType_t priority;     //Priority of the task
-        TaskHandle_t taskHandler; //Pointer to the task handler function
-        TaskCreatorPtr taskCreator;        
+        TaskHandle_t taskHandler; //Pointer to the task handler function        
         TaskKillerPtr taskKiller;
         TaskInitPtr taskInit;        
         uint32_t taskStackSize;        
@@ -75,14 +81,7 @@ private:
     * @param[in] serviceParams Service parameters    
     * @retval ESP_OK if the service is run successfully, otherwise ESP_FAIL
     */ 
-    esp_err_t RunService(ServiceParams_t serviceParams);
-
-    /**
-     * @brief Starts all registered daemon services.
-     * This function iterates through all registered services and calls their `Start()` method.
-     * Each service is expected to be a subclass of `ServiceBase` and implement its own startup logic.     
-     */
-    void RunAllDaemons();
+    esp_err_t RunService(ServiceParams_t serviceParams);    
 
     /**
     * @brief Deletes a task.
@@ -91,4 +90,14 @@ private:
     * @return void
     */
     void KillService(const SharedBus::ServiceID &ServiceID);
+
+    /**
+     * @brief Handles the transition to the machine's start state.
+     * This function is called when the state machine enters the start state. 
+     * It is responsible for initializing necessary components, starting tasks, 
+     * or performing any setup required for this state. 
+     * @return ESP_OK on successful execution.
+     * @return Appropriate error code if the state transition fails.
+     */
+    esp_err_t OnMachineStateStart() override;               
 };
