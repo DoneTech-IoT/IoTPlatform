@@ -1,3 +1,5 @@
+#include "sdkconfig.h"
+
 #ifdef CONFIG_DONE_COMPONENT_LVGL
 //#include "GUIService.hpp"
 //#include "coffeeMaker_GUI.h"
@@ -98,7 +100,7 @@ void ServiceMngr::KillService(const SharedBus::ServiceID &ServiceID)
     mServiceParams[ServiceID].taskKiller(&mServiceParams[ServiceID].taskHandler);
 }
 
-esp_err_t OnMachineStateStart()
+esp_err_t ServiceMngr::OnMachineStateStart()
 {
     esp_err_t err = ESP_OK;
 
