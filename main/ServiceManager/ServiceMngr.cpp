@@ -126,24 +126,24 @@ esp_err_t ServiceMngr::OnMachineStateStart()
 // #endif //CONFIG_DONE_COMPONENT_LVGL
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER    
-    ServiceParams_t MatterParams;
-    strcpy(MatterParams.name, "Matter");    
-    MatterParams.id = SharedBus::ServiceID::MATTER;
-    MatterParams.taskHandler = MatterHandle;
-    MatterParams.taskInit = MatterService::TaskInit;
-    MatterParams.taskKiller =  MatterService::~MatterService;
-    MatterParams.taskStackSize = mServiceStackSize[MatterParams.id];
-    MatterParams.priority = tskIDLE_PRIORITY + 1;
+    // ServiceParams_t MatterParams;
+    // strcpy(MatterParams.name, "Matter");    
+    // MatterParams.id = SharedBus::ServiceID::MATTER;
+    // MatterParams.taskHandler = MatterHandle;
+    // MatterParams.taskInit = MatterService::TaskInit;
+    // MatterParams.taskKiller =  MatterService::~MatterService;
+    // MatterParams.taskStackSize = mServiceStackSize[MatterParams.id];
+    // MatterParams.priority = tskIDLE_PRIORITY + 1;
         
-    err = RunService(MatterParams);
-    if (err)
-    {
-        ESP_LOGE(TAG, "Failed to create Matter !");
-    }
-    else 
-    {
-        ESP_LOGI(TAG, "Matter Daemon Created !");
-    }
+    // err = RunService(MatterParams);
+    // if (err)
+    // {
+    //     ESP_LOGE(TAG, "Failed to create Matter !");
+    // }
+    // else 
+    // {
+    //     ESP_LOGI(TAG, "Matter Daemon Created !");
+    // }
 #endif //CONFIG_DONE_COMPONENT_MATTER
     
 // #ifdef CONFIG_DONE_COMPONENT_MQTT    
