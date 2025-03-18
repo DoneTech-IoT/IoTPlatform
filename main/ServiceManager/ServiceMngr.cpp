@@ -1,11 +1,10 @@
 #include "sdkconfig.h"
-
 #ifdef CONFIG_DONE_COMPONENT_LVGL
 //#include "GUIService.hpp"
 //#include "coffeeMaker_GUI.h"
 #endif
 #ifdef CONFIG_DONE_COMPONENT_MATTER
-#include "MatterService.hpp"
+#include "MatterCoffeeMaker.hpp"
 #else
 #include "esp_netif.h"
 #include "protocol_examples_common.h"
@@ -25,28 +24,28 @@
 
 static const char* TAG = "ServiceMngr";
 ServiceMngr::ServiceParams_t ServiceMngr::mServiceParams[SharedBus::ServiceID::MAX_ID];
-
+TaskHandle_t ServiceMngr::SrvMngHandle = nullptr;
 #ifdef CONFIG_DONE_COMPONENT_LVGL
-    TaskHandle_t ServiceMngr::LVGLHandle = NULL;
-#endif  //CONFIG_DONE_COMPONENT_LVGL
-
+TaskHandle_t ServiceMngr::LVGLHandle = nullptr;
+#endif  
 #ifdef CONFIG_DONE_COMPONENT_MATTER
-    TaskHandle_t ServiceMngr::MatterHandle = NULL;
-#endif  //CONFIG_DONE_COMPONENT_MATTER
-
+TaskHandle_t ServiceMngr::MatterHandle = nullptr;
+#endif
 #ifdef CONFIG_DONE_COMPONENT_MQTT
-    TaskHandle_t ServiceMngr::MQTTHandle = NULL;
-#endif  //CONFIG_DONE_COMPONENT_MQTT
+TaskHandle_t ServiceMngr::MQTTHandle = nullptr;
+#endif
 
 ServiceMngr::ServiceMngr(
     const char *TaskName,
     const SharedBus::ServiceID &ServiceID) :
     ServiceBase(TaskName, ServiceID)
 {
+    esp_err_t err;
+
     nvsFlashInit();
 
     SharedBus sharedBus;
-    if(sharedBus.Init())
+    if(sharedBus.Init() == ESP_OK)
     {
         ESP_LOGI(TAG, "Initialized SharedBus successfully");
     }
@@ -58,6 +57,17 @@ ServiceMngr::ServiceMngr(
 #ifdef MONITORING
 // char pcTaskList[TASK_LIST_BUFFER_SIZE];
 #endif    
+
+    err = TaskInit(
+            &SrvMngHandle,
+            tskIDLE_PRIORITY + 1,
+            mServiceStackSize[SharedBus::ServiceID::SERVICE_MANAGER]);
+    
+    if (err == ESP_OK)
+    {
+        ESP_LOGI(TAG,"%s service was created.",
+            mServiceName[SharedBus::ServiceID::SERVICE_MANAGER]);
+    }        
 }
 
 ServiceMngr::~ServiceMngr()
@@ -81,7 +91,7 @@ esp_err_t ServiceMngr::RunService(ServiceParams_t serviceParams)
                     serviceParams.taskStackSize);
     if (err != ESP_OK) 
     {
-        ESP_LOGE(TAG, "Failed to create %s!", serviceParams.name);
+        ESP_LOGE(TAG, "Failed to create %s!", mServiceName[serviceParams.id]);
         return err;
     }
 
@@ -96,14 +106,14 @@ esp_err_t ServiceMngr::RunService(ServiceParams_t serviceParams)
 */
 void ServiceMngr::KillService(const SharedBus::ServiceID &ServiceID)
 {    
-    ESP_LOGI(TAG, "%s service was Deleted !", mServiceParams[ServiceID].name);
-    mServiceParams[ServiceID].taskKiller(&mServiceParams[ServiceID].taskHandler);
+    // ESP_LOGI(TAG, "%s service was Deleted !", mServiceParams[ServiceID].name);
+    // mServiceParams[ServiceID].taskKiller();
 }
 
 esp_err_t ServiceMngr::OnMachineStateStart()
 {
-    esp_err_t err = ESP_OK;
-
+    esp_err_t err = ESP_OK;             
+         ESP_LOGE(TAG, "OnMachineStateStart");
 // #ifdef CONFIG_DONE_COMPONENT_LVGL    
 //     ServiceParams_t GUIParams;    
 //     strcpy(GUIParams.name, "GUI");    
@@ -125,7 +135,21 @@ esp_err_t ServiceMngr::OnMachineStateStart()
 //     }    
 // #endif //CONFIG_DONE_COMPONENT_LVGL
 
-#ifdef CONFIG_DONE_COMPONENT_MATTER    
+#ifdef CONFIG_DONE_COMPONENT_MATTER 
+    static MatterCoffeeMaker matterCoffeeMaker(
+            mServiceName[SharedBus::ServiceID::MATTER],
+            SharedBus::ServiceID::MATTER);
+
+    err = matterCoffeeMaker.TaskInit(
+            &MatterHandle,
+            tskIDLE_PRIORITY + 1,
+            mServiceStackSize[SharedBus::ServiceID::MATTER]);
+    
+    if (err == ESP_OK)
+    {
+        ESP_LOGI(TAG,"%s service was created.",
+            mServiceName[SharedBus::ServiceID::MATTER]);
+    }     
     // ServiceParams_t MatterParams;
     // strcpy(MatterParams.name, "Matter");    
     // MatterParams.id = SharedBus::ServiceID::MATTER;
