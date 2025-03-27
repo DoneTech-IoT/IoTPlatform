@@ -1,6 +1,23 @@
 #pragma once 
-#include <stdint.h>
 #include "sdkconfig.h"
+#ifdef CONFIG_DONE_COMPONENT_LVGL
+//#include "GUIService.hpp"
+//#include "coffeeMaker_GUI.h"
+#endif
+#ifdef CONFIG_DONE_COMPONENT_MATTER
+#include "MatterCoffeeMaker.hpp"
+#else
+#include "esp_netif.h"
+#include "protocol_examples_common.h"
+#endif
+#ifdef CONFIG_DONE_LOG
+#include "Custom_Log.h"
+#endif
+#ifdef CONFIG_DONE_COMPONENT_MQTT
+//#include "MQTTSErvise.hpp"
+#endif
+
+#include <stdint.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/timers.h"
@@ -31,7 +48,7 @@ public:
     static constexpr uint32_t mServiceStackSize[SharedBus::ServiceID::MAX_ID] =
     {
         0 ,             //NO_ID
-        20  * 1024,     //Service Manager
+        50  * 1024,     //Service Manager
         100 * 1024,     //UI
         50  * 1024,     //MATTER
         50  * 1024,     //MQTT
@@ -47,15 +64,17 @@ public:
 private:    
     static TaskHandle_t SrvMngHandle;
 #ifdef CONFIG_DONE_COMPONENT_LVGL
-    static TaskHandle_t LVGLHandle;
+    static TaskHandle_t LVGLHandle;    
 #endif  
 #ifdef CONFIG_DONE_COMPONENT_MATTER
     static TaskHandle_t MatterHandle;
+    static MatterCoffeeMaker *matterCoffeeMaker;
 #endif
 #ifdef CONFIG_DONE_COMPONENT_MQTT
     static TaskHandle_t MQTTHandle;
 #endif
     
+
     typedef void (*TaskKillerPtr)(void);
     typedef esp_err_t (*TaskInitPtr)(
                             TaskHandle_t *taskHandler,
@@ -97,5 +116,5 @@ private:
      * @return ESP_OK on successful execution.
      * @return Appropriate error code if the state transition fails.
      */
-    esp_err_t OnMachineStateStart() override;               
+    esp_err_t OnMachineStateStart() override;             
 };

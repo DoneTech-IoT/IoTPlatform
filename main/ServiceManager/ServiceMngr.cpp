@@ -1,23 +1,4 @@
-#include "sdkconfig.h"
-#ifdef CONFIG_DONE_COMPONENT_LVGL
-//#include "GUIService.hpp"
-//#include "coffeeMaker_GUI.h"
-#endif
-#ifdef CONFIG_DONE_COMPONENT_MATTER
-#include "MatterCoffeeMaker.hpp"
-#else
-#include "esp_netif.h"
-#include "protocol_examples_common.h"
-#endif
-#ifdef CONFIG_DONE_LOG
-#include "Custom_Log.h"
-#endif
-#ifdef CONFIG_DONE_COMPONENT_MQTT
-//#include "MQTTSErvise.hpp"
-#endif
-
 #include "ServiceMngr.hpp"
-#include "SharedBus.hpp"
 #include "Singleton.hpp"
 #include "nvsFlash.h"
 #include <cstring>
@@ -30,6 +11,7 @@ TaskHandle_t ServiceMngr::LVGLHandle = nullptr;
 #endif  
 #ifdef CONFIG_DONE_COMPONENT_MATTER
 TaskHandle_t ServiceMngr::MatterHandle = nullptr;
+MatterCoffeeMaker* ServiceMngr::matterCoffeeMaker;
 #endif
 #ifdef CONFIG_DONE_COMPONENT_MQTT
 TaskHandle_t ServiceMngr::MQTTHandle = nullptr;
@@ -58,7 +40,7 @@ ServiceMngr::ServiceMngr(
 // char pcTaskList[TASK_LIST_BUFFER_SIZE];
 #endif    
 
-    err = TaskInit(
+    err = this->TaskInit(
             &SrvMngHandle,
             tskIDLE_PRIORITY + 1,
             mServiceStackSize[SharedBus::ServiceID::SERVICE_MANAGER]);
@@ -71,7 +53,7 @@ ServiceMngr::ServiceMngr(
 }
 
 ServiceMngr::~ServiceMngr()
-{        
+{            
 }
 
 /**
@@ -113,7 +95,7 @@ void ServiceMngr::KillService(const SharedBus::ServiceID &ServiceID)
 esp_err_t ServiceMngr::OnMachineStateStart()
 {
     esp_err_t err = ESP_OK;             
-         ESP_LOGE(TAG, "OnMachineStateStart");
+    ESP_LOGE(TAG, "OnMachineStateStart");
 // #ifdef CONFIG_DONE_COMPONENT_LVGL    
 //     ServiceParams_t GUIParams;    
 //     strcpy(GUIParams.name, "GUI");    
@@ -136,11 +118,11 @@ esp_err_t ServiceMngr::OnMachineStateStart()
 // #endif //CONFIG_DONE_COMPONENT_LVGL
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER 
-    static MatterCoffeeMaker matterCoffeeMaker(
-            mServiceName[SharedBus::ServiceID::MATTER],
-            SharedBus::ServiceID::MATTER);
+    matterCoffeeMaker = new MatterCoffeeMaker(
+                mServiceName[SharedBus::ServiceID::MATTER],
+                SharedBus::ServiceID::MATTER);
 
-    err = matterCoffeeMaker.TaskInit(
+    err = matterCoffeeMaker->TaskInit(
             &MatterHandle,
             tskIDLE_PRIORITY + 1,
             mServiceStackSize[SharedBus::ServiceID::MATTER]);
@@ -150,6 +132,7 @@ esp_err_t ServiceMngr::OnMachineStateStart()
         ESP_LOGI(TAG,"%s service was created.",
             mServiceName[SharedBus::ServiceID::MATTER]);
     }     
+
     // ServiceParams_t MatterParams;
     // strcpy(MatterParams.name, "Matter");    
     // MatterParams.id = SharedBus::ServiceID::MATTER;
