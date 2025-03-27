@@ -9,6 +9,8 @@
 
 #include "ServiceMngr.hpp"
 
+static ServiceMngr *serviceMngr;
+
 void check_memory() {
     ESP_LOGI("MEM", "Free heap memory:     %lu bytes", 
         (uint32_t)esp_get_free_heap_size());
@@ -39,9 +41,12 @@ extern "C" void app_main()
     // ServiceManger_TaskInit();
     // Log_RamOccupy("main", "service manager");
     check_memory();
-    ServiceMngr serviceMngr(
-        ServiceMngr::mServiceName[static_cast<uint8_t>(SharedBus::ServiceID::SERVICE_MANAGER)],
-        SharedBus::ServiceID::SERVICE_MANAGER);
+    esp_err_t err;
+
+    serviceMngr = new ServiceMngr(
+                ServiceMngr::mServiceName[SharedBus::ServiceID::SERVICE_MANAGER],
+                SharedBus::ServiceID::SERVICE_MANAGER);                  
+
     check_memory();
 
     gpio_config_t heartBeatConf;
