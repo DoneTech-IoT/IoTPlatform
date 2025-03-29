@@ -8,6 +8,7 @@ TaskHandle_t ServiceMngr::SrvMngHandle = nullptr;
 ServiceMngr::ServiceParams_t ServiceMngr::mServiceParams[SharedBus::ServiceID::MAX_ID];
 #ifdef CONFIG_DONE_COMPONENT_LVGL
 TaskHandle_t ServiceMngr::LVGLHandle = nullptr;
+std::shared_ptr<UICoffeeMaker> ServiceMngr::uiCoffeeMaker;
 #endif  
 #ifdef CONFIG_DONE_COMPONENT_MATTER
 TaskHandle_t ServiceMngr::MatterHandle = nullptr;
@@ -99,9 +100,29 @@ void ServiceMngr::KillService(const SharedBus::ServiceID &ServiceID)
 
 esp_err_t ServiceMngr::OnMachineStateStart()
 {
-    esp_err_t err = ESP_OK;             
- //   ESP_LOGE(TAG, "OnMachineStateStart");
-// #ifdef CONFIG_DONE_COMPONENT_LVGL    
+    esp_err_t err = ESP_OK;
+#ifdef CONFIG_DONE_COMPONENT_LVGL
+    uiCoffeeMaker = Singleton<UICoffeeMaker, const char*, SharedBus::ServiceID>::
+                        GetInstance(static_cast<const char*>
+                        (mServiceName[SharedBus::ServiceID::UI]),
+                        SharedBus::ServiceID::UI);
+
+    err = uiCoffeeMaker->TaskInit(
+        &LVGLHandle,
+        tskIDLE_PRIORITY + 1,
+        mServiceStackSize[SharedBus::ServiceID::UI]);
+
+    if (err == ESP_OK)
+    {
+        ESP_LOGI(TAG,"%s service was created.",
+            mServiceName[SharedBus::ServiceID::UI]);
+    }
+    else
+    {
+        ESP_LOGE(TAG,"%s service was not created.",
+            mServiceName[SharedBus::ServiceID::UI]);
+    }
+
 //     ServiceParams_t GUIParams;    
 //     strcpy(GUIParams.name, "GUI");    
 //     GUIParams.TaskKiller = GUI;
@@ -120,7 +141,7 @@ esp_err_t ServiceMngr::OnMachineStateStart()
 //     {
 //         ESP_LOGI(TAG, "GUI Daemon Created !");        
 //     }    
-// #endif //CONFIG_DONE_COMPONENT_LVGL
+#endif //CONFIG_DONE_COMPONENT_LVGL
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER 
     matterCoffeeMaker = Singleton<MatterCoffeeMaker, const char*, SharedBus::ServiceID>::

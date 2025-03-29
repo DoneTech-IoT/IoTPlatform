@@ -2,8 +2,7 @@
 #include "sdkconfig.h"
 #include <memory>
 #ifdef CONFIG_DONE_COMPONENT_LVGL
-//#include "GUIService.hpp"
-//#include "coffeeMaker_GUI.h"
+#include "UICoffeeMaker.hpp"
 #endif
 #ifdef CONFIG_DONE_COMPONENT_MATTER
 #include "MatterCoffeeMaker.hpp"
@@ -65,7 +64,8 @@ public:
 private:    
     static TaskHandle_t SrvMngHandle;
 #ifdef CONFIG_DONE_COMPONENT_LVGL
-    static TaskHandle_t LVGLHandle;    
+    static TaskHandle_t LVGLHandle;
+    static std::shared_ptr<UICoffeeMaker>uiCoffeeMaker;
 #endif  
 #ifdef CONFIG_DONE_COMPONENT_MATTER
     static TaskHandle_t MatterHandle;
