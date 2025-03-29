@@ -4,14 +4,14 @@
 #include <cstring>
 
 static const char* TAG = "ServiceMngr";
-ServiceMngr::ServiceParams_t ServiceMngr::mServiceParams[SharedBus::ServiceID::MAX_ID];
 TaskHandle_t ServiceMngr::SrvMngHandle = nullptr;
+ServiceMngr::ServiceParams_t ServiceMngr::mServiceParams[SharedBus::ServiceID::MAX_ID];
 #ifdef CONFIG_DONE_COMPONENT_LVGL
 TaskHandle_t ServiceMngr::LVGLHandle = nullptr;
 #endif  
 #ifdef CONFIG_DONE_COMPONENT_MATTER
 TaskHandle_t ServiceMngr::MatterHandle = nullptr;
-MatterCoffeeMaker* ServiceMngr::matterCoffeeMaker;
+std::shared_ptr<MatterCoffeeMaker> ServiceMngr::matterCoffeeMaker;
 #endif
 #ifdef CONFIG_DONE_COMPONENT_MQTT
 TaskHandle_t ServiceMngr::MQTTHandle = nullptr;
@@ -40,7 +40,7 @@ ServiceMngr::ServiceMngr(
 // char pcTaskList[TASK_LIST_BUFFER_SIZE];
 #endif    
 
-    err = this->TaskInit(
+    err = TaskInit(
             &SrvMngHandle,
             tskIDLE_PRIORITY + 1,
             mServiceStackSize[SharedBus::ServiceID::SERVICE_MANAGER]);
@@ -49,11 +49,16 @@ ServiceMngr::ServiceMngr(
     {
         ESP_LOGI(TAG,"%s service was created.",
             mServiceName[SharedBus::ServiceID::SERVICE_MANAGER]);
+    }     
+    else 
+    {
+        ESP_LOGE(TAG,"%s service was not created.",
+            mServiceName[SharedBus::ServiceID::SERVICE_MANAGER]);
     }        
 }
 
 ServiceMngr::~ServiceMngr()
-{            
+{                
 }
 
 /**
@@ -95,7 +100,7 @@ void ServiceMngr::KillService(const SharedBus::ServiceID &ServiceID)
 esp_err_t ServiceMngr::OnMachineStateStart()
 {
     esp_err_t err = ESP_OK;             
-    ESP_LOGE(TAG, "OnMachineStateStart");
+ //   ESP_LOGE(TAG, "OnMachineStateStart");
 // #ifdef CONFIG_DONE_COMPONENT_LVGL    
 //     ServiceParams_t GUIParams;    
 //     strcpy(GUIParams.name, "GUI");    
@@ -118,10 +123,11 @@ esp_err_t ServiceMngr::OnMachineStateStart()
 // #endif //CONFIG_DONE_COMPONENT_LVGL
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER 
-    matterCoffeeMaker = new MatterCoffeeMaker(
-                mServiceName[SharedBus::ServiceID::MATTER],
-                SharedBus::ServiceID::MATTER);
-
+    matterCoffeeMaker = Singleton<MatterCoffeeMaker, const char*, SharedBus::ServiceID>::
+                            GetInstance(static_cast<const char*>
+                                (mServiceName[SharedBus::ServiceID::MATTER]), 
+                                SharedBus::ServiceID::MATTER);    
+    
     err = matterCoffeeMaker->TaskInit(
             &MatterHandle,
             tskIDLE_PRIORITY + 1,
@@ -132,6 +138,11 @@ esp_err_t ServiceMngr::OnMachineStateStart()
         ESP_LOGI(TAG,"%s service was created.",
             mServiceName[SharedBus::ServiceID::MATTER]);
     }     
+    else
+    {
+        ESP_LOGE(TAG,"%s service was not created.",
+            mServiceName[SharedBus::ServiceID::MATTER]);
+    }
 
     // ServiceParams_t MatterParams;
     // strcpy(MatterParams.name, "Matter");    

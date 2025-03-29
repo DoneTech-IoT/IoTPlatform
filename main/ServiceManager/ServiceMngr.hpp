@@ -1,5 +1,6 @@
 #pragma once 
 #include "sdkconfig.h"
+#include <memory>
 #ifdef CONFIG_DONE_COMPONENT_LVGL
 //#include "GUIService.hpp"
 //#include "coffeeMaker_GUI.h"
@@ -68,13 +69,12 @@ private:
 #endif  
 #ifdef CONFIG_DONE_COMPONENT_MATTER
     static TaskHandle_t MatterHandle;
-    static MatterCoffeeMaker *matterCoffeeMaker;
+    static std::shared_ptr<MatterCoffeeMaker>matterCoffeeMaker;
 #endif
 #ifdef CONFIG_DONE_COMPONENT_MQTT
     static TaskHandle_t MQTTHandle;
 #endif
     
-
     typedef void (*TaskKillerPtr)(void);
     typedef esp_err_t (*TaskInitPtr)(
                             TaskHandle_t *taskHandler,
