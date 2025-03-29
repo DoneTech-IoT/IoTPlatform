@@ -8,17 +8,11 @@
 #include "esp_log.h"
 
 #include "ServiceMngr.hpp"
+#include "Singleton.hpp"
+#include "MatterCoffeeMaker.hpp"
 
-static ServiceMngr *serviceMngr;
-
-void check_memory() {
-    ESP_LOGI("MEM", "Free heap memory:     %lu bytes", 
-        (uint32_t)esp_get_free_heap_size());
-    ESP_LOGI("MEM", "Free internal memory: %lu bytes", 
-        (uint32_t)heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
-    ESP_LOGI("MEM", "Free PSRAM:           %lu bytes", 
-        (uint32_t)heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-}
+static TaskHandle_t SrvMngHandle;
+static std::shared_ptr<ServiceMngr> serviceMngr;
 
 #define HEARTBEAT_GPIO GPIO_NUM_21
 
@@ -37,17 +31,14 @@ static const char *TAG = "Main";
  */
 extern "C" void app_main()
 {
-    // Log_RamOccupy("main", "service manager");
-    // ServiceManger_TaskInit();
-    // Log_RamOccupy("main", "service manager");
-    check_memory();
-    esp_err_t err;
+    Log_RamOccupy("main", "service manager");        
 
-    serviceMngr = new ServiceMngr(
-                ServiceMngr::mServiceName[SharedBus::ServiceID::SERVICE_MANAGER],
-                SharedBus::ServiceID::SERVICE_MANAGER);                  
+    serviceMngr = Singleton<ServiceMngr, const char*, SharedBus::ServiceID>::
+                    GetInstance(static_cast<const char*>
+                        (ServiceMngr::mServiceName[SharedBus::ServiceID::SERVICE_MANAGER]),
+                        SharedBus::ServiceID::SERVICE_MANAGER);     
 
-    check_memory();
+    Log_RamOccupy("main", "service manager");    
 
     gpio_config_t heartBeatConf;
     heartBeatConf.intr_type = GPIO_INTR_DISABLE;
