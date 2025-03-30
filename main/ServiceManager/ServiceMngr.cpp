@@ -1,7 +1,8 @@
-#include "ServiceMngr.hpp"
-#include "Singleton.hpp"
 #include "nvsFlash.h"
 #include <cstring>
+
+#include "ServiceMngr.hpp"
+#include "Singleton.hpp"
 
 static const char* TAG = "ServiceMngr";
 TaskHandle_t ServiceMngr::SrvMngHandle = nullptr;
@@ -101,12 +102,13 @@ void ServiceMngr::KillService(const SharedBus::ServiceID &ServiceID)
 esp_err_t ServiceMngr::OnMachineStateStart()
 {
     esp_err_t err = ESP_OK;
+
 #ifdef CONFIG_DONE_COMPONENT_LVGL
     uiCoffeeMaker = Singleton<UICoffeeMaker, const char*, SharedBus::ServiceID>::
                         GetInstance(static_cast<const char*>
                         (mServiceName[SharedBus::ServiceID::UI]),
                         SharedBus::ServiceID::UI);
-
+                        
     err = uiCoffeeMaker->TaskInit(
         &LVGLHandle,
         tskIDLE_PRIORITY + 1,
@@ -122,32 +124,13 @@ esp_err_t ServiceMngr::OnMachineStateStart()
         ESP_LOGE(TAG,"%s service was not created.",
             mServiceName[SharedBus::ServiceID::UI]);
     }
-
-//     ServiceParams_t GUIParams;    
-//     strcpy(GUIParams.name, "GUI");    
-//     GUIParams.TaskKiller = GUI;
-//     GUIParams.taskStack = LVGL_STACK;
-//     GUIParams.priority = tskIDLE_PRIORITY + 1;  
-//     GUIParams.taskHandler = LVGLHandle;  
-//     GUIParams.TaskInit = GUI_TaskInit;
-//     GUI_OnInitElements(GUI_Init);
-//     GUI_OnSharedBusReceived(GUI_ProcessSharedBusMsg);
-//     err = ServiceManager_RunService(GUIParams);
-//     if (err)
-//     {
-//         ESP_LOGE(TAG, "Failed to create GUI!");
-//     }
-//     else
-//     {
-//         ESP_LOGI(TAG, "GUI Daemon Created !");        
-//     }    
 #endif //CONFIG_DONE_COMPONENT_LVGL
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER 
     matterCoffeeMaker = Singleton<MatterCoffeeMaker, const char*, SharedBus::ServiceID>::
                             GetInstance(static_cast<const char*>
-                                (mServiceName[SharedBus::ServiceID::MATTER]), 
-                                SharedBus::ServiceID::MATTER);    
+                            (mServiceName[SharedBus::ServiceID::MATTER]), 
+                            SharedBus::ServiceID::MATTER);    
     
     err = matterCoffeeMaker->TaskInit(
             &MatterHandle,
@@ -164,25 +147,6 @@ esp_err_t ServiceMngr::OnMachineStateStart()
         ESP_LOGE(TAG,"%s service was not created.",
             mServiceName[SharedBus::ServiceID::MATTER]);
     }
-
-    // ServiceParams_t MatterParams;
-    // strcpy(MatterParams.name, "Matter");    
-    // MatterParams.id = SharedBus::ServiceID::MATTER;
-    // MatterParams.taskHandler = MatterHandle;
-    // MatterParams.taskInit = MatterService::TaskInit;
-    // MatterParams.taskKiller =  MatterService::~MatterService;
-    // MatterParams.taskStackSize = mServiceStackSize[MatterParams.id];
-    // MatterParams.priority = tskIDLE_PRIORITY + 1;
-        
-    // err = RunService(MatterParams);
-    // if (err)
-    // {
-    //     ESP_LOGE(TAG, "Failed to create Matter !");
-    // }
-    // else 
-    // {
-    //     ESP_LOGI(TAG, "Matter Daemon Created !");
-    // }
 #endif //CONFIG_DONE_COMPONENT_MATTER
     
 // #ifdef CONFIG_DONE_COMPONENT_MQTT    
