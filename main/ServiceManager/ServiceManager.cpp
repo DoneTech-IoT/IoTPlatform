@@ -3,8 +3,8 @@
 #include "nvsFlash.h"
 
 #ifdef CONFIG_DONE_COMPONENT_LVGL
-#include "GUI.h"
-#include "coffeeMaker_GUI.h"
+// #include "GUI.h"
+// #include "coffeeMaker_GUI.h"
 #endif
 #ifdef CONFIG_DONE_COMPONENT_MATTER
 #include "MatterInterface.h"
@@ -95,16 +95,16 @@ static void ServiceManger_RunAllDaemons()
 
 #ifdef CONFIG_DONE_COMPONENT_LVGL    
     ServiceParams_t GUIParams;
-    GUIParams.maximumRAM_Needed = LVGL_STACK * 2;
-    strcpy(GUIParams.name, "GUI");
-    GUIParams.ramType = PSRAM_;
-    GUIParams.TaskKiller = GUI_TaskKill;
-    GUIParams.taskStack = LVGL_STACK;
-    GUIParams.priority = tskIDLE_PRIORITY + 1;  
-    GUIParams.taskHandler = LVGLHandle;  
-    GUIParams.TaskInit = GUI_TaskInit;
-    GUI_OnInitElements(GUI_Init);
-    GUI_OnSharedBusReceived(GUI_ProcessSharedBusMsg);
+    // GUIParams.maximumRAM_Needed = LVGL_STACK * 2;
+    // strcpy(GUIParams.name, "GUI");
+    // GUIParams.ramType = PSRAM_;
+    // GUIParams.TaskKiller = GUI_TaskKill;
+    // GUIParams.taskStack = LVGL_STACK;
+    // GUIParams.priority = tskIDLE_PRIORITY + 1;  
+    // GUIParams.taskHandler = LVGLHandle;  
+    // GUIParams.TaskInit = GUI_TaskInit;
+    // //GUI_OnInitElements(GUI_Init);
+    // GUI_OnSharedBusReceived(GUI_ProcessSharedBusMsg);
     err = ServiceManager_RunService(GUIParams);
     if (err)
     {
