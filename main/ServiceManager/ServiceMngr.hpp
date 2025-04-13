@@ -14,7 +14,7 @@
 #include "Custom_Log.h"
 #endif
 #ifdef CONFIG_DONE_COMPONENT_MQTT
-//#include "MQTTSErvise.hpp"
+#include "MQTTCoffeeMakerApp.hpp"
 #endif
 
 #include <stdint.h>
@@ -73,7 +73,7 @@ private:
 #endif
 #ifdef CONFIG_DONE_COMPONENT_MQTT
     static TaskHandle_t MQTTHandle;
-    static std::shared_ptr<MQTTCoffeeMakerApp>MQTTCoffeeMakerApp;
+    static std::shared_ptr<MQTTCoffeeMakerApp>mqttCoffeeMakerApp;
 #endif
     
     typedef void (*TaskKillerPtr)(void);

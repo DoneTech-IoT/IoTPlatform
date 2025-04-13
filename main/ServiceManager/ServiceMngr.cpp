@@ -17,7 +17,7 @@ std::shared_ptr<MatterCoffeeMaker> ServiceMngr::matterCoffeeMaker;
 #endif
 #ifdef CONFIG_DONE_COMPONENT_MQTT
 TaskHandle_t ServiceMngr::MQTTHandle = nullptr;
-std::shared_ptr<MQTTCoffeeMakerApp> ServiceMngr::MQTTCoffeeMakerApp;
+std::shared_ptr<MQTTCoffeeMakerApp> ServiceMngr::mqttCoffeeMakerApp;
 #endif
 
 ServiceMngr::ServiceMngr(
@@ -148,11 +148,11 @@ esp_err_t ServiceMngr::OnMachineStateStart()
 #endif // CONFIG_DONE_COMPONENT_MATTER
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
-    MQTTCoffeeMakerApp = Singleton<MQTTCoffeeMakerApp, const char *, SharedBus::ServiceID>::
+    mqttCoffeeMakerApp = Singleton<MQTTCoffeeMakerApp, const char *, SharedBus::ServiceID>::
         GetInstance(static_cast<const char *>(mServiceName[SharedBus::ServiceID::MQTT]),
                     SharedBus::ServiceID::MQTT);
 
-    err = MQTTCoffeeMakerApp->TaskInit(
+    err = mqttCoffeeMakerApp->TaskInit(
         &MQTTHandle,
         tskIDLE_PRIORITY + 1,
         mServiceStackSize[SharedBus::ServiceID::MQTT]);
