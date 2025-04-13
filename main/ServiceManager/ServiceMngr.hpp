@@ -73,6 +73,7 @@ private:
 #endif
 #ifdef CONFIG_DONE_COMPONENT_MQTT
     static TaskHandle_t MQTTHandle;
+    static std::shared_ptr<MQTTCoffeeMakerApp>MQTTCoffeeMakerApp;
 #endif
     
     typedef void (*TaskKillerPtr)(void);
