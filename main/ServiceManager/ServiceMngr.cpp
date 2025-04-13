@@ -1,5 +1,6 @@
 #include "nvsFlash.h"
 #include <cstring>
+#include "esp_heap_caps.h"
 
 #include "ServiceMngr.hpp"
 #include "Singleton.hpp"
@@ -19,12 +20,14 @@ std::shared_ptr<MatterCoffeeMaker> ServiceMngr::matterCoffeeMaker;
 TaskHandle_t ServiceMngr::MQTTHandle = nullptr;
 #endif
 
+#include "esp_heap_caps.h"
+
 ServiceMngr::ServiceMngr(
     const char *TaskName,
     const SharedBus::ServiceID &ServiceID) :
     ServiceBase(TaskName, ServiceID)
 {
-    esp_err_t err;
+    esp_err_t err;    
 
     nvsFlashInit();
 
@@ -102,13 +105,19 @@ void ServiceMngr::KillService(const SharedBus::ServiceID &ServiceID)
 esp_err_t ServiceMngr::OnMachineStateStart()
 {
     esp_err_t err = ESP_OK;
-
+    
 #ifdef CONFIG_DONE_COMPONENT_LVGL
     uiCoffeeMaker = Singleton<UICoffeeMaker, const char*, SharedBus::ServiceID>::
                         GetInstance(static_cast<const char*>
                         (mServiceName[SharedBus::ServiceID::UI]),
-                        SharedBus::ServiceID::UI);
-                        
+                        SharedBus::ServiceID::UI);    
+
+    uiCoffeeMaker->OnSetupSrv(
+        uiCoffeeMaker->OnSetup);
+
+    uiCoffeeMaker->OnSharedbusReceivedSrv(
+        uiCoffeeMaker->OnSharedBusReceivedAppp);
+            
     err = uiCoffeeMaker->TaskInit(
         &LVGLHandle,
         tskIDLE_PRIORITY + 1,
@@ -123,7 +132,7 @@ esp_err_t ServiceMngr::OnMachineStateStart()
     {
         ESP_LOGE(TAG,"%s service was not created.",
             mServiceName[SharedBus::ServiceID::UI]);
-    }
+    }    
 #endif //CONFIG_DONE_COMPONENT_LVGL
 
 #ifdef CONFIG_DONE_COMPONENT_MATTER 
@@ -146,7 +155,7 @@ esp_err_t ServiceMngr::OnMachineStateStart()
     {
         ESP_LOGE(TAG,"%s service was not created.",
             mServiceName[SharedBus::ServiceID::MATTER]);
-    }
+    }    
 #endif //CONFIG_DONE_COMPONENT_MATTER
     
 // #ifdef CONFIG_DONE_COMPONENT_MQTT    
