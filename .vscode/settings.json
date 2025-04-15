@@ -65,8 +65,7 @@
         "typeinfo": "cpp"
     },
     "idf.openOcdConfigs": [
-        "interface/ftdi/esp32_devkitj_v1.cfg",
-        "target/esp32s3.cfg"
+        "board/esp32s3-builtin.cfg"
     ],
     "idf.port": "/dev/ttyACM0",
     "idf.flashType": "UART",
@@ -97,10 +96,5 @@
     "C_Cpp.dimInactiveRegions": false,
     "editor.minimap.maxColumn": 80,
     "editor.wordWrap": "wordWrapColumn",
-    "editor.wordWrapColumn": 100,
-    "idf.customExtraVars": {
-        "OPENOCD_SCRIPTS": "/home/mj/.espressif/tools/openocd-esp32/v0.12.0-esp32-20241016/openocd-esp32/share/openocd/scripts",
-        "ESP_ROM_ELF_DIR": "/home/mj/.espressif/tools/esp-rom-elfs/20241011/",
-        "IDF_TARGET": "esp32s3"
-    }
+    "editor.wordWrapColumn": 100
 }
