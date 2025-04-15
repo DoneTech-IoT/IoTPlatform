@@ -66,42 +66,6 @@ ServiceMngr::~ServiceMngr()
 {                
 }
 
-/**
-* @brief run given service.
-* This function runs the given service by initializing the service parameters and creating the task.
-* @param[in] serviceParams Service parameters    
-* @retval ESP_OK if the service is run successfully, otherwise ESP_FAIL
-*/ 
-esp_err_t ServiceMngr::RunService(ServiceParams_t serviceParams)
-{
-    esp_err_t err = ESP_OK;
-
-    // Call the function pointer (init_func) with proper arguments
-    TaskInitPtr init_func = serviceParams.taskInit;
-    err = init_func(&serviceParams.taskHandler, 
-                    serviceParams.priority, 
-                    serviceParams.taskStackSize);
-    if (err != ESP_OK) 
-    {
-        ESP_LOGE(TAG, "Failed to create %s!", mServiceName[serviceParams.id]);
-        return err;
-    }
-
-    return ESP_OK;    
-}
-
-/**
-* @brief Deletes a task.
-* This function deletes the specified task.
-* @param ServiceID The service ID to be deleted.
-* @return void
-*/
-void ServiceMngr::KillService(const SharedBus::ServiceID &ServiceID)
-{    
-    // ESP_LOGI(TAG, "%s service was Deleted !", mServiceParams[ServiceID].name);
-    // mServiceParams[ServiceID].taskKiller();
-}
-
 esp_err_t ServiceMngr::OnMachineStateStart()
 {
     esp_err_t err = ESP_OK;
@@ -110,13 +74,7 @@ esp_err_t ServiceMngr::OnMachineStateStart()
     uiCoffeeMaker = Singleton<UICoffeeMaker, const char*, SharedBus::ServiceID>::
                         GetInstance(static_cast<const char*>
                         (mServiceName[SharedBus::ServiceID::UI]),
-                        SharedBus::ServiceID::UI);    
-
-    uiCoffeeMaker->OnSetupSrv(
-        uiCoffeeMaker->OnSetup);
-
-    uiCoffeeMaker->OnSharedbusReceivedSrv(
-        uiCoffeeMaker->OnSharedBusReceivedAppp);
+                        SharedBus::ServiceID::UI);                
             
     err = uiCoffeeMaker->TaskInit(
         &LVGLHandle,
@@ -158,26 +116,9 @@ esp_err_t ServiceMngr::OnMachineStateStart()
     }    
 #endif //CONFIG_DONE_COMPONENT_MATTER
     
-// #ifdef CONFIG_DONE_COMPONENT_MQTT    
-//     ServiceParams_t MQTTParams;
-//     strcpy(MQTTParams.name, "MQTT");
-//     MQTTParams.maximumRAM_Needed = 0;                
-//     MQTTParams.ramType = SRAM_;
-//     MQTTParams.TaskKiller = MQTT_TaskKill;
-//     MQTTParams.taskStack = MQTT_STACK;
-//     MQTTParams.priority = tskIDLE_PRIORITY + 1;
-//     MQTTParams.taskHandler = MQTTHandle;
-//     MQTTParams.TaskInit = MQTT_TaskInit;
-//     err = ServiceManager_RunService (MQTTParams);
-//     if (err)
-//     {
-//         ESP_LOGE(TAG, "Failed to create MQTT !");
-//     }    
-//     else 
-//     {
-//         ESP_LOGI(TAG, "MQTT Daemon Created !");
-//     }
-// #endif //CONFIG_DONE_COMPONENT_MQTT    
+#ifdef CONFIG_DONE_COMPONENT_MQTT    
+
+#endif //CONFIG_DONE_COMPONENT_MQTT    
 
     return err;        
 }
