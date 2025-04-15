@@ -30,15 +30,13 @@ static const char *TAG = "Main";
  * @brief Function to change colors based on a timer callback
  */
 extern "C" void app_main()
-{
+{        
     Log_RamOccupy("main", "service manager");        
-
     serviceMngr = Singleton<ServiceMngr, const char*, SharedBus::ServiceID>::
                     GetInstance(static_cast<const char*>
                         (ServiceMngr::mServiceName[SharedBus::ServiceID::SERVICE_MANAGER]),
                         SharedBus::ServiceID::SERVICE_MANAGER);     
-
-    Log_RamOccupy("main", "service manager");    
+    Log_RamOccupy("main", "service manager");        
 
     gpio_config_t heartBeatConf;
     heartBeatConf.intr_type = GPIO_INTR_DISABLE;
