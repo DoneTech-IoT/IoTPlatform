@@ -14,7 +14,7 @@
 #include "Custom_Log.h"
 #endif
 #ifdef CONFIG_DONE_COMPONENT_MQTT
-#include "MQTTCoffeeMakerApp.hpp"
+#include "MQTT_CoffeeMakerApp.hpp"
 #endif
 
 #include <stdint.h>
