@@ -52,12 +52,12 @@ ServiceMngr::ServiceMngr(
     
     if (err == ESP_OK)
     {
-        ESP_LOGI(TAG,"%s service was created.",
+        ESP_LOGI(TAG,"%s service created.",
             mServiceName[SharedBus::ServiceID::SERVICE_MANAGER]);
     }     
     else 
     {
-        ESP_LOGE(TAG,"%s service was not created.",
+        ESP_LOGE(TAG,"failed to create %s service.",
             mServiceName[SharedBus::ServiceID::SERVICE_MANAGER]);
     }        
 }
@@ -83,12 +83,12 @@ esp_err_t ServiceMngr::OnMachineStateStart()
 
     if (err == ESP_OK)
     {
-        ESP_LOGI(TAG,"%s service was created.",
+        ESP_LOGI(TAG,"%s service created.",
             mServiceName[SharedBus::ServiceID::UI]);
     }
     else
     {
-        ESP_LOGE(TAG,"%s service was not created.",
+        ESP_LOGE(TAG,"failed to create %s service",
             mServiceName[SharedBus::ServiceID::UI]);
     }    
 #endif //CONFIG_DONE_COMPONENT_LVGL
@@ -106,12 +106,12 @@ esp_err_t ServiceMngr::OnMachineStateStart()
     
     if (err == ESP_OK)
     {
-        ESP_LOGI(TAG,"%s service was created.",
+        ESP_LOGI(TAG,"%s service created",
             mServiceName[SharedBus::ServiceID::MATTER]);
     }     
     else
     {
-        ESP_LOGE(TAG,"%s service was not created.",
+        ESP_LOGE(TAG,"failed to create %s service",
             mServiceName[SharedBus::ServiceID::MATTER]);
     }    
 #endif //CONFIG_DONE_COMPONENT_MATTER
