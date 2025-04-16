@@ -93,22 +93,6 @@ private:
     static ServiceParams_t mServiceParams[SharedBus::ServiceID::MAX_ID];    
 
     /**
-    * @brief run given service.
-    * This function runs the given service by initializing the service parameters and creating the task.
-    * @param[in] serviceParams Service parameters    
-    * @retval ESP_OK if the service is run successfully, otherwise ESP_FAIL
-    */ 
-    esp_err_t RunService(ServiceParams_t serviceParams);    
-
-    /**
-    * @brief Deletes a task.
-    * This function deletes the specified task.
-    * @param ServiceID The service ID to be deleted.
-    * @return void
-    */
-    void KillService(const SharedBus::ServiceID &ServiceID);
-
-    /**
      * @brief Handles the transition to the machine's start state.
      * This function is called when the state machine enters the start state. 
      * It is responsible for initializing necessary components, starting tasks, 
