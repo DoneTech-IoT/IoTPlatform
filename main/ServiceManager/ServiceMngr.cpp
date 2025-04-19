@@ -5,13 +5,13 @@
 #include "ServiceMngr.hpp"
 #include "Singleton.hpp"
 
-static const char *TAG = "ServiceMngr";
+static const char* TAG = "ServiceMngr";
 TaskHandle_t ServiceMngr::SrvMngHandle = nullptr;
 ServiceMngr::ServiceParams_t ServiceMngr::mServiceParams[SharedBus::ServiceID::MAX_ID];
 #ifdef CONFIG_DONE_COMPONENT_LVGL
 TaskHandle_t ServiceMngr::LVGLHandle = nullptr;
 std::shared_ptr<UICoffeeMaker> ServiceMngr::uiCoffeeMaker;
-#endif
+#endif  
 #ifdef CONFIG_DONE_COMPONENT_MATTER
 TaskHandle_t ServiceMngr::MatterHandle = nullptr;
 std::shared_ptr<MatterCoffeeMaker> ServiceMngr::matterCoffeeMaker;
@@ -25,31 +25,32 @@ std::shared_ptr<MQTTCoffeeMakerApp> ServiceMngr::mqttCoffeeMakerApp;
 
 ServiceMngr::ServiceMngr(
     const char *TaskName,
-    const SharedBus::ServiceID &ServiceID) : ServiceBase(TaskName, ServiceID)
+    const SharedBus::ServiceID &ServiceID) :
+    ServiceBase(TaskName, ServiceID)
 {
     esp_err_t err;    
 
     nvsFlashInit();
 
     SharedBus sharedBus;
-    if (sharedBus.Init() == ESP_OK)
+    if(sharedBus.Init() == ESP_OK)
     {
         ESP_LOGI(TAG, "Initialized SharedBus successfully");
     }
     else
     {
         ESP_LOGE(TAG, "Failed to Initialize SharedBus.");
-    }
+    }                
 
 #ifdef MONITORING
 // char pcTaskList[TASK_LIST_BUFFER_SIZE];
-#endif
+#endif    
 
     err = TaskInit(
-        &SrvMngHandle,
-        tskIDLE_PRIORITY + 1,
-        mServiceStackSize[SharedBus::ServiceID::SERVICE_MANAGER]);
-
+            &SrvMngHandle,
+            tskIDLE_PRIORITY + 1,
+            mServiceStackSize[SharedBus::ServiceID::SERVICE_MANAGER]);
+    
     if (err == ESP_OK)
     {
         ESP_LOGI(TAG,"%s service created.",
@@ -63,19 +64,14 @@ ServiceMngr::ServiceMngr(
 }
 
 ServiceMngr::~ServiceMngr()
-{
+{                
 }
 
-/**
- * @brief run given service.
- * This function runs the given service by initializing the service parameters and creating the task.
- * @param[in] serviceParams Service parameters
- * @retval ESP_OK if the service is run successfully, otherwise ESP_FAIL
- */
-esp_err_t ServiceMngr::RunService(ServiceParams_t serviceParams)
+esp_err_t ServiceMngr::OnMachineStateStart()
 {
     esp_err_t err = ESP_OK;
-
+    
+#ifdef CONFIG_DONE_COMPONENT_LVGL
     uiCoffeeMaker = Singleton<UICoffeeMaker, const char*, SharedBus::ServiceID>::
                         GetInstance(static_cast<const char*>
                         (mServiceName[SharedBus::ServiceID::UI]),
@@ -98,11 +94,17 @@ esp_err_t ServiceMngr::RunService(ServiceParams_t serviceParams)
     }    
 #endif //CONFIG_DONE_COMPONENT_LVGL
 
+#ifdef CONFIG_DONE_COMPONENT_MATTER 
+    matterCoffeeMaker = Singleton<MatterCoffeeMaker, const char*, SharedBus::ServiceID>::
+                            GetInstance(static_cast<const char*>
+                            (mServiceName[SharedBus::ServiceID::MATTER]), 
+                            SharedBus::ServiceID::MATTER);    
+    
     err = matterCoffeeMaker->TaskInit(
-        &MatterHandle,
-        tskIDLE_PRIORITY + 1,
-        mServiceStackSize[SharedBus::ServiceID::MATTER]);
-
+            &MatterHandle,
+            tskIDLE_PRIORITY + 1,
+            mServiceStackSize[SharedBus::ServiceID::MATTER]);
+    
     if (err == ESP_OK)
     {
         ESP_LOGI(TAG,"%s service created",
@@ -110,11 +112,10 @@ esp_err_t ServiceMngr::RunService(ServiceParams_t serviceParams)
     }     
     else
     {
-        ESP_LOGE(TAG,"failed to create %s service",
-            mServiceName[SharedBus::ServiceID::MATTER]);
-    }    
-#endif //CONFIG_DONE_COMPONENT_MATTER
-    
+        ESP_LOGE(TAG, "failed to create %s service",
+                 mServiceName[SharedBus::ServiceID::MATTER]);
+    }
+#endif // CONFIG_DONE_COMPONENT_MATTER
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
     mqttCoffeeMakerApp = Singleton<MQTTCoffeeMakerApp, const char *, SharedBus::ServiceID>::
