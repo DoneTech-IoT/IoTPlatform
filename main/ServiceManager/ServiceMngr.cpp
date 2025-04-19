@@ -129,7 +129,7 @@ esp_err_t ServiceMngr::OnMachineStateStart()
 
     if (err == ESP_OK)
     {
-        ESP_LOGI(TAG, "service %s created.",
+        ESP_LOGI(TAG, "%s service created.",
                  mServiceName[SharedBus::ServiceID::MQTT]);
     }
     else
