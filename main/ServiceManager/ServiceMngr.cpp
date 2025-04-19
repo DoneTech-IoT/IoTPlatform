@@ -1,5 +1,6 @@
 #include "nvsFlash.h"
 #include <cstring>
+#include "esp_heap_caps.h"
 
 #include "ServiceMngr.hpp"
 #include "Singleton.hpp"
@@ -20,11 +21,13 @@ TaskHandle_t ServiceMngr::MQTTHandle = nullptr;
 std::shared_ptr<MQTTCoffeeMakerApp> ServiceMngr::mqttCoffeeMakerApp;
 #endif
 
+#include "esp_heap_caps.h"
+
 ServiceMngr::ServiceMngr(
     const char *TaskName,
     const SharedBus::ServiceID &ServiceID) : ServiceBase(TaskName, ServiceID)
 {
-    esp_err_t err;
+    esp_err_t err;    
 
     nvsFlashInit();
 
@@ -49,20 +52,21 @@ ServiceMngr::ServiceMngr(
 
     if (err == ESP_OK)
     {
-        ESP_LOGI(TAG, "%s service was created.",
-                 mServiceName[SharedBus::ServiceID::SERVICE_MANAGER]);
-    }
-    else
+        ESP_LOGI(TAG,"%s service created.",
+            mServiceName[SharedBus::ServiceID::SERVICE_MANAGER]);
+    }     
+    else 
     {
-        ESP_LOGE(TAG, "%s service was not created.",
-                 mServiceName[SharedBus::ServiceID::SERVICE_MANAGER]);
-    }
+        ESP_LOGE(TAG,"failed to create %s service.",
+            mServiceName[SharedBus::ServiceID::SERVICE_MANAGER]);
+    }        
 }
 
 ServiceMngr::~ServiceMngr()
 {
 }
 
+<<<<<<< HEAD
 /**
  * @brief run given service.
  * This function runs the given service by initializing the service parameters and creating the task.
@@ -73,41 +77,12 @@ esp_err_t ServiceMngr::RunService(ServiceParams_t serviceParams)
 {
     esp_err_t err = ESP_OK;
 
-    // Call the function pointer (init_func) with proper arguments
-    TaskInitPtr init_func = serviceParams.taskInit;
-    err = init_func(&serviceParams.taskHandler,
-                    serviceParams.priority,
-                    serviceParams.taskStackSize);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "Failed to create %s!", mServiceName[serviceParams.id]);
-        return err;
-    }
-
-    return ESP_OK;
-}
-
-/**
- * @brief Deletes a task.
- * This function deletes the specified task.
- * @param ServiceID The service ID to be deleted.
- * @return void
- */
-void ServiceMngr::KillService(const SharedBus::ServiceID &ServiceID)
-{
-    // ESP_LOGI(TAG, "%s service was Deleted !", mServiceParams[ServiceID].name);
-    // mServiceParams[ServiceID].taskKiller();
-}
-
-esp_err_t ServiceMngr::OnMachineStateStart()
-{
-    esp_err_t err = ESP_OK;
-
-#ifdef CONFIG_DONE_COMPONENT_LVGL
-    uiCoffeeMaker = Singleton<UICoffeeMaker, const char *, SharedBus::ServiceID>::
-        GetInstance(static_cast<const char *>(mServiceName[SharedBus::ServiceID::UI]),
-                    SharedBus::ServiceID::UI);
-
+    uiCoffeeMaker = Singleton<UICoffeeMaker, const char*, SharedBus::ServiceID>::
+                        GetInstance(static_cast<const char*>
+                        (mServiceName[SharedBus::ServiceID::UI]),
+                        SharedBus::ServiceID::UI);                
+            
+>>>>>>> main
     err = uiCoffeeMaker->TaskInit(
         &LVGLHandle,
         tskIDLE_PRIORITY + 1,
@@ -115,20 +90,15 @@ esp_err_t ServiceMngr::OnMachineStateStart()
 
     if (err == ESP_OK)
     {
-        ESP_LOGI(TAG, "%s service was created.",
-                 mServiceName[SharedBus::ServiceID::UI]);
+        ESP_LOGI(TAG,"%s service created.",
+            mServiceName[SharedBus::ServiceID::UI]);
     }
     else
     {
-        ESP_LOGE(TAG, "%s service was not created.",
-                 mServiceName[SharedBus::ServiceID::UI]);
-    }
-#endif // CONFIG_DONE_COMPONENT_LVGL
-
-#ifdef CONFIG_DONE_COMPONENT_MATTER
-    matterCoffeeMaker = Singleton<MatterCoffeeMaker, const char *, SharedBus::ServiceID>::
-        GetInstance(static_cast<const char *>(mServiceName[SharedBus::ServiceID::MATTER]),
-                    SharedBus::ServiceID::MATTER);
+        ESP_LOGE(TAG,"failed to create %s service",
+            mServiceName[SharedBus::ServiceID::UI]);
+    }    
+#endif //CONFIG_DONE_COMPONENT_LVGL
 
     err = matterCoffeeMaker->TaskInit(
         &MatterHandle,
@@ -137,15 +107,19 @@ esp_err_t ServiceMngr::OnMachineStateStart()
 
     if (err == ESP_OK)
     {
-        ESP_LOGI(TAG, "%s service was created.",
-                 mServiceName[SharedBus::ServiceID::MATTER]);
-    }
+        ESP_LOGI(TAG,"%s service created",
+            mServiceName[SharedBus::ServiceID::MATTER]);
+    }     
     else
     {
-        ESP_LOGE(TAG, "%s service was not created.",
-                 mServiceName[SharedBus::ServiceID::MATTER]);
-    }
-#endif // CONFIG_DONE_COMPONENT_MATTER
+        ESP_LOGE(TAG,"failed to create %s service",
+            mServiceName[SharedBus::ServiceID::MATTER]);
+    }    
+#endif //CONFIG_DONE_COMPONENT_MATTER
+    
+#ifdef CONFIG_DONE_COMPONENT_MQTT    
+
+#endif //CONFIG_DONE_COMPONENT_MQTT    
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
     mqttCoffeeMakerApp = Singleton<MQTTCoffeeMakerApp, const char *, SharedBus::ServiceID>::
