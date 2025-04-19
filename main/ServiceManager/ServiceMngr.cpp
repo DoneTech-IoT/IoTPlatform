@@ -18,6 +18,7 @@ std::shared_ptr<MatterCoffeeMaker> ServiceMngr::matterCoffeeMaker;
 #endif
 #ifdef CONFIG_DONE_COMPONENT_MQTT
 TaskHandle_t ServiceMngr::MQTTHandle = nullptr;
+std::shared_ptr<MQTTCoffeeMaker> ServiceMngr::mqttCoffeeMakerApp;
 #endif
 
 #include "esp_heap_caps.h"
@@ -111,14 +112,32 @@ esp_err_t ServiceMngr::OnMachineStateStart()
     }     
     else
     {
-        ESP_LOGE(TAG,"failed to create %s service",
-            mServiceName[SharedBus::ServiceID::MATTER]);
-    }    
-#endif //CONFIG_DONE_COMPONENT_MATTER
-    
-#ifdef CONFIG_DONE_COMPONENT_MQTT    
+        ESP_LOGE(TAG, "failed to create %s service",
+                 mServiceName[SharedBus::ServiceID::MATTER]);
+    }
+#endif // CONFIG_DONE_COMPONENT_MATTER
 
-#endif //CONFIG_DONE_COMPONENT_MQTT    
+#ifdef CONFIG_DONE_COMPONENT_MQTT
+    mqttCoffeeMakerApp = Singleton<MQTTCoffeeMaker, const char *, SharedBus::ServiceID>::
+        GetInstance(static_cast<const char *>(mServiceName[SharedBus::ServiceID::MQTT]),
+                    SharedBus::ServiceID::MQTT);
 
-    return err;        
+    err = mqttCoffeeMakerApp->TaskInit(
+        &MQTTHandle,
+        tskIDLE_PRIORITY + 1,
+        mServiceStackSize[SharedBus::ServiceID::MQTT]);
+
+    if (err == ESP_OK)
+    {
+        ESP_LOGI(TAG, "%s service created.",
+                 mServiceName[SharedBus::ServiceID::MQTT]);
+    }
+    else
+    {
+        ESP_LOGE(TAG, "failed to create %s service.",
+                 mServiceName[SharedBus::ServiceID::MQTT]);
+    }
+#endif // CONFIG_DONE_COMPONENT_MQTT
+
+    return err;
 }
