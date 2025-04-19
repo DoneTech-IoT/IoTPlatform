@@ -18,7 +18,7 @@ std::shared_ptr<MatterCoffeeMaker> ServiceMngr::matterCoffeeMaker;
 #endif
 #ifdef CONFIG_DONE_COMPONENT_MQTT
 TaskHandle_t ServiceMngr::MQTTHandle = nullptr;
-std::shared_ptr<MQTTCoffeeMakerApp> ServiceMngr::mqttCoffeeMakerApp;
+std::shared_ptr<MQTTCoffeeMaker> ServiceMngr::mqttCoffeeMakerApp;
 #endif
 
 #include "esp_heap_caps.h"
@@ -118,7 +118,7 @@ esp_err_t ServiceMngr::OnMachineStateStart()
 #endif // CONFIG_DONE_COMPONENT_MATTER
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
-    mqttCoffeeMakerApp = Singleton<MQTTCoffeeMakerApp, const char *, SharedBus::ServiceID>::
+    mqttCoffeeMakerApp = Singleton<MQTTCoffeeMaker, const char *, SharedBus::ServiceID>::
         GetInstance(static_cast<const char *>(mServiceName[SharedBus::ServiceID::MQTT]),
                     SharedBus::ServiceID::MQTT);
 
