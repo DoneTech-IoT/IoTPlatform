@@ -66,7 +66,6 @@ ServiceMngr::~ServiceMngr()
 {
 }
 
-<<<<<<< HEAD
 /**
  * @brief run given service.
  * This function runs the given service by initializing the service parameters and creating the task.
@@ -82,7 +81,6 @@ esp_err_t ServiceMngr::RunService(ServiceParams_t serviceParams)
                         (mServiceName[SharedBus::ServiceID::UI]),
                         SharedBus::ServiceID::UI);                
             
->>>>>>> main
     err = uiCoffeeMaker->TaskInit(
         &LVGLHandle,
         tskIDLE_PRIORITY + 1,
@@ -117,9 +115,6 @@ esp_err_t ServiceMngr::RunService(ServiceParams_t serviceParams)
     }    
 #endif //CONFIG_DONE_COMPONENT_MATTER
     
-#ifdef CONFIG_DONE_COMPONENT_MQTT    
-
-#endif //CONFIG_DONE_COMPONENT_MQTT    
 
 #ifdef CONFIG_DONE_COMPONENT_MQTT
     mqttCoffeeMakerApp = Singleton<MQTTCoffeeMakerApp, const char *, SharedBus::ServiceID>::
