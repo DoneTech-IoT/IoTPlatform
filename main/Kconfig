@@ -8,7 +8,10 @@ menu "Done Main Config"
             bool "LILYGO-S3 Display board"                  
 
         config DONE_BOARDS_WROOM
-            bool "Wroom-S3 board"                                        
+            bool "Wroom-S3 board"   
+
+        config DONE_SAMPLE_COFFEE_MAKER_BOARD
+            bool "Done Evaluation Board"                                      
     endchoice        
          
     config DONE_PARTITION_TABLE_CUSTOM
