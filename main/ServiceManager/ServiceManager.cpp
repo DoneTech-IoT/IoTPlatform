@@ -103,7 +103,7 @@ static void ServiceManger_RunAllDaemons()
     GUIParams.priority = tskIDLE_PRIORITY + 1;  
     GUIParams.taskHandler = LVGLHandle;  
     GUIParams.TaskInit = GUI_TaskInit;
-    GUI_OnInitElements(GUI_Init);
+    GUI_OnInitElements(GUI_Setup);
     GUI_OnSharedBusReceived(GUI_ProcessSharedBusMsg);
     err = ServiceManager_RunService(GUIParams);
     if (err)
