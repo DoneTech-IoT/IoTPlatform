@@ -4,6 +4,7 @@
 
 #include "ServiceMngr.hpp"
 #include "Singleton.hpp"
+#include "SpiffsManager.h"
 
 static const char* TAG = "ServiceMngr";
 TaskHandle_t ServiceMngr::SrvMngHandle = nullptr;
@@ -31,6 +32,8 @@ ServiceMngr::ServiceMngr(
     esp_err_t err;    
 
     nvsFlashInit();
+
+    SpiffsInit();
 
     SharedBus sharedBus;
     if(sharedBus.Init() == ESP_OK)
