@@ -2,7 +2,7 @@ menu "Done Main Config"
 
     choice DONE_BOARDS
         prompt "Select your development board"
-        default DONE_BOARDS_LILYGO_S3        
+        default DONE_COFFEE_MAKER_BOARD        
             
         config DONE_BOARDS_LILYGO_S3
             bool "LILYGO-S3 Display board"                  
