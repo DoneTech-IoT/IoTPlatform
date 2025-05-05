@@ -15,8 +15,6 @@
 static TaskHandle_t SrvMngHandle;
 static std::shared_ptr<ServiceMngr> serviceMngr;
 
-// #define HEARTBEAT_GPIO GPIO_NUM_21
-
 // Define the heartbeat pattern in milliseconds
 const int HeartbeatPattern[] = {
     200, // First "lub" (on time)
