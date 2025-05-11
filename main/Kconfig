@@ -2,13 +2,16 @@ menu "Done Main Config"
 
     choice DONE_BOARDS
         prompt "Select your development board"
-        default DONE_BOARDS_LILYGO_S3        
+        default DONE_COFFEE_MAKER_BOARD        
             
         config DONE_BOARDS_LILYGO_S3
             bool "LILYGO-S3 Display board"                  
 
         config DONE_BOARDS_WROOM
-            bool "Wroom-S3 board"                                        
+            bool "Wroom-S3 board"   
+
+        config DONE_COFFEE_MAKER_BOARD
+            bool "Done CoffeeMaker Board"                                      
     endchoice        
          
     config DONE_PARTITION_TABLE_CUSTOM
@@ -19,7 +22,8 @@ menu "Done Main Config"
     config DONE_PARTITION_TABLE_CUSTOM_FILENAME           
         string         
         default "partitions_s3_8m.csv"  if DONE_BOARDS_WROOM
-        default "partitions_s3_16m.csv" if DONE_BOARDS_LILYGO_S3                            
+        default "partitions_s3_16m.csv" if DONE_BOARDS_LILYGO_S3
+        default "partitions_s3_16m.csv" if DONE_COFFEE_MAKER_BOARD                            
 
     menu "Done Firmware components"
         config DONE_COMPONENT_SPOTIFY
@@ -28,7 +32,7 @@ menu "Done Main Config"
 
         config DONE_COMPONENT_LVGL
             bool "LVGL component"      
-            depends on DONE_BOARDS_LILYGO_S3
+            depends on DONE_BOARDS_LILYGO_S3 || DONE_COFFEE_MAKER_BOARD
             default y         
 
         config DONE_COMPONENT_MATTER

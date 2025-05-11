@@ -10,11 +10,10 @@
 #include "ServiceMngr.hpp"
 #include "Singleton.hpp"
 #include "MatterCoffeeMaker.hpp"
+#include "BSP.h"
 
 static TaskHandle_t SrvMngHandle;
 static std::shared_ptr<ServiceMngr> serviceMngr;
-
-#define HEARTBEAT_GPIO GPIO_NUM_21
 
 // Define the heartbeat pattern in milliseconds
 const int HeartbeatPattern[] = {
@@ -41,7 +40,7 @@ extern "C" void app_main()
     gpio_config_t heartBeatConf;
     heartBeatConf.intr_type = GPIO_INTR_DISABLE;
     heartBeatConf.mode = GPIO_MODE_OUTPUT;
-    heartBeatConf.pin_bit_mask = (1ULL << HEARTBEAT_GPIO);
+    heartBeatConf.pin_bit_mask = (1ULL << BSP_HEARTBEAT_GPIO);
     heartBeatConf.pull_down_en = GPIO_PULLDOWN_DISABLE;
     heartBeatConf.pull_up_en = GPIO_PULLUP_DISABLE;
     gpio_config(&heartBeatConf);    
@@ -50,7 +49,7 @@ extern "C" void app_main()
     {
         for (int i = 0; i < HeartbeatPatternLength; i++) 
         {            
-            gpio_set_level(HEARTBEAT_GPIO, i % 2);            
+            gpio_set_level(BSP_HEARTBEAT_GPIO, i % 2);            
             vTaskDelay(pdMS_TO_TICKS(HeartbeatPattern[i]));
         }
     }
