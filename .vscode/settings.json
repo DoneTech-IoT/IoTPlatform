@@ -1,5 +1,5 @@
 {
-    "idf.adapterTargetName": "esp32s3",
+    "idf.adapterTargetName": "esp32c6",
     "files.associations": {
         "lvgl.h": "c",
         "rm67162.h": "c",
@@ -65,7 +65,7 @@
         "typeinfo": "cpp"
     },
     "idf.openOcdConfigs": [
-        "board/esp32s3-builtin.cfg"
+        "board/esp32c6-builtin.cfg"
     ],
     "idf.port": "/dev/ttyACM0",
     "idf.flashType": "UART",

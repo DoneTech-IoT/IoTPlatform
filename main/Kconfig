@@ -11,7 +11,10 @@ menu "Done Main Config"
             bool "Wroom-S3 board"   
 
         config DONE_COFFEE_MAKER_BOARD
-            bool "Done CoffeeMaker Board"                                      
+            bool "Done CoffeeMaker Board" 
+            
+        config DONE_TEST_C6
+            bool "Test C6"
     endchoice        
          
     config DONE_PARTITION_TABLE_CUSTOM
