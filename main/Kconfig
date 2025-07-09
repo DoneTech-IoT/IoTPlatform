@@ -15,6 +15,9 @@ menu "Done Main Config"
             
         config DONE_TEST_C6
             bool "Test C6"
+
+        config DONE_TEST_C3
+            bool "Test C3"
     endchoice        
          
     config DONE_PARTITION_TABLE_CUSTOM
@@ -27,7 +30,8 @@ menu "Done Main Config"
         default "partitions_s3_8m.csv"  if DONE_BOARDS_WROOM
         default "partitions_s3_16m.csv" if DONE_BOARDS_LILYGO_S3
         default "partitions_s3_16m.csv" if DONE_COFFEE_MAKER_BOARD 
-        default "partitions_c6.csv"     if DONE_TEST_C6                       
+        default "partitions_c6.csv"     if DONE_TEST_C6 
+        default "partitions_c3.csv"     if DONE_TEST_C3                                             
                            
 
     menu "Done Firmware components"
