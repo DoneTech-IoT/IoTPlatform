@@ -11,9 +11,12 @@ menu "Done Main Config"
             bool "Wroom-S3 board"   
 
         config DONE_COFFEE_MAKER_BOARD
-            bool "Done CoffeeMaker Board"                                      
-    endchoice        
-         
+            bool "Done CoffeeMaker Board" 
+
+        config DONE_TEST_C6
+            bool "Test C6"    
+    endchoice           
+
     config DONE_PARTITION_TABLE_CUSTOM
         bool 
         depends on PARTITION_TABLE_CUSTOM     
@@ -23,7 +26,9 @@ menu "Done Main Config"
         string         
         default "partitions_s3_8m.csv"  if DONE_BOARDS_WROOM
         default "partitions_s3_16m.csv" if DONE_BOARDS_LILYGO_S3
-        default "partitions_s3_16m.csv" if DONE_COFFEE_MAKER_BOARD                            
+        default "partitions_s3_16m.csv" if DONE_COFFEE_MAKER_BOARD  
+        default "partitions_c6.csv"     if DONE_TEST_C6
+                          
 
     menu "Done Firmware components"
         config DONE_COMPONENT_SPOTIFY
