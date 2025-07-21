@@ -190,6 +190,13 @@ dependencies:
     source:
       type: idf
     version: 5.4.0
+  lvgl/lvgl:
+    component_hash: d7c1ac037ae6e85d94897f807d6e7ba0946a83e720074fc95a4f6241da9f9f53
+    dependencies: []
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 8.4.0
 direct_dependencies:
 - espressif/button
 - espressif/esp_delta_ota
@@ -202,6 +209,7 @@ direct_dependencies:
 - espressif/json_parser
 - espressif/led_strip
 - espressif/mdns
+- lvgl/lvgl
 manifest_hash: e103e8b7927d4c7e15de42557d69ad1382e933f82915c587782bfd47ee311517
-target: esp32c6
+target: esp32s3
 version: 2.0.0
