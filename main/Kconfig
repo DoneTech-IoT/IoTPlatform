@@ -13,8 +13,8 @@ menu "Done Main Config"
         config DONE_COFFEE_MAKER_BOARD
             bool "Done CoffeeMaker Board" 
 
-        config DONE_TEST_C6
-            bool "Test C6"    
+        config DONE_WAVESHARE_ESP32C6
+            bool "Waveshare esp32c6"    
     endchoice  
 
     choice DONE_MATTER_DEVICE
@@ -39,7 +39,7 @@ menu "Done Main Config"
         default "partitions_s3_8m.csv"  if DONE_BOARDS_WROOM
         default "partitions_s3_16m.csv" if DONE_BOARDS_LILYGO_S3
         default "partitions_s3_16m.csv" if DONE_COFFEE_MAKER_BOARD  
-        default "partitions_c6.csv"     if DONE_TEST_C6
+        default "partitions_c6.csv"     if DONE_WAVESHARE_ESP32C6
                           
 
     menu "Done Firmware components"
