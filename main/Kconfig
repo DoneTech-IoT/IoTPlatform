@@ -13,9 +13,20 @@ menu "Done Main Config"
         config DONE_COFFEE_MAKER_BOARD
             bool "Done CoffeeMaker Board" 
 
-        config DONE_TEST_C6
-            bool "Test C6"    
-    endchoice           
+        config DONE_WAVESHARE_ESP32C6
+            bool "Waveshare esp32c6"    
+    endchoice  
+
+    choice DONE_MATTER_DEVICE
+        prompt "Select your DONE's Matter device"
+        default DONE_MATTER_DEVICE_COFFEE_MAKER
+            
+        config DONE_MATTER_DEVICE_COFFEE_MAKER
+            bool "Smart Coffee Maker"                  
+
+        config DONE_MATTER_DEVICE_REFRIGERATOR
+            bool "Smart Refrigerator"          
+    endchoice 
 
     config DONE_PARTITION_TABLE_CUSTOM
         bool 
@@ -23,11 +34,12 @@ menu "Done Main Config"
         default y 
 
     config DONE_PARTITION_TABLE_CUSTOM_FILENAME           
-        string         
+        string
+        depends on DONE_BOARDS         
         default "partitions_s3_8m.csv"  if DONE_BOARDS_WROOM
         default "partitions_s3_16m.csv" if DONE_BOARDS_LILYGO_S3
         default "partitions_s3_16m.csv" if DONE_COFFEE_MAKER_BOARD  
-        default "partitions_c6.csv"     if DONE_TEST_C6
+        default "partitions_c6.csv"     if DONE_WAVESHARE_ESP32C6
                           
 
     menu "Done Firmware components"
