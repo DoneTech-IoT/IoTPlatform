@@ -41,7 +41,6 @@ menu "Done Main Config"
         default "partitions_s3_16m.csv" if DONE_COFFEE_MAKER_BOARD  
         default "partitions_c6.csv"     if DONE_WAVESHARE_ESP32C6
                           
-
     menu "Done Firmware components"
         config DONE_COMPONENT_SPOTIFY
             bool "Spotify component"        
