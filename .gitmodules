@@ -3,7 +3,7 @@
 	url = git@github.com:DoneTech-IoT/Matter.git
 [submodule "components/UserInterface"]
 	path = components/UserInterface
-	url = git@github.com:DoneTech-IoT/CoffeeMaker_UI.git
+	url = git@github.com:DoneTech-IoT/UserInterface.git
 [submodule "components/MQTT"]
 	path = components/MQTT
 	url = git@github.com:DoneTech-IoT/MQTTS.git
